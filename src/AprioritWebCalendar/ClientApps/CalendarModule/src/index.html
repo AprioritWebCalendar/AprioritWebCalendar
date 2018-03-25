@@ -1,14 +1,57 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <title>CalendarModule</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <base href="/">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Calendar</title>
+
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
+
 <body>
-  <app-root></app-root>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+          aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        <a class="navbar-brand" href="#">Web Calendar</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">link</a></li>
+          <li><a href="#">link</a></li>
+          <li><a href="#">link</a></li>
+          <li><a href="#">link</a></li>
+        </ul>
+        <form class="navbar-form navbar-right">
+          <input type="text" class="form-control" placeholder="Search...">
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <h2>Web Calendar</h2>
+      <app-root></app-root>
+    </div>
+  </div>
+
+
+  <hr />
+  <footer>
+    <p>&copy; 2018 - Yurii Nosach & Yurii Mustafin</p>
+  </footer>
 </body>
+
 </html>

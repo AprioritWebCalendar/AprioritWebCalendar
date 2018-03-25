@@ -16,7 +16,8 @@ import { CoreModule } from '../../../CoreModule/src/app/app.module';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    CoreModule
   ],
   providers: [],
   bootstrap: [AppComponent]

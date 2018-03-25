@@ -319,3 +319,5 @@ ASALocalRun/
 # MSBuild Binary and Structured Log
 *.binlog
 
+src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/jwtOptions.json
+src/AprioritWebCalendar/AprioritWebCalendar.Web/wwwroot/*
