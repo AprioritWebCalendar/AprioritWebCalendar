@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
 using AprioritWebCalendar.Business.DomainModels;
@@ -20,16 +19,13 @@ namespace AprioritWebCalendar.Business.Services
     public class UserAuthenticationService : IUserAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JwtOptions _jwtOptions;
         private readonly IMapper _mapper;
 
         public UserAuthenticationService(
-            UserManager<ApplicationUser> userManager, 
-            IOptions<JwtOptions> jwtOptions,
+            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             _userManager = userManager;
-            _jwtOptions = jwtOptions.Value;
             _mapper = mapper;
         }
 
