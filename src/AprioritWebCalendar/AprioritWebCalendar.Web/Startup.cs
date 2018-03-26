@@ -43,6 +43,8 @@ namespace AprioritWebCalendar.Web
             // Enabling DI configs using IOptions<T>.
             services.AddOptions();
 
+            services.Configure<JwtOptions>(CustomConfiguration.GetSection("JwtOptions"));
+
             services.UseAppDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.UseIdentity();
             services.UseRepository();
@@ -125,7 +127,7 @@ namespace AprioritWebCalendar.Web
                     await next();
                 }
             });
-
+            
             app.UseMvcWithDefaultRoute();
             app.UseStaticFiles();
 
