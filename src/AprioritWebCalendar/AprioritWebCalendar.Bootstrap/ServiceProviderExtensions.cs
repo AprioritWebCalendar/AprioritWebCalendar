@@ -8,6 +8,8 @@ using AprioritWebCalendar.Data;
 using AprioritWebCalendar.Data.Interfaces;
 using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Business.Identity;
+using AprioritWebCalendar.Business.Interfaces;
+using AprioritWebCalendar.Business.Services;
 
 namespace AprioritWebCalendar.Bootstrap
 {
@@ -43,6 +45,12 @@ namespace AprioritWebCalendar.Bootstrap
         public static void UseRepository(this IServiceCollection services)
         {
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        }
+
+        public static void MapServices(this IServiceCollection services)
+        {
+            services.AddTransient<IIdentityService, IdentityService>();
+            services.AddTransient<IUserAuthenticationService, UserAuthenticationService>();
         }
     }
 }
