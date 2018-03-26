@@ -17,6 +17,7 @@ namespace AprioritWebCalendar.Web.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            // TODO: Fix.
             if (context.HttpContext.User.Identity.IsAuthenticated)
             {
                 context.Result = new ForbidResult();
