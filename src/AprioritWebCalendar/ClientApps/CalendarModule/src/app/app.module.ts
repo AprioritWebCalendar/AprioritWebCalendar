@@ -7,8 +7,6 @@ import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { CoreModule } from '../../../CoreModule/src/app/app.module';
-
 @NgModule({
   declarations: [
     AppComponent
@@ -16,8 +14,7 @@ import { CoreModule } from '../../../CoreModule/src/app/app.module';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
-    CoreModule
+    HttpModule
   ],
   providers: [],
   bootstrap: [AppComponent]
