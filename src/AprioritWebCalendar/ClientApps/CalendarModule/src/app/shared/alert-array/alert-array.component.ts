@@ -11,5 +11,5 @@ export class AlertArrayComponent {
   public alertType: string;
 
   @Input()
-  public errors: Array<string>;
+  public errors: string[];
 }

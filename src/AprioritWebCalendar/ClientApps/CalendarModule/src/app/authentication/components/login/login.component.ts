@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
-import { ErrorArray } from '../../../infrastructure/errorArray';
 import { Router } from '@angular/router';
 import { LoginModel } from './login.model';
 import { NgForm } from '@angular/forms';
+import { Response } from '@angular/http';
 
 @Component({
   selector: 'app-login',
@@ -16,31 +16,28 @@ export class LoginComponent {
     private router: Router) { }
 
   private loginModel: LoginModel = new LoginModel();
-  private errors: Array<string>;
+  private errors: string[];
 
   login(loginForm: NgForm) {
-    try {
-      this.errors = [];
+    this.errors = null;
 
-      if (!loginForm.valid)
-        return;
+    if (!loginForm.valid)
+      return;
 
-      this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password)
-        .subscribe(data => {
-          if (this.authService.isAuthenticated()){
-            this.router.navigate(['/']);
-          }
-        },
-        error => {
+    this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password)
+      .subscribe((response: Response) => {
+        if (this.authService.isAuthenticated()) {
+          this.router.navigate(['/']);
+        }
+      },
+      (response: Response) => {
+        var result = response.json();
+
+        if (result instanceof Array){
+          this.errors = result as string[];
+        } else {
           this.errors.push("Something happened. Try again!");
-        });
-    }
-    catch (e) {
-      if (e instanceof ErrorArray){
-        this.errors = e.getErrors();
-      } else {
-        alert("Something happened. Try again!");
-      }
-    }
+        }
+      });
   }
 }

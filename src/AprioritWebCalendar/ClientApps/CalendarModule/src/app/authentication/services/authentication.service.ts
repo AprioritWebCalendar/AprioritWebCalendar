@@ -2,15 +2,17 @@ import { Injectable, OnInit } from "@angular/core";
 import { Http, Response } from "@angular/http";
 import { Observable } from 'rxjs/Observable';
 import "rxjs/add/operator/map";
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 import { User } from "./../models/user";
-import { ErrorArray } from "./../../infrastructure/errorArray";
 import { ResponseExceptionHandler } from "../../infrastructure/responseExceptionHandler";
 
 @Injectable()
 export class AuthenticationService implements OnInit {
 
     private currentUser : User;
+    private token : string;
 
     constructor(private http : Http) {}
 
@@ -29,17 +31,24 @@ export class AuthenticationService implements OnInit {
     login(emailOrUserName : string, password : string) {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
-                ResponseExceptionHandler.throwExcepion(response);
-
                 this.currentUser = response.json()["User"];
+                this.token = response.json()["AccessToken"];
+
                 sessionStorage.setItem("user", JSON.stringify(this.currentUser));
+                return this.currentUser;
+            })
+            .catch(e => {
+                return Observable.throw(e);
             });
     }
 
     register(email : string, userName : string, password : string) {
         return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password})
-            .map((response : Response) => {
-                ResponseExceptionHandler.throwExcepion(response);
+            .map((response: Response) => {
+                
+            })
+            .catch(e => {
+                return Observable.throw(e);
             });
     }
 

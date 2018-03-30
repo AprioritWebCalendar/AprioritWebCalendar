@@ -1,4 +1,4 @@
-<div class="alert alert-{{alertType}}" role="alert">
+<div class="alert alert-{{alertType}}" role="alert" *ngIf="errors">
     <li *ngFor="let e of errors">{{e}}</li>
   </div>
   
