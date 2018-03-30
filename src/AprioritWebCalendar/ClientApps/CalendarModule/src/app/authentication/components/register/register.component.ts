@@ -19,8 +19,16 @@ export class RegisterComponent  {
 
   register(registerForm: NgForm) {
     try {
-      this.authService.register(this.registerModel.email, this.registerModel.userName, this.registerModel.password);
-      this.router.navigate(['/']);
+      if (!registerForm.valid)
+        return;
+
+      this.authService.register(this.registerModel.email, this.registerModel.userName, this.registerModel.password)
+        .subscribe(data => {
+          this.router.navigate(['/']);
+        },
+        error =>{
+          this.errors.push("Something happened. Try again!");
+        });
     }
     catch (e) {
       if (e instanceof ErrorArray){

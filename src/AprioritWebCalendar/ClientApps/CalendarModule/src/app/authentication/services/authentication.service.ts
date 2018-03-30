@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnInit } from "@angular/core";
 import { Http, Response } from "@angular/http";
 import { Observable } from 'rxjs/Observable';
 import "rxjs/add/operator/map";
@@ -8,10 +8,15 @@ import { ErrorArray } from "./../../infrastructure/errorArray";
 import { ResponseExceptionHandler } from "../../infrastructure/responseExceptionHandler";
 
 @Injectable()
-export class AuthenticationService {
-    constructor(private http : Http) {}
+export class AuthenticationService implements OnInit {
 
     private currentUser : User;
+
+    constructor(private http : Http) {}
+
+    ngOnInit(): void {
+        this.currentUser = JSON.parse(sessionStorage.getItem("user"));
+    }
 
     isAuthenticated() : boolean {
         return this.currentUser != null;

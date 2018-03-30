@@ -1,9 +1,9 @@
-<ul class="nav navbar-nav navbar-right" *ngIf="isAuth">
-  <li><a [routerLink]="['/profile']">{{user.UserName}}</a></li>
+<ul class="nav navbar-nav navbar-right" *ngIf="isAuthenticated()">
+  <li><a [routerLink]="['/profile']">{{getUser().UserName}}</a></li>
   <li><a href="#" (click)="logout()">Logout</a></li>
 </ul>
 
-<ul class="nav navbar-nav navbar-right" *ngIf="!isAuth">
+<ul class="nav navbar-nav navbar-right" *ngIf="!isAuthenticated()">
   <li><a [routerLink]="['/login']">Login</a></li>
   <li><a [routerLink]="['/register']">Register</a></li>
 </ul>

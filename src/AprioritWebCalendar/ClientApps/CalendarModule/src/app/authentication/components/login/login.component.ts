@@ -3,6 +3,7 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { ErrorArray } from '../../../infrastructure/errorArray';
 import { Router } from '@angular/router';
 import { LoginModel } from './login.model';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -17,13 +18,22 @@ export class LoginComponent {
   private loginModel: LoginModel = new LoginModel();
   private errors: Array<string>;
 
-  login() {
+  login(loginForm: NgForm) {
     try {
-      this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password);
+      this.errors = [];
 
-      if (this.authService.isAuthenticated()){
-        this.router.navigate(['/']);
-      }
+      if (!loginForm.valid)
+        return;
+
+      this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password)
+        .subscribe(data => {
+          if (this.authService.isAuthenticated()){
+            this.router.navigate(['/']);
+          }
+        },
+        error => {
+          this.errors.push("Something happened. Try again!");
+        });
     }
     catch (e) {
       if (e instanceof ErrorArray){

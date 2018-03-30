@@ -6,13 +6,16 @@ import { User } from '../../models/user';
   selector: 'app-auth-panel',
   templateUrl: './auth-panel.component.html'
 })
-export class AuthPanelComponent implements OnInit {
+export class AuthPanelComponent {
 
   constructor(private authService: AuthenticationService) { }
 
-  ngOnInit() {
-    let isAuth : boolean = this.authService.isAuthenticated();
-    let user : User = this.authService.getCurrentUser();
+  isAuthenticated() : boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  getUser() : User {
+    return this.authService.getCurrentUser();
   }
 
   logout() {

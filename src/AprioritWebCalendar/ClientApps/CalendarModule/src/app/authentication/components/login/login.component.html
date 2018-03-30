@@ -2,7 +2,7 @@
   <h2>Login</h2>
   <hr />
 
-  <form>
+  <form #loginForm="ngForm" novalidate>
     <div class="form-group">
       <label class="control-label" for="Login">Email or User Name</label>
       <input type="text" class="form-control" id="Login" name="Login" required
@@ -20,8 +20,10 @@
     </div>
 
     <div class="form-group">
-      <button type="submit" class="btn btn-primary" 
-        (click)="login()" [disabled]="!emailOrUserName.valid || !password.valid">Login</button>
+      <button type="button" class="btn btn-primary" 
+        (click)="login(loginForm)" [disabled]="loginForm.invalid">Login</button>
     </div>
   </form>
+
+  <app-alert-array [alertType]="danger" [errors]="errors"></app-alert-array>
 </div>
