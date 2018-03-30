@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -34,6 +35,14 @@ namespace AprioritWebCalendar.Web.Controllers
             _userAuthenticationService = userAuthenticationService;
             _mapper = mapper;
             _jwtOptions = jwtOptions.Value;
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> Get()
+        {
+            var user = await _identityService.GetUserAsync(this.GetUserId());
+            return Ok(_mapper.Map<UserViewModel>(user));
         }
 
         [HttpPost("Login")]

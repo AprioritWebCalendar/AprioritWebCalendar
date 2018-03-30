@@ -10,8 +10,9 @@ export class AuthorizeGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
         try {
             let user : User = JSON.parse(sessionStorage.getItem("user"));
+            let token : string = sessionStorage.getItem("token");
 
-            if (user == null)
+            if (user == null || token == null)
                 throw new Error();
 
             return true;
