@@ -56,13 +56,9 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<int>("RoleId");
 
-                    b.Property<int?>("RoleId1");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("RoleId1");
 
                     b.ToTable("AspNetRoleClaims");
                 });
@@ -129,13 +125,9 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<int>("UserId");
 
-                    b.Property<int?>("UserId1");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserClaims");
                 });
@@ -150,13 +142,9 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<int>("UserId");
 
-                    b.Property<int?>("UserId1");
-
                     b.HasKey("LoginProvider", "ProviderKey");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserLogins");
                 });
@@ -167,17 +155,9 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<int>("RoleId");
 
-                    b.Property<int?>("RoleId1");
-
-                    b.Property<int?>("UserId1");
-
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("RoleId1");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserRoles");
                 });
@@ -190,13 +170,9 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int?>("UserId1");
-
                     b.Property<string>("Value");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserTokens");
                 });
@@ -207,10 +183,6 @@ namespace AprioritWebCalendar.Data.Migrations
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationRole", "Role")
-                        .WithMany("AspNetRoleClaims")
-                        .HasForeignKey("RoleId1");
                 });
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.ApplicationUserClaim", b =>
@@ -219,10 +191,6 @@ namespace AprioritWebCalendar.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationUser", "User")
-                        .WithMany("AspNetUserClaims")
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.ApplicationUserLogin", b =>
@@ -231,10 +199,6 @@ namespace AprioritWebCalendar.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationUser", "User")
-                        .WithMany("AspNetUserLogins")
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.ApplicationUserRole", b =>
@@ -244,18 +208,10 @@ namespace AprioritWebCalendar.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationRole", "Role")
-                        .WithMany("AspNetUserRoles")
-                        .HasForeignKey("RoleId1");
-
                     b.HasOne("AprioritWebCalendar.Data.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationUser", "User")
-                        .WithMany("AspNetUserRoles")
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.ApplicationUserToken", b =>
@@ -264,10 +220,6 @@ namespace AprioritWebCalendar.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AprioritWebCalendar.Data.Models.ApplicationUser", "User")
-                        .WithMany("AspNetUserTokens")
-                        .HasForeignKey("UserId1");
                 });
 #pragma warning restore 612, 618
         }
