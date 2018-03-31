@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 
 namespace AprioritWebCalendar.Data.Models
 {
-    [Table("AspNetRoles")]
     public partial class ApplicationRole : IdentityRole<int>
     {
         public ApplicationRole()
         {
-            AspNetRoleClaims = new HashSet<ApplicationRoleClaim>();
-            AspNetUserRoles = new HashSet<ApplicationUserRole>();
+            UserRoles = new HashSet<IdentityUserRole<int>>();
         }
-
-        public ICollection<ApplicationRoleClaim> AspNetRoleClaims { get; set; }
-        public ICollection<ApplicationUserRole> AspNetUserRoles { get; set; }
+        
+        public ICollection<IdentityUserRole<int>> UserRoles { get; set; }
     }
 }
