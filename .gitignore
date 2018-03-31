@@ -320,3 +320,4 @@ ASALocalRun/
 *.binlog
 
 src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/jwtOptions.json
+src/AprioritWebCalendar/ClientApps/CalendarModule/dist/
