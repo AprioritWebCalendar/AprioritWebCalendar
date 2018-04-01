@@ -10,6 +10,7 @@ using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Infrastructure.Exceptions;
 using AprioritWebCalendar.ViewModel.Calendar;
 using DomainCalendar = AprioritWebCalendar.Business.DomainModels.Calendar;
+using DomainUserCalendar = AprioritWebCalendar.Business.DomainModels.UserCalendar;
 
 namespace AprioritWebCalendar.Business.Services
 {
@@ -137,6 +138,14 @@ namespace AprioritWebCalendar.Business.Services
 
             await _userCalendarRepository.UpdateAsync(userCalendar);
             await _userCalendarRepository.SaveAsync();
+        }
+
+        public async Task<IEnumerable<DomainUserCalendar>> GetUsersSharedWithAsync(int calendarId)
+        {
+            var users = await _userCalendarRepository.FindAllIncludingAsync(c => c.CalendarId == calendarId,
+                c => c.User);
+
+            return _mapper.Map<IEnumerable<DomainUserCalendar>>(users);
         }
 
         public async Task<bool> IsOwnerAsync(int calendarId, int userId)
