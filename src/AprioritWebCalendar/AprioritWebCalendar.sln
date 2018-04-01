@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.Web", "AprioritWebCalendar.Web\AprioritWebCalendar.Web.csproj", "{3B9711AD-C85C-46DD-9960-F24C869B1B59}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54C5DB29-ABD6-421E-8817-34C9821D96E8} = {54C5DB29-ABD6-421E-8817-34C9821D96E8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.Data", "AprioritWebCalendar.Data\AprioritWebCalendar.Data.csproj", "{54C5DB29-ABD6-421E-8817-34C9821D96E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.Business", "AprioritWebCalendar.Business\AprioritWebCalendar.Business.csproj", "{D023EFD0-D515-42B3-AF17-600A81D577A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.Infrastructure", "AprioritWebCalendar.Infrastructure\AprioritWebCalendar.Infrastructure.csproj", "{6918B0B4-EB4B-40A9-8C4A-A884BC4ADEB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.ViewModel", "AprioritWebCalendar.ViewModel\AprioritWebCalendar.ViewModel.csproj", "{CA6C6874-1B36-4C4C-B127-C33139B98765}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AprioritWebCalendar.Bootstrap", "AprioritWebCalendar.Bootstrap\AprioritWebCalendar.Bootstrap.csproj", "{50F85914-850B-4077-995D-A288A0FAF55D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B9711AD-C85C-46DD-9960-F24C869B1B59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9711AD-C85C-46DD-9960-F24C869B1B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9711AD-C85C-46DD-9960-F24C869B1B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9711AD-C85C-46DD-9960-F24C869B1B59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54C5DB29-ABD6-421E-8817-34C9821D96E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54C5DB29-ABD6-421E-8817-34C9821D96E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54C5DB29-ABD6-421E-8817-34C9821D96E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54C5DB29-ABD6-421E-8817-34C9821D96E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D023EFD0-D515-42B3-AF17-600A81D577A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D023EFD0-D515-42B3-AF17-600A81D577A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D023EFD0-D515-42B3-AF17-600A81D577A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D023EFD0-D515-42B3-AF17-600A81D577A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6918B0B4-EB4B-40A9-8C4A-A884BC4ADEB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6918B0B4-EB4B-40A9-8C4A-A884BC4ADEB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6918B0B4-EB4B-40A9-8C4A-A884BC4ADEB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6918B0B4-EB4B-40A9-8C4A-A884BC4ADEB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA6C6874-1B36-4C4C-B127-C33139B98765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA6C6874-1B36-4C4C-B127-C33139B98765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA6C6874-1B36-4C4C-B127-C33139B98765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA6C6874-1B36-4C4C-B127-C33139B98765}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50F85914-850B-4077-995D-A288A0FAF55D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50F85914-850B-4077-995D-A288A0FAF55D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50F85914-850B-4077-995D-A288A0FAF55D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50F85914-850B-4077-995D-A288A0FAF55D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B5072E41-457C-4802-BE3C-F9F6F1827AE3}
+	EndGlobalSection
+EndGlobal

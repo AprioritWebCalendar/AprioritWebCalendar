@@ -1,0 +1,29 @@
+<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <h2>Login</h2>
+  <hr />
+
+  <form #loginForm="ngForm" novalidate>
+    <div class="form-group">
+      <label class="control-label" for="Login">Email or User Name</label>
+      <input type="text" class="form-control" id="Login" name="Login" required
+        placeholder="Enter Email or User Name" 
+        [(ngModel)]="loginModel.emailOrUserName" #emailOrUserName="ngModel" />
+      <span class="text-danger" *ngIf="!emailOrUserName.valid && !emailOrUserName.untouched">This field is required.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label" for="Password">Password</label>
+      <input type="password" class="form-control" id="Password" name="Password" required 
+        placeholder="Enter Password"
+        [(ngModel)]="loginModel.password" #password="ngModel" />
+      <span class="text-danger" *ngIf="!password.valid && !password.untouched">This field is required.</span>
+    </div>
+
+    <div class="form-group">
+      <button type="button" class="btn btn-primary" 
+        (click)="login(loginForm)" [disabled]="loginForm.invalid">Login</button>
+    </div>
+  </form>
+
+  <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+</div>
