@@ -21,6 +21,7 @@ import { AlertComponent } from './shared/alert/alert.component';
 import { AlertArrayComponent } from './shared/alert-array/alert-array.component';
 
 import { EqualTextValidator } from 'angular2-text-equality-validator';
+import { CustomHttp } from './services/custom.http';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { EqualTextValidator } from 'angular2-text-equality-validator';
     AuthorizeGuard,
     AnonymousGuard,
 
-    AuthenticationService
+    AuthenticationService,
+    CustomHttp
   ],
   bootstrap: [AppComponent]
 })

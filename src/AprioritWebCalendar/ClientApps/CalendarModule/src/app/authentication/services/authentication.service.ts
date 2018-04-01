@@ -6,6 +6,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 
 import { User } from "./../models/user";
+import { CustomHttp } from "../../services/custom.http";
 
 @Injectable()
 export class AuthenticationService {
@@ -13,7 +14,7 @@ export class AuthenticationService {
     private currentUser : User;
     private token : string;
 
-    constructor(private http : Http) {
+    constructor(private http : Http, private customHttp : CustomHttp) {
         var token = sessionStorage.getItem("token");
 
         if (token == null)
@@ -23,6 +24,8 @@ export class AuthenticationService {
             .subscribe((response : User) => {
                 this.token = token;
                 this.currentUser = response;
+                
+                this.customHttp.configureToken(this.token);
             });
     }
 
@@ -43,6 +46,7 @@ export class AuthenticationService {
                 sessionStorage.setItem("user", JSON.stringify(this.currentUser));
                 sessionStorage.setItem("token", this.token);
 
+                this.customHttp.configureToken(this.token);
                 return this.currentUser;
             })
             .catch(e => {
