@@ -10,6 +10,7 @@ using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Business.Identity;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Services;
+using AprioritWebCalendar.Business.Validation;
 
 namespace AprioritWebCalendar.Bootstrap
 {
@@ -51,6 +52,9 @@ namespace AprioritWebCalendar.Bootstrap
         {
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IUserAuthenticationService, UserAuthenticationService>();
+
+            services.AddTransient<ICalendarService, CalendarService>();
+            services.AddTransient<ICalendarValidator, CalendarValidator>();
         }
     }
 }
