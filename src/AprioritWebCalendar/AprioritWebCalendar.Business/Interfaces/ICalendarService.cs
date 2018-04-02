@@ -36,7 +36,7 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// </summary>
         /// <param name="calendarId">ID of the calendar.</param>
         /// <param name="updateModel">View (binding model).</param>
-        Task<Calendar> UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel);
+        Task UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel);
 
         /// <summary>
         /// Deletes an existing calendar.

@@ -63,19 +63,22 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<DomainCalendar>(calendar);
         }
 
-        public async Task<DomainCalendar> UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel)
+        public async Task UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel)
         {
             var calendar = await _GetByIdAsync(calendarId);
-            calendar = _mapper.Map<Calendar>(updateModel);
+
+            calendar.Name = updateModel.Name;
+            calendar.Description = updateModel.Description;
+            calendar.Color = updateModel.Color;
 
             await _calendarRepository.UpdateAsync(calendar);
             await _calendarRepository.SaveAsync();
-
-            return _mapper.Map<DomainCalendar>(calendar);
         }
 
         public async Task DeleteCalendarAsync(int calendarId)
         {
+            // TODO: Check for existing events, etc..?
+
             var calendar = await _GetByIdAsync(calendarId);
             await _calendarRepository.RemoveAsync(calendar);
             await _calendarRepository.SaveAsync();

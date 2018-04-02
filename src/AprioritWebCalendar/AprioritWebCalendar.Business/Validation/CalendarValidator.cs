@@ -26,7 +26,7 @@ namespace AprioritWebCalendar.Business.Validation
 
             if (await _calendarRepository.AnyAsync(c => c.Name.Equals(model.Name) && c.OwnerId == ownerId))
             {
-                errors.AddError($"You already have a calendar with name {model.Name}.");
+                errors.AddError($"You already have a calendar with name {model.Name}.", "Name");
             }
 
             return errors;
@@ -38,7 +38,7 @@ namespace AprioritWebCalendar.Business.Validation
             
             if (await _calendarRepository.AnyAsync(c => c.Name.Equals(model.Name) && c.OwnerId == ownerId && c.Id != calendarId))
             {
-                errors.AddError($"You already have a calendar with name {model.Name}.");
+                errors.AddError($"You already have a calendar with name {model.Name}.", "Name");
             }
 
             return errors;

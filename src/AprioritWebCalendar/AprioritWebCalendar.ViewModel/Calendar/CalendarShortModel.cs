@@ -6,6 +6,9 @@ namespace AprioritWebCalendar.ViewModel.Calendar
 {
     public class CalendarShortModel
     {
+        [BindNever]
+        public int Id { get; set; }
+
         [StringLength(32, MinimumLength = 3), Required]
         public string Name { get; set; }
 

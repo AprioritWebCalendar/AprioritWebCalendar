@@ -32,8 +32,8 @@ namespace AprioritWebCalendar.Web.Controllers
             _calendarValidator = calendarValidator;
         }
 
-        [HttpGet("User/{id}")]
-        public async Task<IActionResult> GetUserCalendars(int id, bool onlyOwn = false)
+        [HttpGet]
+        public async Task<IActionResult> GetUserCalendars(bool onlyOwn = false)
         {
             var calendars = await _calendarService.GetCalendarsAsync(this.GetUserId(), onlyOwn);
             var viewModels = _mapper.Map<IEnumerable<CalendarShortModel>>(calendars);
@@ -75,7 +75,7 @@ namespace AprioritWebCalendar.Web.Controllers
                 return BadRequest(ModelState.ToStringEnumerable());
 
             var calendarDomain = await _calendarService.CreateCalendarAsync(model, this.GetUserId());
-            return Ok(_mapper.Map<CalendarShortModel>(calendarDomain));
+            return Ok(new { calendarDomain.Id });
         }
 
         [HttpPut("{id}"), ValidateApiModelFilter]
@@ -95,8 +95,8 @@ namespace AprioritWebCalendar.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.ToStringEnumerable());
 
-            var calendarDomain = await _calendarService.UpdateCalendarAsync(id, model);
-            return Ok(_mapper.Map<CalendarShortModel>(calendar));
+            await _calendarService.UpdateCalendarAsync(id, model);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -106,6 +106,8 @@ namespace AprioritWebCalendar.Web.Controllers
 
             if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
                 throw new ArgumentException();
+
+            // TODO: Check for existing events, etc..?
 
             await _calendarService.DeleteCalendarAsync(id);
             return Ok();
@@ -125,8 +127,8 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You can't remove sharing for your calendar.");
 
             // TODO: Replace for custom exception.
-
-            if (!await _calendarService.IsOwnerAsync(id, userId))
+            
+            if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
                 throw new ArgumentException();
 
             await _calendarService.RemoveSharingAsync(id, userId);
