@@ -44,6 +44,8 @@ namespace AprioritWebCalendar.Bootstrap
             CreateMap<Business.DomainModels.UserCalendar, Data.Models.UserCalendar>();
             CreateMap<Data.Models.UserCalendar, Business.DomainModels.UserCalendar>();
 
+            CreateMap<Business.DomainModels.UserCalendar, UserCalendarViewModel>();
+
             #endregion
 
             #region EventCalendar.

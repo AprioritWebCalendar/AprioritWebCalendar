@@ -31,5 +31,17 @@ namespace AprioritWebCalendar.Business.Validation
 
             return errors;
         }
+
+        public async Task<IEnumerable<ValidationResult>> ValidateUpdateAsync(int calendarId, CalendarShortModel model, int ownerId)
+        {
+            var errors = new List<ValidationResult>();
+            
+            if (await _calendarRepository.AnyAsync(c => c.Name.Equals(model.Name) && c.OwnerId == ownerId && c.Id != calendarId))
+            {
+                errors.AddError($"You already have a calendar with name {model.Name}.");
+            }
+
+            return errors;
+        }
     }
 }

@@ -154,6 +154,26 @@ namespace AprioritWebCalendar.Business.Services
             return calendar.OwnerId == userId;
         }
 
+        public async Task<bool> IsOwnerOrSharedWithAsync(int calendarId, int userId)
+        {
+            var calendar = await _GetByIdAsync(calendarId, c => c.SharedUsers);
+
+            if (calendar.OwnerId == userId)
+                return true;
+
+            return calendar.SharedUsers.Any(u => u.UserId == userId);
+        }
+
+        public async Task<bool> CanEditAsync(int calendarId, int userId)
+        {
+            var calendar = await _GetByIdAsync(calendarId, c => c.SharedUsers);
+
+            if (calendar.OwnerId == userId)
+                return true;
+
+            return calendar.SharedUsers.Any(u => u.UserId == userId && !u.IsReadOnly);
+        }
+
         #region Private methods.
 
         private async Task<Calendar> _GetByIdAsync(int id, params Expression<Func<Calendar, object>>[] includeProperties)

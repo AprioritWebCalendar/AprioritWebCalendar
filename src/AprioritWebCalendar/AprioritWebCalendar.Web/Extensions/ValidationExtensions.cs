@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -28,6 +29,18 @@ namespace AprioritWebCalendar.Web.Extensions
                 list.Add(err.Description);
             }
             return list;
+        }
+
+        public static ModelStateDictionary ToModelState(this IEnumerable<ValidationResult> errors, ModelStateDictionary modelState = null)
+        {
+            if (modelState == null)
+                modelState = new ModelStateDictionary();
+
+            foreach (var err in errors)
+            {
+                modelState.AddModelError(err.MemberNames.FirstOrDefault(), err.ErrorMessage);
+            }
+            return modelState;
         }
     }
 }
