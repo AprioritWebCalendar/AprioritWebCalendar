@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using AprioritWebCalendar.ViewModel.Account;
 
 namespace AprioritWebCalendar.ViewModel.Calendar
 {
@@ -13,5 +15,8 @@ namespace AprioritWebCalendar.ViewModel.Calendar
         [RegularExpression("^((0x){0,1}|#{0,1})([0-9A-F]{8}|[0-9A-F]{6})$")]
         [StringLength(7), Required]
         public string Color { get; set; }
+
+        [BindNever]
+        public UserViewModel Owner { get; set; }
     }
 }

@@ -41,14 +41,14 @@ namespace AprioritWebCalendar.Business.Services
                 predicate = c => c.OwnerId == userId || c.SharedUsers.Any(u => u.UserId == userId);
 
             var calendars = await _calendarRepository.FindAllIncludingAsync(predicate,
-                c => c.SharedUsers);
+                c => c.SharedUsers, c => c.Owner);
 
             return _mapper.Map<IEnumerable<DomainCalendar>>(calendars);
         }
 
         public async Task<DomainCalendar> GetCalendarByIdAsync(int calendarId)
         {
-            var calendar = await _GetByIdAsync(calendarId);
+            var calendar = await _GetByIdAsync(calendarId, c => c.Owner);
             return _mapper.Map<DomainCalendar>(calendar);
         }
 
