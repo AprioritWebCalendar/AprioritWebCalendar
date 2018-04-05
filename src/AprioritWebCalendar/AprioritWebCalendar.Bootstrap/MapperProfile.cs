@@ -21,14 +21,13 @@ namespace AprioritWebCalendar.Bootstrap
 
             #region Calendar.
 
-            CreateMap<Business.DomainModels.Calendar, Data.Models.Calendar>();
+            CreateMap<Business.DomainModels.Calendar, Data.Models.Calendar>()
+                .ForMember(dest => dest.Owner, opt => opt.Ignore());
+
             CreateMap<Data.Models.Calendar, Business.DomainModels.Calendar>();
 
             CreateMap<CalendarShortModel, Business.DomainModels.Calendar>();
             CreateMap<Business.DomainModels.Calendar, CalendarShortModel>();
-
-            CreateMap<CalendarShortModel, Data.Models.Calendar>();
-            CreateMap<Data.Models.Calendar, CalendarShortModel>();
 
             #endregion
 
