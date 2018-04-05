@@ -16,9 +16,9 @@ namespace AprioritWebCalendar.Data.Models
 
         public int Id { get; set; }
 
-        [ConcurrencyCheck, StringLength(32), Required]
+        [StringLength(32), Required]
         public string Name { get; set; }
-        [ConcurrencyCheck, StringLength(256)]
+        [StringLength(256)]
         public string Description { get; set; }
 
         [Required, StringLength(7)]
