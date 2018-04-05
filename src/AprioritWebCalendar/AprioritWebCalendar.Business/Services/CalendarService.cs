@@ -8,6 +8,7 @@ using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Data.Interfaces;
 using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Infrastructure.Exceptions;
+using AprioritWebCalendar.Infrastructure.Extensions;
 using AprioritWebCalendar.ViewModel.Calendar;
 using DomainCalendar = AprioritWebCalendar.Business.DomainModels.Calendar;
 using DomainUserCalendar = AprioritWebCalendar.Business.DomainModels.UserCalendar;
@@ -48,30 +49,38 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<DomainCalendar> GetCalendarByIdAsync(int calendarId)
         {
-            var calendar = await _GetByIdAsync(calendarId, c => c.Owner);
+            return await GetCalendarByIdAsync(calendarId, "Owner");
+        }
+
+        public async Task<DomainCalendar> GetCalendarByIdAsync(int calendarId, params string[] includeProperties)
+        {
+            var calendar = (await _calendarRepository.FindAllIncludingAsync(c => c.Id == calendarId, includeProperties))
+                .FirstOrDefault();
+
+            if (calendar == null)
+                throw new NotFoundException();
+
             return _mapper.Map<DomainCalendar>(calendar);
         }
 
-        public async Task<DomainCalendar> CreateCalendarAsync(CalendarShortModel createModel, int ownerId)
+        public async Task<int> CreateCalendarAsync(DomainCalendar calendar, int ownerId)
         {
-            var calendar = _mapper.Map<Calendar>(createModel);
-            calendar.OwnerId = ownerId;
+            var dataCalendar = _mapper.Map<Calendar>(calendar);
+            dataCalendar.OwnerId = ownerId;
 
-            calendar = await _calendarRepository.CreateAsync(calendar);
+            dataCalendar = await _calendarRepository.CreateAsync(dataCalendar);
             await _calendarRepository.SaveAsync();
 
-            return _mapper.Map<DomainCalendar>(calendar);
+            return dataCalendar.Id;
         }
 
-        public async Task UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel)
+        public async Task UpdateCalendarAsync(DomainCalendar calendar)
         {
-            var calendar = await _GetByIdAsync(calendarId);
-
-            calendar.Name = updateModel.Name;
-            calendar.Description = updateModel.Description;
-            calendar.Color = updateModel.Color;
-
-            await _calendarRepository.UpdateAsync(calendar);
+            var dataCalendar = await _calendarRepository.FindByIdAsync(calendar.Id);
+            //dataCalendar = _mapper.Map<Calendar>(calendar);
+            //Mapper.Map(calendar, dataCalendar, typeof(DomainCalendar), typeof(Calendar));
+            _mapper.MapToEntity(calendar, dataCalendar);
+            await _calendarRepository.UpdateAsync(dataCalendar);
             await _calendarRepository.SaveAsync();
         }
 

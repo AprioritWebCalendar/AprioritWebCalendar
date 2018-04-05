@@ -8,6 +8,7 @@ using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.ViewModel.Calendar;
 using AprioritWebCalendar.Web.Filters;
 using AprioritWebCalendar.Web.Extensions;
+using AprioritWebCalendar.Business.DomainModels;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -74,8 +75,9 @@ namespace AprioritWebCalendar.Web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.ToStringEnumerable());
 
-            var calendarDomain = await _calendarService.CreateCalendarAsync(model, this.GetUserId());
-            return Ok(new { calendarDomain.Id });
+            var domainCalendar = _mapper.Map<Calendar>(model);
+            var id = await _calendarService.CreateCalendarAsync(domainCalendar, this.GetUserId());
+            return Ok(new { Id = id });
         }
 
         [HttpPut("{id}"), ValidateApiModelFilter]
@@ -94,8 +96,13 @@ namespace AprioritWebCalendar.Web.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.ToStringEnumerable());
+            
+            calendar.Id = id;
+            calendar.Name = model.Name;
+            calendar.Description = model.Description;
+            calendar.Color = model.Color;
 
-            await _calendarService.UpdateCalendarAsync(id, model);
+            await _calendarService.UpdateCalendarAsync(calendar);
             return Ok();
         }
 
