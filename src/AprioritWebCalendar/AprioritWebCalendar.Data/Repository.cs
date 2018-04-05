@@ -51,6 +51,17 @@ namespace AprioritWebCalendar.Data
             return all;
         }
 
+        public async Task<IQueryable<TEntity>> FindAllIncludingAsync(Expression<Func<TEntity, bool>> predicate, params string[] includeProperties)
+        {
+            var all = await FindAllAsync(predicate);
+
+            foreach (var prop in includeProperties)
+            {
+                all = all.Include(prop);
+            }
+            return all;
+        }
+
         public async Task<TEntity> FindByIdAsync(int id)
         {
             return await _context.Set<TEntity>().FindAsync(id);
@@ -117,6 +128,5 @@ namespace AprioritWebCalendar.Data
         {
             await _context.SaveChangesAsync();
         }
-
     }
 }

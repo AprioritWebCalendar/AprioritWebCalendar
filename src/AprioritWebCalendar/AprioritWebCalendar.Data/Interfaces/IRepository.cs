@@ -13,6 +13,7 @@ namespace AprioritWebCalendar.Data.Interfaces
 
         Task<IQueryable<TEntity>> FindAllIncludingAsync(params Expression<Func<TEntity, object>>[] includeProperties);
         Task<IQueryable<TEntity>> FindAllIncludingAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties);
+        Task<IQueryable<TEntity>> FindAllIncludingAsync(Expression<Func<TEntity, bool>> predicate, params string[] includeProperties);
 
         Task<TEntity> FindByIdAsync(int id);
         Task<TEntity> FindByKeysAsync(params object[] values);
