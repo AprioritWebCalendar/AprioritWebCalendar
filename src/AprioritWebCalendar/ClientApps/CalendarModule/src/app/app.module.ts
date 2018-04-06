@@ -1,11 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, ApplicationModule, APP_INITIALIZER } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
 
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -23,6 +23,8 @@ import { AlertArrayComponent } from './shared/alert-array/alert-array.component'
 import { EqualTextValidator } from 'angular2-text-equality-validator';
 import { CustomHttp } from './services/custom.http';
 import { CalendarService } from './calendar/services/calendar.service';
+import { MainScreenComponent } from './calendar/components/main-screen/main-screen.component';
+import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-menu/left-calendar-menu.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import { CalendarService } from './calendar/services/calendar.service';
     LoginComponent,
     RegisterComponent,
     AlertComponent,
-    AlertArrayComponent
+    AlertArrayComponent,
+    MainScreenComponent,
+    LeftCalendarMenuComponent
   ],
   imports: [
     BrowserModule,
@@ -40,11 +44,20 @@ import { CalendarService } from './calendar/services/calendar.service';
     routing
   ],
   providers: [
-    AuthorizeGuard,
-    AnonymousGuard,
+    {
+      provide: CustomHttp,
+      deps: [XHRBackend, RequestOptions, ApplicationModule],
+      useFactory: (backend, options, aplicationService) => {
+        var customHttp = new CustomHttp(backend, options, aplicationService);
+        customHttp.getToken();
+        return customHttp;
+      }
+    },
 
     AuthenticationService,
-    CustomHttp,
+
+    AuthorizeGuard,
+    AnonymousGuard,
 
     CalendarService
   ],
