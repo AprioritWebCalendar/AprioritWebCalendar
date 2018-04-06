@@ -23,6 +23,8 @@ import { AlertArrayComponent } from './shared/alert-array/alert-array.component'
 import { EqualTextValidator } from 'angular2-text-equality-validator';
 import { CustomHttp } from './services/custom.http';
 import { CalendarService } from './calendar/services/calendar.service';
+import { MainScreenComponent } from './calendar/components/main-screen/main-screen.component';
+import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-menu/left-calendar-menu.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import { CalendarService } from './calendar/services/calendar.service';
     LoginComponent,
     RegisterComponent,
     AlertComponent,
-    AlertArrayComponent
+    AlertArrayComponent,
+    MainScreenComponent,
+    LeftCalendarMenuComponent
   ],
   imports: [
     BrowserModule,

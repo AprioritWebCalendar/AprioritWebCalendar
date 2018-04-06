@@ -1,0 +1,26 @@
+<div class="col-sm-3 col-md-2 sidebar">
+    <div class="nav nav-sidebar">
+        <div *ngIf="model.Calendars.length > 0">
+            <h4>Calendars you're assigned to:</h4>
+
+            <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars">
+                <input id="checkbox-calendar-{{c.Id}}" type="checkbox" 
+                    [(ngModel)]="c.IsChecked" (change)="calendarsChanged()" />
+                <label for="checkbox-calendar-{{c.Id}}">
+                    <span>{{c.Name}}</span>
+                    <small *ngIf="UserId != c.Owner.Id">
+                        {{c.Owner.UserName}}
+                    </small>
+                </label>
+            </li>
+        </div>
+
+        <div *ngIf="(model.Calendars.length == 0 || model.Calendars == null) && !model.IsError">
+            <app-alert [innerText]="'There are not any calendars available for you.'" [alertType]="'danger'"></app-alert>
+        </div>
+
+        <div *ngIf="model.IsError">
+            <app-alert [innerText]="'It seems we have some problems. Try to reload the page.'" [alertType]="'danger'"></app-alert>
+        </div>
+    </div>
+</div>
