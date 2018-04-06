@@ -22,6 +22,7 @@ import { AlertArrayComponent } from './shared/alert-array/alert-array.component'
 
 import { EqualTextValidator } from 'angular2-text-equality-validator';
 import { CustomHttp } from './services/custom.http';
+import { CalendarService } from './calendar/services/calendar.service';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,9 @@ import { CustomHttp } from './services/custom.http';
     AnonymousGuard,
 
     AuthenticationService,
-    CustomHttp
+    CustomHttp,
+
+    CalendarService
   ],
   bootstrap: [AppComponent]
 })
