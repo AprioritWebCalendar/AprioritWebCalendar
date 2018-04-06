@@ -9,7 +9,6 @@ using AprioritWebCalendar.Data.Interfaces;
 using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Infrastructure.Exceptions;
 using AprioritWebCalendar.Infrastructure.Extensions;
-using AprioritWebCalendar.ViewModel.Calendar;
 using DomainCalendar = AprioritWebCalendar.Business.DomainModels.Calendar;
 using DomainUserCalendar = AprioritWebCalendar.Business.DomainModels.UserCalendar;
 

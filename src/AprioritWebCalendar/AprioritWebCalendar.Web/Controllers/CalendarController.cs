@@ -54,7 +54,7 @@ namespace AprioritWebCalendar.Web.Controllers
             return Ok(calendar);
         }
 
-        [HttpGet("SharedUsers/{id}")]
+        [HttpGet("{id}/SharedUsers")]
         public async Task<IActionResult> GetSharedUsers(int id)
         {
             // TODO: Replace for custom exception.
@@ -120,14 +120,14 @@ namespace AprioritWebCalendar.Web.Controllers
             return Ok();
         }
 
-        [HttpPut("Share/{id}"), ValidateApiModelFilter]
+        [HttpPut("{id}/Share"), ValidateApiModelFilter]
         public async Task<IActionResult> Share(int id, [FromBody]CalendarShareRequest model)
         {
             await _calendarService.ShareCalendarAsync(id, model.UserId.Value, model.IsReadOnly);
             return Ok();
         }
 
-        [HttpPut("RemoveSharing/{id}")]
+        [HttpPut("{id}/RemoveSharing")]
         public async Task<IActionResult> RemoveSharing(int id, [FromBody]int userId)
         {
             if (userId == this.GetUserId())
@@ -142,7 +142,7 @@ namespace AprioritWebCalendar.Web.Controllers
             return Ok();
         }
 
-        [HttpPut("Subscribe/{id}")]
+        [HttpPut("{id}/Subscribe")]
         public async Task<IActionResult> Subscribe(int id)
         {
             // It works if calendar is already shared with user.
@@ -151,7 +151,7 @@ namespace AprioritWebCalendar.Web.Controllers
             return Ok();
         }
 
-        [HttpPut("Unsubscribe/{id}")]
+        [HttpPut("{id}/Unsubscribe")]
         public async Task<IActionResult> Unsubscribe(int id)
         {
             // It works if calendar is already shared with user.

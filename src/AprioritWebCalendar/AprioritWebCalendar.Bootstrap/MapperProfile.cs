@@ -22,7 +22,9 @@ namespace AprioritWebCalendar.Bootstrap
             #region Calendar.
 
             CreateMap<Business.DomainModels.Calendar, Data.Models.Calendar>()
-                .ForMember(dest => dest.Owner, opt => opt.Ignore());
+                .ForMember(dest => dest.Owner, opt => opt.Ignore())
+                .ForMember(dest => dest.EventCalendars, opt => opt.Ignore())
+                .ForMember(dest => dest.SharedUsers, opt => opt.Ignore());
 
             CreateMap<Data.Models.Calendar, Business.DomainModels.Calendar>();
 
@@ -33,14 +35,23 @@ namespace AprioritWebCalendar.Bootstrap
 
             #region Event.
 
-            CreateMap<Business.DomainModels.Event, Data.Models.Event>();
+            CreateMap<Business.DomainModels.Event, Data.Models.Event>()
+                .ForMember(dest => dest.Calendars, opt => opt.Ignore())
+                .ForMember(dest => dest.Invitations, opt => opt.Ignore())
+                .ForMember(dest => dest.Owner, opt => opt.Ignore())
+                .ForMember(dest => dest.Period, opt => opt.Ignore());
+
             CreateMap<Data.Models.Event, Business.DomainModels.Event>();
 
             #endregion
 
             #region UserCalendar.
 
-            CreateMap<Business.DomainModels.UserCalendar, Data.Models.UserCalendar>();
+            CreateMap<Business.DomainModels.UserCalendar, Data.Models.UserCalendar>()
+                .ForMember(dest => dest.Calendar, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
+
+
             CreateMap<Data.Models.UserCalendar, Business.DomainModels.UserCalendar>();
 
             CreateMap<Business.DomainModels.UserCalendar, UserCalendarViewModel>();
@@ -49,14 +60,21 @@ namespace AprioritWebCalendar.Bootstrap
 
             #region EventCalendar.
 
-            CreateMap<Business.DomainModels.EventCalendar, Data.Models.EventCalendar>();
+            CreateMap<Business.DomainModels.EventCalendar, Data.Models.EventCalendar>()
+                .ForMember(dest => dest.Calendar, opt => opt.Ignore())
+                .ForMember(dest => dest.Event, opt => opt.Ignore());
+
             CreateMap<Data.Models.EventCalendar, Business.DomainModels.EventCalendar>();
 
             #endregion
 
             #region Invitation.
 
-            CreateMap<Business.DomainModels.Invitation, Data.Models.Invitation>();
+            CreateMap<Business.DomainModels.Invitation, Data.Models.Invitation>()
+                .ForMember(dest => dest.Event, opt => opt.Ignore())
+                .ForMember(dest => dest.Invitator, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
+
             CreateMap<Data.Models.Invitation, Business.DomainModels.Invitation>();
 
             #endregion
