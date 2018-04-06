@@ -1,11 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, ApplicationModule, APP_INITIALIZER } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
 
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -40,11 +40,20 @@ import { CalendarService } from './calendar/services/calendar.service';
     routing
   ],
   providers: [
-    AuthorizeGuard,
-    AnonymousGuard,
+    {
+      provide: CustomHttp,
+      deps: [XHRBackend, RequestOptions, ApplicationModule],
+      useFactory: (backend, options, aplicationService) => {
+        var customHttp = new CustomHttp(backend, options, aplicationService);
+        customHttp.getToken();
+        return customHttp;
+      }
+    },
 
     AuthenticationService,
-    CustomHttp,
+
+    AuthorizeGuard,
+    AnonymousGuard,
 
     CalendarService
   ],
