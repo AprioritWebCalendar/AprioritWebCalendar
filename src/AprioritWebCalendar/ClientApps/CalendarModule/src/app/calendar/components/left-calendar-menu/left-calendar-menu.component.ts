@@ -4,6 +4,8 @@ import { LeftCalendarMenuModel } from './left-calendar-menu.model';
 import { Calendar } from '../../models/calendar';
 import { AuthenticationService } from '../../../authentication/services/authentication.service';
 import { CalendarCheck } from './calendar.check.model';
+import { DialogService } from 'ng2-bootstrap-modal';
+import { CalendarCreateComponent } from '../calendar-create/calendar-create.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -15,7 +17,8 @@ export class LeftCalendarMenuComponent implements OnInit {
 
     constructor(
         private calendarService: CalendarService,
-        private authService: AuthenticationService
+        private authService: AuthenticationService,
+        private dialogService: DialogService
     ) { }
 
     public UserId: Number;
@@ -32,6 +35,16 @@ export class LeftCalendarMenuComponent implements OnInit {
             },
             (response: Response) => {
                 this.model.IsError = true;
+            });
+    }
+
+    showCreateModal() {
+        this.dialogService.addDialog(CalendarCreateComponent)
+            .subscribe((calendar: CalendarCheck) => {
+                if (calendar != null) {
+                    calendar.Owner = this.authService.getCurrentUser();
+                    this.model.Calendars.push(calendar);
+                }
             });
     }
 
