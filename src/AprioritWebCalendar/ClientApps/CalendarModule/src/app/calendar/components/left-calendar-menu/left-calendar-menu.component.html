@@ -3,23 +3,23 @@
 <contextmenu #calendarMenu>
     <div class="dropdown open">
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li *ngIf="!contextmenu.get('item.IsReadOnly') || contextmenu.get('item.Owner.Id') == UserId">
-                <a class="dropdown-item">Edit</a>
+            <li *ngIf="!calendarMenu.get('item.IsReadOnly') || calendarMenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item" (click)="showEditModal(calendarMenu.get('item'))">Edit</a>
             </li>
 
-            <li *ngIf="contextmenu.get('item.Owner.Id') == UserId">
+            <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
                 <a class="dropdown-item">Delete</a>
             </li>
 
-            <li *ngIf="contextmenu.get('item.Owner.Id') == UserId">
+            <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
                 <a class="dropdown-item">Share</a>
             </li>
 
-            <li *ngIf="contextmenu.get('!item.IsSubscribed')">
+            <li *ngIf="calendarMenu.get('!item.IsSubscribed')">
                 <a class="dropdown-item">Subscribe</a>
             </li>
 
-            <li *ngIf="contextmenu.get('item.IsSubscribed')">
+            <li *ngIf="calendarMenu.get('item.IsSubscribed')">
                 <a class="dropdown-item">Unsubscribe</a>
             </li>
         </ul>

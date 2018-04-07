@@ -6,6 +6,7 @@ import { AuthenticationService } from '../../../authentication/services/authenti
 import { CalendarCheck } from './calendar.check.model';
 import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarCreateComponent } from '../calendar-create/calendar-create.component';
+import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/calendar-edit.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -45,6 +46,22 @@ export class LeftCalendarMenuComponent implements OnInit {
                     calendar.Owner = this.authService.getCurrentUser();
                     this.model.Calendars.push(calendar);
                 }
+            });
+    }
+
+    showEditModal(calendar: CalendarCheck) {
+        var model = {
+            Id: calendar.Id,
+            Name: calendar.Name,
+            Description: calendar.Description,
+            Color: calendar.Color
+        };
+
+        this.dialogService.addDialog(CalendarEditComponent, model)
+            .subscribe((editModel: ICalendarEditModel) => {
+                calendar.Name = editModel.Name;
+                calendar.Description = editModel.Description;
+                calendar.Color = editModel.Color;
             });
     }
 
