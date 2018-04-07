@@ -28,8 +28,10 @@ namespace AprioritWebCalendar.Bootstrap
 
             CreateMap<Data.Models.Calendar, Business.DomainModels.Calendar>();
 
-            CreateMap<CalendarShortModel, Business.DomainModels.Calendar>();
-            CreateMap<Business.DomainModels.Calendar, CalendarShortModel>();
+            CreateMap<CalendarRequestModel, Business.DomainModels.Calendar>();
+            CreateMap<Business.DomainModels.Calendar, CalendarRequestModel>();
+
+            CreateMap<Business.DomainModels.Calendar, CalendarViewModel>();
 
             #endregion
 
