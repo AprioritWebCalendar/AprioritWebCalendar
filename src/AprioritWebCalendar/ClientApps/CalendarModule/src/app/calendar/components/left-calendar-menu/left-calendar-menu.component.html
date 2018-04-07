@@ -1,11 +1,41 @@
+<!-- That's not an error. CLI builds it well. -->
+
+<contextmenu #calendarMenu>
+    <div class="dropdown open">
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li *ngIf="!contextmenu.get('item.IsReadOnly') || contextmenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item">Edit</a>
+            </li>
+
+            <li *ngIf="contextmenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item">Delete</a>
+            </li>
+
+            <li *ngIf="contextmenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item">Share</a>
+            </li>
+
+            <li *ngIf="contextmenu.get('!item.IsSubscribed')">
+                <a class="dropdown-item">Subscribe</a>
+            </li>
+
+            <li *ngIf="contextmenu.get('item.IsSubscribed')">
+                <a class="dropdown-item">Unsubscribe</a>
+            </li>
+        </ul>
+    </div>
+</contextmenu>
+
 <div class="col-sm-3 col-md-2 sidebar">
     <div class="nav nav-sidebar">
         <div *ngIf="model.Calendars.length > 0">
-            <h4>Calendars you're assigned to:</h4>
+            <h4 class="text-center">Calendars</h4>
 
-            <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars">
+            <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars"
+                [contextmenu]="[calendarMenu, {item: c}]">
                 <input id="checkbox-calendar-{{c.Id}}" type="checkbox" 
                     [(ngModel)]="c.IsChecked" (change)="calendarsChanged()" />
+
                 <label for="checkbox-calendar-{{c.Id}}">
                     <span>{{c.Name}}</span>
                     <small *ngIf="UserId != c.Owner.Id">

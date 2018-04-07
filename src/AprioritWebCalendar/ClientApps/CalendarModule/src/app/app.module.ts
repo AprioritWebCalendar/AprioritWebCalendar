@@ -9,6 +9,7 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
 import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { ContextmenuModule } from 'ng2-contextmenu';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -49,6 +50,7 @@ import { CalendarCreateComponent } from './calendar/components/calendar-create/c
 
     BootstrapModalModule,
     ColorPickerModule,
+    ContextmenuModule,
 
     routing
   ],

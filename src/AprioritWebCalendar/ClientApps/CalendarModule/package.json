@@ -27,10 +27,11 @@
     "core-js": "^2.4.1",
     "font-awesome": "^4.7.0",
     "jquery": "3.3.1",
+    "ng2-bootstrap-modal": "https://github.com/Sky4CE/ng2-bootstrap-modal/tarball/v.1.0.2",
+    "ng2-contextmenu": "^1.4.0",
     "ngx-color-picker": "^5.3.8",
     "rxjs": "^5.5.6",
-    "zone.js": "^0.8.19",
-    "ng2-bootstrap-modal": "https://github.com/Sky4CE/ng2-bootstrap-modal/tarball/v.1.0.2"
+    "zone.js": "^0.8.19"
   },
   "devDependencies": {
     "@angular/cli": "~1.7.3",
