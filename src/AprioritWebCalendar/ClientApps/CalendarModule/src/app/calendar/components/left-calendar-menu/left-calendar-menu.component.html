@@ -12,7 +12,7 @@
             </li>
 
             <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
-                <a class="dropdown-item">Share</a>
+                <a class="dropdown-item" (click)="showShareModal(calendarMenu.get('item'))">Share</a>
             </li>
 
             <li *ngIf="!calendarMenu.get('item.IsSubscribed')">

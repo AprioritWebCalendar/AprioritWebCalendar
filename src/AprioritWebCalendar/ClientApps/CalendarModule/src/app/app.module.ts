@@ -32,6 +32,8 @@ import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-m
 import { CalendarCreateComponent } from './calendar/components/calendar-create/calendar-create.component';
 import { CalendarEditComponent } from './calendar/components/calendar-edit/calendar-edit.component';
 import { CalendarDeleteComponent } from './calendar/components/calendar-delete/calendar-delete.component';
+import { ShareCalendarComponent } from './calendar/components/share-calendar/share-calendar.component';
+import { SharedUsersListComponent } from './calendar/components/shared-users-list/shared-users-list.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import { CalendarDeleteComponent } from './calendar/components/calendar-delete/c
     LeftCalendarMenuComponent,
     CalendarCreateComponent,
     CalendarEditComponent,
-    CalendarDeleteComponent
+    CalendarDeleteComponent,
+    ShareCalendarComponent,
+    SharedUsersListComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +84,8 @@ import { CalendarDeleteComponent } from './calendar/components/calendar-delete/c
   entryComponents: [
       CalendarCreateComponent,
       CalendarEditComponent,
-      CalendarDeleteComponent
+      CalendarDeleteComponent,
+      ShareCalendarComponent
     ]
 })
 export class CalendarModule { }
