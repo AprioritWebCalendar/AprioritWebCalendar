@@ -7,6 +7,7 @@ import { CalendarCheck } from './calendar.check.model';
 import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarCreateComponent } from '../calendar-create/calendar-create.component';
 import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/calendar-edit.component';
+import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -62,6 +63,21 @@ export class LeftCalendarMenuComponent implements OnInit {
                 calendar.Name = editModel.Name;
                 calendar.Description = editModel.Description;
                 calendar.Color = editModel.Color;
+            });
+    }
+
+    showDeleteModal(calendar: CalendarCheck) {
+        var model = {
+            Id: calendar.Id,
+            Name: calendar.Name
+        };
+
+        this.dialogService.addDialog(CalendarDeleteComponent, model)
+            .subscribe((isOk: boolean) => {
+                if (!isOk)
+                    return;
+
+                this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
             });
     }
 

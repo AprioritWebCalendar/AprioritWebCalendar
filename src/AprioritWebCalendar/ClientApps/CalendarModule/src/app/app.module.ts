@@ -31,6 +31,7 @@ import { MainScreenComponent } from './calendar/components/main-screen/main-scre
 import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-menu/left-calendar-menu.component';
 import { CalendarCreateComponent } from './calendar/components/calendar-create/calendar-create.component';
 import { CalendarEditComponent } from './calendar/components/calendar-edit/calendar-edit.component';
+import { CalendarDeleteComponent } from './calendar/components/calendar-delete/calendar-delete.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { CalendarEditComponent } from './calendar/components/calendar-edit/calen
     MainScreenComponent,
     LeftCalendarMenuComponent,
     CalendarCreateComponent,
-    CalendarEditComponent
+    CalendarEditComponent,
+    CalendarDeleteComponent
   ],
   imports: [
     BrowserModule,
@@ -77,7 +79,8 @@ import { CalendarEditComponent } from './calendar/components/calendar-edit/calen
   bootstrap: [AppComponent],
   entryComponents: [
       CalendarCreateComponent,
-      CalendarEditComponent
+      CalendarEditComponent,
+      CalendarDeleteComponent
     ]
 })
 export class CalendarModule { }
