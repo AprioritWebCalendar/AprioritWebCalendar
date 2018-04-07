@@ -48,7 +48,7 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<DomainCalendar> GetCalendarByIdAsync(int calendarId)
         {
-            return await GetCalendarByIdAsync(calendarId, "Owner");
+            return await GetCalendarByIdAsync(calendarId, "Owner", "SharedUsers");
         }
 
         public async Task<DomainCalendar> GetCalendarByIdAsync(int calendarId, params string[] includeProperties)

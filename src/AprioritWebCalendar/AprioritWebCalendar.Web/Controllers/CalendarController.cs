@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,22 +37,28 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserCalendars(bool onlyOwn = false)
         {
-            var calendars = await _calendarService.GetCalendarsAsync(this.GetUserId(), onlyOwn);
-            var viewModels = _mapper.Map<IEnumerable<CalendarShortModel>>(calendars);
+            var userId = this.GetUserId();
+
+            var calendars = await _calendarService.GetCalendarsAsync(userId, onlyOwn);
+            var viewModels = _mapper.MapToCalendarViewModel(calendars.ToList(), userId);
+
             return this.OkOrNoContent(viewModels);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
+            var userId = this.GetUserId();
             // TODO: Replace for custom exception.
 
             // A calendar can be got only by owner or a user that the calendar shared with.
-            if (!await _calendarService.IsOwnerOrSharedWithAsync(id, this.GetUserId()))
+            if (!await _calendarService.IsOwnerOrSharedWithAsync(id, userId))
                 throw new ArgumentException();
 
-            var calendar = _mapper.Map<CalendarShortModel>(await _calendarService.GetCalendarByIdAsync(id));
-            return Ok(calendar);
+            var domainCalendar = await _calendarService.GetCalendarByIdAsync(id);
+
+            var calendarVM = _mapper.MapToCalendarViewModel(domainCalendar, userId);
+            return Ok(calendarVM);
         }
 
         [HttpGet("{id}/SharedUsers")]
@@ -68,7 +75,7 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPost, ValidateApiModelFilter]
-        public async Task<IActionResult> Create([FromBody]CalendarShortModel model)
+        public async Task<IActionResult> Create([FromBody]CalendarRequestModel model)
         {
             (await _calendarValidator.ValidateCreateAsync(model, this.GetUserId())).ToModelState(ModelState);
 
@@ -81,7 +88,7 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPut("{id}"), ValidateApiModelFilter]
-        public async Task<IActionResult> Update(int id, [FromBody]CalendarShortModel model)
+        public async Task<IActionResult> Update(int id, [FromBody]CalendarRequestModel model)
         {
             // TODO: Replace for custom exception.
 
