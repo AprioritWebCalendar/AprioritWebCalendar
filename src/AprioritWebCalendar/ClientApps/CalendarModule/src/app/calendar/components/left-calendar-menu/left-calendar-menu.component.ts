@@ -81,6 +81,32 @@ export class LeftCalendarMenuComponent implements OnInit {
             });
     }
 
+    subscribeCalendar(calendar: CalendarCheck) {
+        if (!confirm(`Subscribe calendar "${calendar.Name}"?`))
+            return;
+
+        this.calendarService.subscribeCalendar(calendar.Id)
+            .subscribe((isOk: boolean) => {
+                calendar.IsSubscribed = true;
+            },
+            (resp: Response) => {
+                // TODO: Notifications.
+            });
+    }
+
+    unsubscribeCalendar(calendar: CalendarCheck) {
+        if (!confirm(`Unsubscribe calendar "${calendar.Name}"?`))
+            return;
+
+        this.calendarService.unsubscribeCalendar(calendar.Id)
+            .subscribe((isOk: boolean) => {
+                calendar.IsSubscribed = false;
+            },
+            (resp: Response) => {
+                // TODO: Notifications.
+            });
+    }
+
     @Output()
     onCalendarsChanged = new EventEmitter<Number[]>();
 
