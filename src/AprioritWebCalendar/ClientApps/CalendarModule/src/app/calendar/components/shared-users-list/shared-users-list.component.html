@@ -1,0 +1,34 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        Users, that calendar is chared with.
+    </div>
+
+    <table class="table table-stripped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Read Only</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let userCal of sharedUsers">
+                <td>{{userCal.User.UserName}}</td>
+
+                <td>
+                    <div class="checkbox checkbox-danger">
+                        <input type="checkbox" id="readonly-checkbox-u{{userCal.User.Id}}" 
+                            [(ngModel)]="userCal.IsReadOnly" (change)="readOnlyStateChanged(userCal)" />
+
+                        <label for="readonly-checkbox-u{{userCal.User.Id}}"></label>
+                    </div>
+                </td>
+
+                <td>
+                    <a (click)="removeSharing(userCal)"><span class="glyphicon glyphicon-remove icon-red clickable"></span></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

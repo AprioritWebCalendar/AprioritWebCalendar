@@ -166,5 +166,20 @@ namespace AprioritWebCalendar.Web.Controllers
             await _calendarService.UnsunscribeCalendarAsync(id, this.GetUserId());
             return Ok();
         }
+
+        [HttpPut("{id}/ReadOnly/{userId}")]
+        public async Task<IActionResult> SetReadOnly(int id, int userId, [FromBody]bool isReadOnly)
+        {
+            if (userId == this.GetUserId())
+                return this.BadRequestError("You can't change this status for yourself.");
+
+            // TODO: Replace for custom exception.
+
+            if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
+                throw new ArgumentException();
+
+            await _calendarService.SetReadOnlyStatusAsync(id, userId, isReadOnly);
+            return Ok();
+        }
     }
 }

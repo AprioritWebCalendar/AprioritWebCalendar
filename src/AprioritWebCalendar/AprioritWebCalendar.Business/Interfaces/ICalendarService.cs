@@ -91,6 +91,15 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<IEnumerable<UserCalendar>> GetUsersSharedWithAsync(int calendarId);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="calendarId"></param>
+        /// <param name="userId"></param>
+        /// <param name="isReadOnly"></param>
+        /// <returns></returns>
+        Task SetReadOnlyStatusAsync(int calendarId, int userId, bool isReadOnly);
+
+        /// <summary>
         /// Checks user is owner of calendar.
         /// </summary>
         /// <param name="calendarId">ID of the calendar.</param>

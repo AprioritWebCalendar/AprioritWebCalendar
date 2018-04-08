@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -43,6 +44,15 @@ namespace AprioritWebCalendar.Business.Services
         {
             var user = await _userRepository.FindByIdAsync(id);
             return _mapper.Map<User>(user);
+        }
+
+        public async Task<IEnumerable<User>> FindUsersAsync(string emailOrUserName, int currentUserId)
+        {
+            Expression<Func<ApplicationUser, bool>> filter = u => u.Id != currentUserId
+                && (u.Email.IndexOf(emailOrUserName) >= 0 || u.UserName.IndexOf(emailOrUserName) >= 0);
+
+            var users = await _userRepository.FindAllAsync(filter);
+            return _mapper.Map<IEnumerable<User>>(users);
         }
     }
 }

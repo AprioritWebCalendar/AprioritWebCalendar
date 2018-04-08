@@ -8,11 +8,12 @@ import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarCreateComponent } from '../calendar-create/calendar-create.component';
 import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/calendar-edit.component';
 import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.component';
+import { ShareCalendarComponent } from '../share-calendar/share-calendar.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
     templateUrl: './left-calendar-menu.component.html',
-    styleUrls: ['./left.menu.css', './checkbox.css']
+    styleUrls: ['./left.menu.css']
 })
 export class LeftCalendarMenuComponent implements OnInit {
     public model: LeftCalendarMenuModel = new LeftCalendarMenuModel();
@@ -79,6 +80,16 @@ export class LeftCalendarMenuComponent implements OnInit {
 
                 this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
             });
+    }
+
+    showShareModal(calendar: CalendarCheck) {
+        var model = { 
+            Id: calendar.Id,
+            Name: calendar.Name,
+            Owner: calendar.Owner
+        };
+
+        this.dialogService.addDialog(ShareCalendarComponent, model);
     }
 
     subscribeCalendar(calendar: CalendarCheck) {

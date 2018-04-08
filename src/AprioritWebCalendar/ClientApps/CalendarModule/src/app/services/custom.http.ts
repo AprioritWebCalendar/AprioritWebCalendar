@@ -17,7 +17,7 @@ export class CustomHttp extends Http {
 
         this.token = token;
         sessionStorage.setItem("token", token);
-        this._defaultOptions.headers.set("Authorization", `Bearer ${token}`);
+        this.attachToken(this._defaultOptions);
         console.log("The CustomHttp has been configured.");
     }
 
@@ -39,6 +39,10 @@ export class CustomHttp extends Http {
             this.configureToken(token);
             console.log("The token has been found"); 
         });
+    }
+
+    public attachToken(options: RequestOptions) {
+        options.headers.set("Authorization", `Bearer ${this.token}`);
     }
 
     public tokenExists() : boolean {

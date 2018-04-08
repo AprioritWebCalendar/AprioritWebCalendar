@@ -1,0 +1,27 @@
+<div class="form-group">
+        <label class="control-label" for="emailOrUserName">Choose a user to share</label>
+
+        <input type="text" id="emailOrUserName" name="emailOrUserName" class="form-control"
+            typeaheadOptionField="UserName"
+            [typeaheadMinLength]="4"
+            [(ngModel)]="emailOrUserName"
+            [typeahead]="users"
+            (typeaheadOnSelect)="typeaheadOnSelect($event)" />
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="selected-username">User to share:</label>
+        <span name="selected-username">{{selectedUser.UserName}}</span>
+    </div>
+
+    <div class="form-group">
+        <div class="checkbox checkbox-danger">
+            <input type="checkbox" [(ngModel)]="isReadOnly" id="read-only" />
+            <label for="read-only">Read Only</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="button" class="btn btn-primary"
+            (click)="shareCalendar()">Share</button>
+    </div>
