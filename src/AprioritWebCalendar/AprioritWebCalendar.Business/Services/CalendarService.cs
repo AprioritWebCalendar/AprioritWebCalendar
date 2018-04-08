@@ -159,6 +159,21 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<IEnumerable<DomainUserCalendar>>(users);
         }
 
+        public async Task SetReadOnlyStatusAsync(int calendarId, int userId, bool isReadOnly)
+        {
+            var userCalendar = await _GetUserCalendarAsync(userId, calendarId);
+
+            // TODO: Replace for custom exception.
+
+            if (userCalendar.IsReadOnly == isReadOnly)
+                throw new InvalidOperationException();
+
+            userCalendar.IsReadOnly = isReadOnly;
+
+            await _userCalendarRepository.UpdateAsync(userCalendar);
+            await _userCalendarRepository.SaveAsync();
+        }
+
         public async Task<bool> IsOwnerAsync(int calendarId, int userId)
         {
             var calendar = await _GetByIdAsync(calendarId);
