@@ -31,7 +31,7 @@ export class CalendarService {
             });
     }
 
-    public getSharedUsers(id: Number) : Observable<UserCalendar> {
+    public getSharedUsers(id: Number) : Observable<UserCalendar[]> {
         return this.customHttp.get(`${this.baseUrl}${id}/SharedUsers`)
             .map((response: Response) => {
                 return response.json();

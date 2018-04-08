@@ -7,6 +7,10 @@ import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
+import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
+import { ColorPickerModule } from 'ngx-color-picker';
+import { ContextmenuModule } from 'ng2-contextmenu';
+
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
 import { AuthorizeGuard } from './guards/authorize.guard';
@@ -25,6 +29,9 @@ import { CustomHttp } from './services/custom.http';
 import { CalendarService } from './calendar/services/calendar.service';
 import { MainScreenComponent } from './calendar/components/main-screen/main-screen.component';
 import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-menu/left-calendar-menu.component';
+import { CalendarCreateComponent } from './calendar/components/calendar-create/calendar-create.component';
+import { CalendarEditComponent } from './calendar/components/calendar-edit/calendar-edit.component';
+import { CalendarDeleteComponent } from './calendar/components/calendar-delete/calendar-delete.component';
 
 @NgModule({
   declarations: [
@@ -35,12 +42,20 @@ import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-m
     AlertComponent,
     AlertArrayComponent,
     MainScreenComponent,
-    LeftCalendarMenuComponent
+    LeftCalendarMenuComponent,
+    CalendarCreateComponent,
+    CalendarEditComponent,
+    CalendarDeleteComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
+
+    BootstrapModalModule,
+    ColorPickerModule,
+    ContextmenuModule,
+
     routing
   ],
   providers: [
@@ -61,6 +76,11 @@ import { LeftCalendarMenuComponent } from './calendar/components/left-calendar-m
 
     CalendarService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+      CalendarCreateComponent,
+      CalendarEditComponent,
+      CalendarDeleteComponent
+    ]
 })
 export class CalendarModule { }

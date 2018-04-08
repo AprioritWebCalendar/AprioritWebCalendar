@@ -6,4 +6,7 @@ export class Calendar {
     public Description: string;
     public Color: string;
     public Owner: User;
+
+    public IsReadOnly?: boolean;
+    public IsSubscribed?: boolean;
 }

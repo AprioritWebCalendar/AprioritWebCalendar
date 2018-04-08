@@ -1,11 +1,41 @@
+<!-- That's not an error. CLI builds it well. -->
+
+<contextmenu #calendarMenu>
+    <div class="dropdown open">
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li *ngIf="!calendarMenu.get('item.IsReadOnly') || calendarMenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item" (click)="showEditModal(calendarMenu.get('item'))">Edit</a>
+            </li>
+
+            <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item" (click)="showDeleteModal(calendarMenu.get('item'))">Delete</a>
+            </li>
+
+            <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
+                <a class="dropdown-item">Share</a>
+            </li>
+
+            <li *ngIf="!calendarMenu.get('item.IsSubscribed')">
+                <a class="dropdown-item" (click)="subscribeCalendar(calendarMenu.get('item'))">Subscribe</a>
+            </li>
+
+            <li *ngIf="calendarMenu.get('item.IsSubscribed')">
+                <a class="dropdown-item" (click)="unsubscribeCalendar(calendarMenu.get('item'))">Unsubscribe</a>
+            </li>
+        </ul>
+    </div>
+</contextmenu>
+
 <div class="col-sm-3 col-md-2 sidebar">
     <div class="nav nav-sidebar">
         <div *ngIf="model.Calendars.length > 0">
-            <h4>Calendars you're assigned to:</h4>
+            <h4 class="text-center">Calendars</h4>
 
-            <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars">
+            <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars"
+                [contextmenu]="[calendarMenu, {item: c}]">
                 <input id="checkbox-calendar-{{c.Id}}" type="checkbox" 
                     [(ngModel)]="c.IsChecked" (change)="calendarsChanged()" />
+
                 <label for="checkbox-calendar-{{c.Id}}">
                     <span>{{c.Name}}</span>
                     <small *ngIf="UserId != c.Owner.Id">
@@ -22,5 +52,13 @@
         <div *ngIf="model.IsError">
             <app-alert [innerText]="'It seems we have some problems. Try to reload the page.'" [alertType]="'danger'"></app-alert>
         </div>
+    </div>
+
+    <hr>
+    
+    <div class="nav nav-sidebar">
+        <button type="button" class="btn btn-success col-md-offset-3" (click)="showCreateModal()">
+            Create new
+        </button>
     </div>
 </div>
