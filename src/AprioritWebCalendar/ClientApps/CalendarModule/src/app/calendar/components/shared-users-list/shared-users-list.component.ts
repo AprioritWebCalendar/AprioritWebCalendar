@@ -1,13 +1,17 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { UserCalendar } from '../../models/user.calendar';
 import { CalendarService } from '../../services/calendar.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
     selector: 'app-shared-users-list',
     templateUrl: './shared-users-list.component.html'
 })
 export class SharedUsersListComponent {
-    constructor(private calendarService: CalendarService) {}
+    constructor(
+        private calendarService: CalendarService,
+        private userService: UserService
+    ) {}
 
     @Input()
     id: Number;

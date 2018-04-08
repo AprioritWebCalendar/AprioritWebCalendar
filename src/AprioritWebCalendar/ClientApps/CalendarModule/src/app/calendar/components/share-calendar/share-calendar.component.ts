@@ -41,4 +41,8 @@ export class ShareCalendarComponent
 
             });
     }
+
+    addShared(userCalendar: UserCalendar) {
+        this.sharedUsers.push(userCalendar);
+    }
 }

@@ -10,6 +10,7 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -34,6 +35,8 @@ import { CalendarEditComponent } from './calendar/components/calendar-edit/calen
 import { CalendarDeleteComponent } from './calendar/components/calendar-delete/calendar-delete.component';
 import { ShareCalendarComponent } from './calendar/components/share-calendar/share-calendar.component';
 import { SharedUsersListComponent } from './calendar/components/shared-users-list/shared-users-list.component';
+import { UserService } from './services/user.service';
+import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +52,8 @@ import { SharedUsersListComponent } from './calendar/components/shared-users-lis
     CalendarEditComponent,
     CalendarDeleteComponent,
     ShareCalendarComponent,
-    SharedUsersListComponent
+    SharedUsersListComponent,
+    SelectUserShareComponent
   ],
   imports: [
     BrowserModule,
@@ -59,6 +63,7 @@ import { SharedUsersListComponent } from './calendar/components/shared-users-lis
     BootstrapModalModule,
     ColorPickerModule,
     ContextmenuModule,
+    TypeaheadModule.forRoot(),
 
     routing
   ],
@@ -78,7 +83,8 @@ import { SharedUsersListComponent } from './calendar/components/shared-users-lis
     AuthorizeGuard,
     AnonymousGuard,
 
-    CalendarService
+    CalendarService,
+    UserService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
