@@ -16,7 +16,14 @@ export class SharedUsersListComponent {
     sharedUsers: UserCalendar[];
 
     readOnlyStateChanged(userCalendar: UserCalendar) {
-        console.log(userCalendar);
+        this.calendarService.setReadOnly(this.id, userCalendar.User.Id, userCalendar.IsReadOnly)
+            .subscribe((isOk: boolean) => {
+                if (!isOk)
+                    return;
+            },
+            (e: Response) => {
+                // TODO: Notification.
+            });
     }
 
     removeSharing(userCalendar: UserCalendar) {
