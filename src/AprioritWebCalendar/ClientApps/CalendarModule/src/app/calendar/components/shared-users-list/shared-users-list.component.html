@@ -3,11 +3,12 @@
         Users, that calendar is chared with.
     </div>
 
-    <table class="table">
+    <table class="table table-stripped">
         <thead>
             <tr>
                 <th>User</th>
                 <th>Read Only</th>
+                <th></th>
             </tr>
         </thead>
 
@@ -17,11 +18,15 @@
 
                 <td>
                     <div class="checkbox checkbox-danger">
-                        <input type="checkbox" id="readonly-checkbox-u{{userCal.User.Id}}"
+                        <input type="checkbox" id="readonly-checkbox-u{{userCal.User.Id}}" 
                             [(ngModel)]="userCal.IsReadOnly" (change)="readOnlyStateChanged(userCal)" />
 
                         <label for="readonly-checkbox-u{{userCal.User.Id}}"></label>
                     </div>
+                </td>
+
+                <td>
+                    <a (click)="removeSharing(userCal)"><span class="glyphicon glyphicon-remove icon-red clickable"></span></a>
                 </td>
             </tr>
         </tbody>

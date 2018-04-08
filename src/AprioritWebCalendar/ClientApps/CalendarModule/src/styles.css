@@ -28,3 +28,12 @@ body {
         display: none;
     }
 }
+
+/* Custom */
+.icon-red {
+    color: rgb(209, 91, 71);
+}
+
+.clickable {
+    cursor: pointer;
+}

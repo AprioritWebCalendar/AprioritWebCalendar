@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Response } from "@angular/http";
+import { Response, RequestOptions, Headers } from "@angular/http";
 import { CustomHttp } from "../../services/custom.http";
 import { Observable } from "rxjs/Observable";
 import { Calendar } from "../models/calendar";
@@ -87,7 +87,12 @@ export class CalendarService {
     }
 
     public removeSharingCalendar(id: Number, userId: Number) : Observable<boolean> {
-        return this.customHttp.put(`${this.baseUrl}${id}/RemoveSharing`, userId)
+        var opts = new RequestOptions();
+        opts.headers = new Headers();
+        opts.headers.set("Content-Type", "application/json");
+        this.customHttp.attachToken(opts);
+
+        return this.customHttp.put(`${this.baseUrl}${id}/RemoveSharing`, userId, opts)
             .map((response: Response) => {
                 return true;
             })
