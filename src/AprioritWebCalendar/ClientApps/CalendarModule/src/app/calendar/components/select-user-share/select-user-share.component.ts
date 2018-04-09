@@ -6,6 +6,7 @@ import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 import { Observer } from 'rxjs/Observer';
 import { CalendarService } from '../../services/calendar.service';
 import { UserCalendar } from '../../models/user.calendar';
+import { ToastsManager } from 'ng2-toastr';
 
 @Component({
     selector: 'app-select-user-share',
@@ -19,14 +20,12 @@ export class SelectUserShareComponent {
     @Input()
     id: Number;
 
-    @Input()
-    sharedUsers: UserCalendar[];
-
     isReadOnly: boolean = true;
 
     constructor(
         private userService: UserService,
-        private calendarService: CalendarService
+        private calendarService: CalendarService,
+        private toastr: ToastsManager
     ) {
         this.users = Observable.create((observer: any) => {
             userService.findUsersByEmailOrUserName(this.emailOrUserName)
@@ -44,9 +43,10 @@ export class SelectUserShareComponent {
         this.calendarService.shareCalendar(this.id, this.selectedUser.Id, this.isReadOnly)
             .subscribe(isOk => {
                 this.onCalendarShared.emit(userCalendar);
+                this.toastr.success("The calendar has been shared successfully.");
             },
             (e: Response) => {
-                // TODO: Show notification.
+                this.toastr.error("Unable to share the calendar.");
             });
     }
 

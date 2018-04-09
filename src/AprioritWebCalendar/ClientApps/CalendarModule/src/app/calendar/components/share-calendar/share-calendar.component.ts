@@ -22,6 +22,7 @@ export class ShareCalendarComponent
     Owner: User;
 
     public sharedUsers: UserCalendar[] = [];
+    isError: boolean = false;
 
     constructor(
         public dialogService: DialogService,
@@ -38,7 +39,7 @@ export class ShareCalendarComponent
                     this.sharedUsers = users;
             },
             (resp: Response) => {
-
+                this.isError = true;
             });
     }
 

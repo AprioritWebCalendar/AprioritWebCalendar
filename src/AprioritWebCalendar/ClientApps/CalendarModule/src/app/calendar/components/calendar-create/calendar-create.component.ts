@@ -21,7 +21,9 @@ export class CalendarCreateComponent extends DialogComponent<CalendarCreateModel
         super(dialogService);
      }
 
-    createColor(createForm: NgForm) {
+     createCalendar(createForm: NgForm) {
+        this.errors = [];
+
         if (!createForm.valid || this.model.Color == undefined)
             return;
 

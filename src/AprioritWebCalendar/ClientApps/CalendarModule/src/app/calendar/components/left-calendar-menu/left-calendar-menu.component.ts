@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewContainerRef } from '@angular/core';
 import { CalendarService } from '../../services/calendar.service';
 import { LeftCalendarMenuModel } from './left-calendar-menu.model';
 import { Calendar } from '../../models/calendar';
@@ -9,6 +9,7 @@ import { CalendarCreateComponent } from '../calendar-create/calendar-create.comp
 import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/calendar-edit.component';
 import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.component';
 import { ShareCalendarComponent } from '../share-calendar/share-calendar.component';
+import { ToastsManager } from 'ng2-toastr';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -21,8 +22,10 @@ export class LeftCalendarMenuComponent implements OnInit {
     constructor(
         private calendarService: CalendarService,
         private authService: AuthenticationService,
-        private dialogService: DialogService
-    ) { }
+        private dialogService: DialogService,
+        private toastr: ToastsManager
+    ) {
+     }
 
     public UserId: Number;
 
@@ -38,6 +41,7 @@ export class LeftCalendarMenuComponent implements OnInit {
             },
             (response: Response) => {
                 this.model.IsError = true;
+                this.toastr.error("It seems we have some problems. Try to reload the page.");
             });
     }
 
@@ -47,6 +51,8 @@ export class LeftCalendarMenuComponent implements OnInit {
                 if (calendar != null) {
                     calendar.Owner = this.authService.getCurrentUser();
                     this.model.Calendars.push(calendar);
+
+                    this.toastr.success("The calendar has been created successfully.");
                 }
             });
     }
@@ -64,6 +70,8 @@ export class LeftCalendarMenuComponent implements OnInit {
                 calendar.Name = editModel.Name;
                 calendar.Description = editModel.Description;
                 calendar.Color = editModel.Color;
+
+                this.toastr.success("The calendar has been updated successfully.");
             });
     }
 
@@ -79,6 +87,7 @@ export class LeftCalendarMenuComponent implements OnInit {
                     return;
 
                 this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
+                this.toastr.success("The calendar has been deleted successfully.");
             });
     }
 
@@ -99,9 +108,10 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.calendarService.subscribeCalendar(calendar.Id)
             .subscribe((isOk: boolean) => {
                 calendar.IsSubscribed = true;
+                this.toastr.success("You have subscribed to the calendar.");
             },
             (resp: Response) => {
-                // TODO: Notifications.
+                this.toastr.error("Unable to subscribe to the calendar. Try to reload the page.");
             });
     }
 
@@ -112,9 +122,10 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.calendarService.unsubscribeCalendar(calendar.Id)
             .subscribe((isOk: boolean) => {
                 calendar.IsSubscribed = false;
+                this.toastr.success("You have unsubscribed from the calendar.");
             },
             (resp: Response) => {
-                // TODO: Notifications.
+                this.toastr.error("Unable to unsubscribe from the calendar. Try to reload the page.");
             });
     }
 

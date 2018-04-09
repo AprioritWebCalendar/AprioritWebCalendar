@@ -34,6 +34,8 @@ export class CalendarEditComponent extends DialogComponent<ICalendarEditModel, I
 
     
     editCalendar(editForm: NgForm) {
+        this.errors = [];
+
         if (!editForm.valid || this.Color == undefined)
             return;
 

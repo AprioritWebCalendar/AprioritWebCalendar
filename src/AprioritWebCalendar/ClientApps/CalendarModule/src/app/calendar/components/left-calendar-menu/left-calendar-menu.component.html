@@ -15,11 +15,11 @@
                 <a class="dropdown-item" (click)="showShareModal(calendarMenu.get('item'))">Share</a>
             </li>
 
-            <li *ngIf="!calendarMenu.get('item.IsSubscribed')">
+            <li *ngIf="!calendarMenu.get('item.IsSubscribed') && calendarMenu.get('item.Owner.Id') != UserId">
                 <a class="dropdown-item" (click)="subscribeCalendar(calendarMenu.get('item'))">Subscribe</a>
             </li>
 
-            <li *ngIf="calendarMenu.get('item.IsSubscribed')">
+            <li *ngIf="calendarMenu.get('item.IsSubscribed') && calendarMenu.get('item.Owner.Id') != UserId">
                 <a class="dropdown-item" (click)="unsubscribeCalendar(calendarMenu.get('item'))">Unsubscribe</a>
             </li>
         </ul>

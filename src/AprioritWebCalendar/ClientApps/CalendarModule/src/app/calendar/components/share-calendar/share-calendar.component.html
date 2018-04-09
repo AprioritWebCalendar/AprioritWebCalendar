@@ -9,7 +9,6 @@
 
         <div class="modal-body">
             <app-select-user-share [id]="Id"
-                [sharedUsers]="sharedUsers"
                 (onCalendarShared)="addShared($event)"></app-select-user-share>
 
             <app-shared-users-list *ngIf="sharedUsers.length > 0" 
@@ -17,6 +16,9 @@
 
             <app-alert [alertType]="'danger'" [innerText]="'The calendar has not been shared with anybody.'"
                     *ngIf="sharedUsers.length == 0"></app-alert>
+
+            <app-alert *ngIf="isError" [alertType]="'danger'" 
+            [innerText]="'It seems we have some problems. Try to reload the page.'"></app-alert>
         </div>
 
         <div class="modal-footer">
