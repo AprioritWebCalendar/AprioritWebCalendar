@@ -4,6 +4,7 @@ import { NgModule, ApplicationModule, APP_INITIALIZER } from '@angular/core';
 
 import { AppComponent } from './app.component';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
@@ -11,6 +12,7 @@ import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { ToastModule } from 'ng2-toastr/ng2-toastr';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -59,11 +61,13 @@ import { SelectUserShareComponent } from './calendar/components/select-user-shar
     BrowserModule,
     FormsModule,
     HttpModule,
+    BrowserAnimationsModule,
 
     BootstrapModalModule,
     ColorPickerModule,
     ContextmenuModule,
     TypeaheadModule.forRoot(),
+    ToastModule.forRoot(),
 
     routing
   ],

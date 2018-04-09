@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { UserCalendar } from '../../models/user.calendar';
 import { CalendarService } from '../../services/calendar.service';
 import { UserService } from '../../../services/user.service';
+import { ToastsManager } from 'ng2-toastr';
 
 @Component({
     selector: 'app-shared-users-list',
@@ -10,7 +11,8 @@ import { UserService } from '../../../services/user.service';
 export class SharedUsersListComponent {
     constructor(
         private calendarService: CalendarService,
-        private userService: UserService
+        private userService: UserService,
+        private toastr: ToastsManager
     ) {}
 
     @Input()
@@ -24,9 +26,11 @@ export class SharedUsersListComponent {
             .subscribe((isOk: boolean) => {
                 if (!isOk)
                     return;
+
+                this.toastr.success("Read Only state has been changed.");
             },
             (e: Response) => {
-                // TODO: Notification.
+                this.toastr.error("Unable to change Read Only state. Try to reload the page.");
             });
     }
 
@@ -43,11 +47,10 @@ export class SharedUsersListComponent {
                     return;
 
                 this.sharedUsers.splice(this.sharedUsers.indexOf(userCalendar), 1);
-
-                // TODO: Notification.
+                this.toastr.success("The user has been unshared from the calendar.");
             },
             (e: Response) => {
-                // TODO: Notification.
+                this.toastr.error("Unable to unshare the calendar.");
             });
     }
 }

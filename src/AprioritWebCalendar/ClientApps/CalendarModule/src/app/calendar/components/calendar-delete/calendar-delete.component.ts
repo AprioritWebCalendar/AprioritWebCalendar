@@ -25,6 +25,8 @@ export class CalendarDeleteComponent extends DialogComponent<ICalendarDeleteMode
      }
 
      deleteCalendar() {
+        this.errors = [];
+
         if (!confirm("Are you sure?"))
             return;
 
