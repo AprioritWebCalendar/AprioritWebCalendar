@@ -13,6 +13,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
+import { PopoverModule } from 'ngx-bootstrap';
 
 import { AuthPanelComponent } from './authentication/components/auth-panel/auth-panel.component';
 
@@ -68,6 +69,7 @@ import { SelectUserShareComponent } from './calendar/components/select-user-shar
     ContextmenuModule,
     TypeaheadModule.forRoot(),
     ToastModule.forRoot(),
+    PopoverModule.forRoot(),
 
     routing
   ],
