@@ -20,7 +20,7 @@ namespace AprioritWebCalendar.Business.Validation
             _calendarRepository = calendarRepository;
         }
 
-        public async Task<IEnumerable<ValidationResult>> ValidateCreateAsync(CalendarShortModel model, int ownerId)
+        public async Task<IEnumerable<ValidationResult>> ValidateCreateAsync(CalendarRequestModel model, int ownerId)
         {
             var errors = new List<ValidationResult>();
 
@@ -32,7 +32,7 @@ namespace AprioritWebCalendar.Business.Validation
             return errors;
         }
 
-        public async Task<IEnumerable<ValidationResult>> ValidateUpdateAsync(int calendarId, CalendarShortModel model, int ownerId)
+        public async Task<IEnumerable<ValidationResult>> ValidateUpdateAsync(int calendarId, CalendarRequestModel model, int ownerId)
         {
             var errors = new List<ValidationResult>();
             

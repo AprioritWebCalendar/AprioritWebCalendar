@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { Http, Response, RequestOptionsArgs, Headers, RequestOptions } from "@angular/http";
 import { Observable } from 'rxjs/Observable';
 import "rxjs/add/operator/map";
@@ -7,26 +7,24 @@ import 'rxjs/add/observable/throw';
 
 import { User } from "./../models/user";
 import { CustomHttp } from "../../services/custom.http";
+import { Router } from "@angular/router";
 
 @Injectable()
 export class AuthenticationService {
-
     private currentUser : User;
-    private token : string;
 
-    constructor(private http : Http, private customHttp : CustomHttp) {
-        var token = sessionStorage.getItem("token");
-
-        if (token == null)
-            return;
-
-        this.getUser(token)
-            .subscribe((response : User) => {
-                this.token = token;
-                this.currentUser = response;
-                
-                this.customHttp.configureToken(this.token);
-            });
+    constructor(
+        private http : Http, 
+        private customHttp : CustomHttp,
+        private router: Router
+    ) {
+        if (customHttp.tokenExists()) {
+            this.getUser()
+                .subscribe((response: User) => {
+                    this.currentUser = response;
+                    console.log("The current user has been got");
+                });
+        }
     }
 
     isAuthenticated() : boolean {
@@ -41,12 +39,13 @@ export class AuthenticationService {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
                 this.currentUser = response.json()["User"];
-                this.token = response.json()["AccessToken"];
+                var token = response.json()["AccessToken"];
 
                 sessionStorage.setItem("user", JSON.stringify(this.currentUser));
-                sessionStorage.setItem("token", this.token);
 
-                this.customHttp.configureToken(this.token);
+                console.log("The token has been saved");
+
+                this.customHttp.configureToken(token);
                 return this.currentUser;
             })
             .catch(e => {
@@ -65,18 +64,14 @@ export class AuthenticationService {
     }
 
     logout() {
+        this.customHttp.resetToken();
         sessionStorage.removeItem("user");
-        sessionStorage.removeItem("token");
         this.currentUser = null;
-        this.token = null;
+        this.router.navigate(['/login']);
     }
 
-    getUser(token: string) {
-        var options = new RequestOptions({
-            headers: new Headers({"Authorization" : "Bearer " + token })
-        })
-
-        return this.http.get("/api/Account", options)
+    getUser() {
+        return this.customHttp.get("/api/Account")
             .map((response:Response) => {
                 return response.json() as User;
             })

@@ -25,18 +25,26 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Calendar> GetCalendarByIdAsync(int calendarId);
 
         /// <summary>
+        /// Gets a calendar by Id and loads its navigation properties (declared as string).
+        /// </summary>
+        /// <param name="calendarId">ID of the calendar.</param>
+        /// <param name="includeProperties">Include properties</param>
+        /// <returns>Calendar domain model.</returns>
+        Task<Calendar> GetCalendarByIdAsync(int calendarId, params string[] includeProperties);
+
+        /// <summary>
         /// Creates a new calendar.
         /// </summary>
-        /// <param name="createModel">View (binding model).</param>
-        /// <param name="ownerId">ID of the users that's owner.</param>
-        Task<Calendar> CreateCalendarAsync(CalendarShortModel createModel, int ownerId);
+        /// <param name="calendar">Calendar domain model.</param>
+        /// <param name="ownerId">Owner ID.</param>
+        /// <returns>Id of the calendar.</returns>
+        Task<int> CreateCalendarAsync(Calendar calendar, int ownerId);
 
         /// <summary>
         /// Updates an existing calendar.
         /// </summary>
-        /// <param name="calendarId">ID of the calendar.</param>
-        /// <param name="updateModel">View (binding model).</param>
-        Task UpdateCalendarAsync(int calendarId, CalendarShortModel updateModel);
+        /// <param name="calendar">Calendar domain model to update.</param>
+        Task UpdateCalendarAsync(Calendar calendar);
 
         /// <summary>
         /// Deletes an existing calendar.
@@ -81,6 +89,15 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <param name="calendarId">ID of the calendar.</param>
         /// <returns>Enumeration of users.</returns>
         Task<IEnumerable<UserCalendar>> GetUsersSharedWithAsync(int calendarId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="calendarId"></param>
+        /// <param name="userId"></param>
+        /// <param name="isReadOnly"></param>
+        /// <returns></returns>
+        Task SetReadOnlyStatusAsync(int calendarId, int userId, bool isReadOnly);
 
         /// <summary>
         /// Checks user is owner of calendar.

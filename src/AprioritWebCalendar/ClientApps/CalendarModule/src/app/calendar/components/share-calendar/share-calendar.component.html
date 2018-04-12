@@ -1,0 +1,28 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Calendar "{{Name}}" sharing options</h4>
+        </div>
+
+        <div class="modal-body">
+            <app-select-user-share [id]="Id"
+                (onCalendarShared)="addShared($event)"></app-select-user-share>
+
+            <app-shared-users-list *ngIf="sharedUsers.length > 0" 
+                    [sharedUsers]="sharedUsers" [id]="Id"></app-shared-users-list>
+
+            <app-alert [alertType]="'danger'" [innerText]="'The calendar has not been shared with anybody.'"
+                    *ngIf="sharedUsers.length == 0"></app-alert>
+
+            <app-alert *ngIf="isError" [alertType]="'danger'" 
+            [innerText]="'It seems we have some problems. Try to reload the page.'"></app-alert>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" (click)="close()">Close</button>
+        </div>
+    </div>
+</div>
