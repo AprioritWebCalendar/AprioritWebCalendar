@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MonthViewDay } from 'calendar-utils';
 
 @Component({
     selector: 'app-main-screen',
@@ -21,5 +22,13 @@ export class MainScreenComponent implements OnInit {
 
     changeViewMode(viewMode: string) {
         this.viewMode = viewMode;
+    }
+
+    dayClicked(day: MonthViewDay) {
+        console.log(day);
+    }
+
+    openCreateEventModal() {
+        alert("There will be a modal window to create an event.");
     }
 }

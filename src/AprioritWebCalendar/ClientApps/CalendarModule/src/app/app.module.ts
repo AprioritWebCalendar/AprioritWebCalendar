@@ -11,7 +11,7 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
-import { TypeaheadModule, ButtonsModule } from 'ngx-bootstrap';
+import { TypeaheadModule, ButtonsModule, TooltipModule } from 'ngx-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 
 import { CalendarModule as ngCalendarModule } from 'angular-calendar';
@@ -42,6 +42,7 @@ import { SharedUsersListComponent } from './calendar/components/shared-users-lis
 import { UserService } from './services/user.service';
 import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
 import { CalendarViewSwitcherComponent } from './calendar/components/calendar-view-switcher/calendar-view-switcher.component';
+import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { CalendarViewSwitcherComponent } from './calendar/components/calendar-vi
     ShareCalendarComponent,
     SharedUsersListComponent,
     SelectUserShareComponent,
-    CalendarViewSwitcherComponent
+    CalendarViewSwitcherComponent,
+    AddEventButtonComponent
   ],
   imports: [
     BrowserModule,
@@ -73,6 +75,7 @@ import { CalendarViewSwitcherComponent } from './calendar/components/calendar-vi
     TypeaheadModule.forRoot(),
     ToastModule.forRoot(),
     ButtonsModule.forRoot(),
+    TooltipModule.forRoot(),
 
     ngCalendarModule.forRoot(),
 

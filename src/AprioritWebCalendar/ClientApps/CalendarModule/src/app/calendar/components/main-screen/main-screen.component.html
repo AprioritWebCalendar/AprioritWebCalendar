@@ -8,6 +8,8 @@
             [viewMode]="viewMode" (onViewModeChanged)="changeViewMode($event)"></app-calendar-view-switcher>
     </div>
 
+    <hr />
+
     <div [ngSwitch]="viewMode" class="row">
         <mwl-calendar-day-view
             *ngSwitchCase="'Day'"
@@ -24,4 +26,6 @@
             [events]="events"
             [viewDate]="viewDate"></mwl-calendar-month-view>
     </div>
+
+    <app-add-event-button (onCreateEventClicked)="openCreateEventModal()"></app-add-event-button>
 </div>
