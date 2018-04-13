@@ -40,6 +40,7 @@ import { ShareCalendarComponent } from './calendar/components/share-calendar/sha
 import { SharedUsersListComponent } from './calendar/components/shared-users-list/shared-users-list.component';
 import { UserService } from './services/user.service';
 import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
+import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { SelectUserShareComponent } from './calendar/components/select-user-shar
     CalendarDeleteComponent,
     ShareCalendarComponent,
     SharedUsersListComponent,
-    SelectUserShareComponent
+    SelectUserShareComponent,
+    NotificationsPopoverComponent
   ],
   imports: [
     BrowserModule,
