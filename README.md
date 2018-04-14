@@ -21,8 +21,4 @@ Hello, here is instruction how to run the application.
   4. You have to build app or run it via <b>ng serve</b> using proxy-config.
   5. If you are running it using proxy-config, there are 2 files with them in that folder, open one of them and <b>configure port</b>, where back-end part runs.
   
-  6. <b>TEST ACCOUNT:</b>
-  - Login: admin
-  - Password: qwerty123
-  
   P.S. I'm not sure that directory for build output is configured well, so make sure too...
