@@ -1,0 +1,15 @@
+.badge-notify {
+    /*background: #0000FF;*/
+    position: relative;
+    top: 5px;
+}
+
+.bell-icon {
+    margin-top: 15px;
+    margin-left: 15px;
+    color: #FFFFFF;
+}
+
+.bell-icon:hover {
+    color: #FFFFFF;
+}

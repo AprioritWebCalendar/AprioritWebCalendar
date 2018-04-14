@@ -13,6 +13,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule, ButtonsModule, TooltipModule } from 'ngx-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
+import { PopoverModule } from 'ngx-bootstrap';
 
 import { CalendarModule as ngCalendarModule } from 'angular-calendar';
 
@@ -43,6 +44,7 @@ import { UserService } from './services/user.service';
 import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
 import { CalendarViewSwitcherComponent } from './calendar/components/calendar-view-switcher/calendar-view-switcher.component';
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
+import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +63,8 @@ import { AddEventButtonComponent } from './calendar/components/add-event-button/
     SharedUsersListComponent,
     SelectUserShareComponent,
     CalendarViewSwitcherComponent,
-    AddEventButtonComponent
+    AddEventButtonComponent,
+    NotificationsPopoverComponent
   ],
   imports: [
     BrowserModule,
@@ -76,6 +79,7 @@ import { AddEventButtonComponent } from './calendar/components/add-event-button/
     ToastModule.forRoot(),
     ButtonsModule.forRoot(),
     TooltipModule.forRoot(),
+    PopoverModule.forRoot(),
 
     ngCalendarModule.forRoot(),
 

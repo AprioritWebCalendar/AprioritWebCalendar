@@ -1,0 +1,18 @@
+<a href="#" 
+    [popover]="notificationsPopover" popoverTitle="Notifications" 
+    placement="bottom" [outsideClick]="true" container="body">
+        <span class="glyphicon glyphicon-bell bell-icon"></span>
+</a>
+<span class="badge badge-notify" *ngIf="unreadCount > 0">{{unreadCount}}</span>
+
+
+<ng-template #notificationsPopover container="body">
+    <div class="list-group" *ngIf="unreadCount > 0">
+        <a href="#" class="list-group-item" *ngFor="let item of notifications">
+            <h4 class="list-group-item-heading">{{item.Title}}</h4>
+            <p class="list-group-item-text">{{item.Description}}</p>
+        </a>
+    </div>
+
+    <p class="text-danger">Move this popover to the left of the search form.</p>
+</ng-template>

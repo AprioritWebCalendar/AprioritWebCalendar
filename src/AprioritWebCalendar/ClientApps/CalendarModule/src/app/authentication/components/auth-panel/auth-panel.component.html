@@ -1,9 +1,31 @@
 <ul class="nav navbar-nav navbar-right" *ngIf="isAuthenticated()">
-  <li><a [routerLink]="['/profile']">{{getUser().UserName}}</a></li>
-  <li><a href="#" (click)="logout()">Logout</a></li>
+    <li><app-notifications-popover></app-notifications-popover></li>
+
+    <li>
+        <a href="#" 
+            [popover]="userPopover" 
+            popoverTitle="My Profile" placement="bottom" [outsideClick]="true" container="body">
+                {{getUser().UserName}}
+        </a>
+    </li>
+
+    <li>
+        <a href="#" (click)="logout()">Logout</a>
+    </li>
+
+    <ng-template #userPopover container="body">
+        <h4 class="title">{{getUser().UserName}}</h4>
+        <address>{{getUser().Email}}</address>
+
+        <button type="button" class="btn btn-primary">Settings</button>
+    </ng-template>
 </ul>
 
 <ul class="nav navbar-nav navbar-right" *ngIf="!isAuthenticated()">
-  <li><a [routerLink]="['/login']">Login</a></li>
-  <li><a [routerLink]="['/register']">Register</a></li>
+    <li>
+        <a [routerLink]="['/login']">Login</a>
+    </li>
+    <li>
+        <a [routerLink]="['/register']">Register</a>
+    </li>
 </ul>
