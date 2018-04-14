@@ -1,28 +1,47 @@
 <app-left-calendar-menu (onCalendarsChanged)="loadEvents($event)"></app-left-calendar-menu>
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">There might be some text...</h1>
+    <h1 class="page-header">{{ viewDate | calendarDate:(viewMode + 'ViewTitle'):'en' }}</h1>
 
     <div class="row">
         <app-calendar-view-switcher 
             [viewMode]="viewMode" (onViewModeChanged)="changeViewMode($event)"></app-calendar-view-switcher>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary"
+                mwlCalendarPreviousView
+                [view]="viewMode"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="viewDateChanged($event)">Previous</button>
+            
+            <button type="button" class="btn btn-primary"
+                mwlCalendarToday
+                [(viewDate)]="viewDate"
+                (viewDateChange)="viewDateChanged($event)">Today</button>
+            
+            <button type="button" class="btn btn-primary"
+                mwlCalendarNextView
+                [view]="viewMode"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="viewDateChanged($event)">Next</button>
+        </div>
     </div>
 
     <hr />
 
     <div [ngSwitch]="viewMode" class="row">
         <mwl-calendar-day-view
-            *ngSwitchCase="'Day'"
+            *ngSwitchCase="'day'"
             [events]="events"
             [viewDate]="viewDate"></mwl-calendar-day-view>
 
         <mwl-calendar-week-view
-            *ngSwitchCase="'Week'"
+            *ngSwitchCase="'week'"
             [events]="events"
             [viewDate]="viewDate"></mwl-calendar-week-view>
 
         <mwl-calendar-month-view
-            *ngSwitchCase="'Month'"
+            *ngSwitchCase="'month'"
             [events]="events"
             [viewDate]="viewDate"></mwl-calendar-month-view>
     </div>

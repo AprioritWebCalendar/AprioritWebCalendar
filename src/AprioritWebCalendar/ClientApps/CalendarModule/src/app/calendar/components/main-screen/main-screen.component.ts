@@ -7,9 +7,9 @@ import { MonthViewDay } from 'calendar-utils';
 })
 export class MainScreenComponent implements OnInit {
     events: any[] = [];
-    viewDate: Date = new Date();
 
-    viewMode: string = "Month";
+    public viewDate: Date = new Date();
+    public viewMode: string = "month";
 
     constructor() { }
 
@@ -26,6 +26,10 @@ export class MainScreenComponent implements OnInit {
 
     dayClicked(day: MonthViewDay) {
         console.log(day);
+    }
+
+    viewDateChanged(date: Date) {
+        console.log(`View date has been changed ${date}`);
     }
 
     openCreateEventModal() {
