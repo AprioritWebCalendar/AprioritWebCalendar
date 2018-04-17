@@ -12,9 +12,10 @@ using System;
 namespace AprioritWebCalendar.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180417185439_Add_Event_IsAllDay")]
+    partial class Add_Event_IsAllDay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

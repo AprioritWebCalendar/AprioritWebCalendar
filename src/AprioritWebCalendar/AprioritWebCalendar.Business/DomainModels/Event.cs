@@ -17,7 +17,8 @@ namespace AprioritWebCalendar.Business.DomainModels
         public DateTime? EndDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-
+        
+        public bool IsAllDay { get; set; }
         public int? RemindBefore { get; set; }
 
         public Period Period { get; set; }
