@@ -6,6 +6,8 @@ using System.Text;
 
 namespace AprioritWebCalendar.Data.Models
 {
+    // TODO: Add "IsSubscribed".
+
     public class Calendar
     {
         public Calendar()

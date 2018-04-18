@@ -33,9 +33,11 @@ namespace AprioritWebCalendar.Data.Models
         public DateTime? EndDate { get; set; }
 
         [DataType(DataType.Time)]
-        public TimeSpan StartTime { get; set; }
+        public TimeSpan? StartTime { get; set; }
         [DataType(DataType.Time)]
-        public TimeSpan EndTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
+
+        public bool IsAllDay { get; set; }
         
         public int? RemindBefore { get; set; }
         public bool IsPrivate { get; set; } = true;

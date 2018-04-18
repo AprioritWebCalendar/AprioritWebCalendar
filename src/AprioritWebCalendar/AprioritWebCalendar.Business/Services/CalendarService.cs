@@ -62,6 +62,12 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<DomainCalendar>(calendar);
         }
 
+        public async Task<int?> GetUserDefaultCalendarIdAsync(int userId)
+        {
+            return (await _calendarRepository.FindAllAsync(c => c.OwnerId == userId && c.IsDefault))
+                .FirstOrDefault()?.Id;
+        }
+
         public async Task<int> CreateCalendarAsync(DomainCalendar calendar, int ownerId)
         {
             var dataCalendar = _mapper.Map<Calendar>(calendar);
