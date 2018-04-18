@@ -25,6 +25,13 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Calendar> GetCalendarByIdAsync(int calendarId);
 
         /// <summary>
+        /// Gets an id of user's default calendar.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns></returns>
+        Task<int?> GetUserDefaultCalendarIdAsync(int userId); 
+
+        /// <summary>
         /// Gets a calendar by Id and loads its navigation properties (declared as string).
         /// </summary>
         /// <param name="calendarId">ID of the calendar.</param>
