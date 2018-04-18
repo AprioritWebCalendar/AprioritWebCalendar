@@ -20,5 +20,8 @@ namespace AprioritWebCalendar.Business.DomainModels
         public int? RemindBefore { get; set; }
 
         public Period Period { get; set; }
+
+        public int CalendarId { get; set; }
+        public string Color { get; set; }
     }
 }
