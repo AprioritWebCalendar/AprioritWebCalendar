@@ -16,6 +16,9 @@ namespace AprioritWebCalendar.Bootstrap
             CreateMap<ApplicationUser, User>()
                 .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
 
+            CreateMap<ApplicationUser, UserInvitation>()
+                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
+
             CreateMap<User, UserViewModel>();
 
             #endregion
@@ -39,12 +42,21 @@ namespace AprioritWebCalendar.Bootstrap
             #region Event.
 
             CreateMap<Business.DomainModels.Event, Data.Models.Event>()
+                .ForMember(dest => dest.LocationDescription, opt => opt.MapFrom(src => src.Location.Description))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Location.Longitude))
+                .ForMember(dest => dest.Lattitude, opt => opt.MapFrom(src => src.Location.Lattitude))
+
                 .ForMember(dest => dest.Calendars, opt => opt.Ignore())
                 .ForMember(dest => dest.Invitations, opt => opt.Ignore())
                 .ForMember(dest => dest.Owner, opt => opt.Ignore())
                 .ForMember(dest => dest.Period, opt => opt.Ignore());
 
-            CreateMap<Data.Models.Event, Business.DomainModels.Event>();
+            CreateMap<Data.Models.Event, Business.DomainModels.Event>()
+                .ForMember(dest => dest.Location.Description, opt => opt.MapFrom(src => src.LocationDescription))
+                .ForMember(dest => dest.Location.Longitude, opt => opt.MapFrom(src => src.Longitude))
+                .ForMember(dest => dest.Location.Lattitude, opt => opt.MapFrom(src => src.Lattitude));
+
+
             CreateMap<EventViewModel, Business.DomainModels.Event>();
 
             #endregion

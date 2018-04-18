@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AprioritWebCalendar.Business.DomainModels
 {
@@ -15,8 +13,8 @@ namespace AprioritWebCalendar.Business.DomainModels
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         
         public bool IsAllDay { get; set; }
         public int? RemindBefore { get; set; }
