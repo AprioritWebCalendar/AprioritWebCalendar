@@ -4,8 +4,6 @@ using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.ViewModel.Account;
 using AprioritWebCalendar.ViewModel.Calendar;
 using AprioritWebCalendar.ViewModel.Event;
-using System;
-using System.Globalization;
 
 namespace AprioritWebCalendar.Bootstrap
 {
@@ -47,11 +45,7 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.Period, opt => opt.Ignore());
 
             CreateMap<Data.Models.Event, Business.DomainModels.Event>();
-            CreateMap<EventViewModel, Business.DomainModels.Event>()
-                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => DateTime.ParseExact(src.StartDate, "MM/dd/yyyy", CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => DateTime.ParseExact(src.EndDate, "MM/dd/yyyy", CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => TimeSpan.ParseExact(src.StartTime, "g", CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => TimeSpan.ParseExact(src.EndTime, "g", CultureInfo.InvariantCulture)));
+            CreateMap<EventViewModel, Business.DomainModels.Event>();
 
             #endregion
 
