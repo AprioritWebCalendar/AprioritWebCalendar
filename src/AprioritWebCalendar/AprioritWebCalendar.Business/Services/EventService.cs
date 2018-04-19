@@ -290,11 +290,6 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<bool> CanEditAsync(int eventId, int userId)
         {
-            var ev = await _GetEventAsync(eventId, e => e.Calendars);
-
-            if (ev.OwnerId == userId)
-                return true;
-
             var eventCalendars = (await _eventCalendarRepository
                 .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar))
                 .AsEnumerable();
