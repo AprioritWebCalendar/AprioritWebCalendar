@@ -23,5 +23,6 @@ namespace AprioritWebCalendar.Business.DomainModels
 
         public int CalendarId { get; set; }
         public string Color { get; set; }
+        public bool IsReadOnly { get; set; }
     }
 }

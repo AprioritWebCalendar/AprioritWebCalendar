@@ -31,5 +31,6 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public int CalendarId { get; set; }
         public string Color { get; set; }
+        public bool IsReadOnly { get; set; }
     }
 }

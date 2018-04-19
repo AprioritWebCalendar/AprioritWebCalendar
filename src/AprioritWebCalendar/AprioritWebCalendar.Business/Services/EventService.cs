@@ -73,7 +73,8 @@ namespace AprioritWebCalendar.Business.Services
                 {
                     UserId = userId,
                     CalendarId = c.Id,
-                    Calendar = c
+                    Calendar = c,
+                    IsReadOnly = false
                 });
 
             dataUserCalendars.AddRange(userOwnCalendars);
@@ -85,7 +86,8 @@ namespace AprioritWebCalendar.Business.Services
                                 {
                                     EventId = @event.Id,
                                     CalendarId = usCalendar.CalendarId,
-                                    Color = usCalendar.Calendar.Color
+                                    Color = usCalendar.Calendar.Color,
+                                    IsReadOnly = usCalendar.IsReadOnly
                                 }).ToList();
 
             dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
@@ -94,8 +96,11 @@ namespace AprioritWebCalendar.Business.Services
 
             foreach (var ev in domainEvents)
             {
-                ev.CalendarId = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id).CalendarId;
-                ev.Color = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id).Color;
+                var match = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id);
+
+                ev.CalendarId = match.CalendarId;
+                ev.Color = match.Color;
+                ev.IsReadOnly = match.IsReadOnly;
             }
 
             return domainEvents;
