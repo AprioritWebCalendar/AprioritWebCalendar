@@ -52,12 +52,17 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.Period, opt => opt.Ignore());
 
             CreateMap<Data.Models.Event, Business.DomainModels.Event>()
-                .ForMember(dest => dest.Location.Description, opt => opt.MapFrom(src => src.LocationDescription))
-                .ForMember(dest => dest.Location.Longitude, opt => opt.MapFrom(src => src.Longitude))
-                .ForMember(dest => dest.Location.Lattitude, opt => opt.MapFrom(src => src.Lattitude));
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location{ Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude}));
 
 
             CreateMap<EventViewModel, Business.DomainModels.Event>();
+
+            #endregion
+
+            #region Location.
+
+            CreateMap<Location, LocationViewModel>();
+            CreateMap<LocationViewModel, Location>();
 
             #endregion
 
@@ -99,6 +104,9 @@ namespace AprioritWebCalendar.Bootstrap
 
             CreateMap<Business.DomainModels.Period, Data.Models.Period>();
             CreateMap<Data.Models.Period, Business.DomainModels.Period>();
+
+            CreateMap<Business.DomainModels.Period, PeriodViewModel>();
+            CreateMap<PeriodViewModel, Business.DomainModels.Period>();
 
             #endregion
         }

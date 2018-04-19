@@ -22,6 +22,7 @@ namespace AprioritWebCalendar.Business.Services
         private readonly IRepository<EventCalendar> _eventCalendarRepository;
         private readonly IRepository<UserCalendar> _userCalendarRepository;
         private readonly IRepository<Invitation> _invitationRepository;
+        private readonly IRepository<Calendar> _calendarRepository;
 
         private readonly ICalendarService _calendarService;
 
@@ -32,6 +33,7 @@ namespace AprioritWebCalendar.Business.Services
             IRepository<EventCalendar> eventCalendarRepository,
             IRepository<UserCalendar> userCalendarRepository,
             IRepository<Invitation> invitationRepository,
+            IRepository<Calendar> calendarRepository,
             ICalendarService calendarService,
             IMapper mapper)
         {
@@ -39,6 +41,7 @@ namespace AprioritWebCalendar.Business.Services
             _eventCalendarRepository = eventCalendarRepository;
             _userCalendarRepository = userCalendarRepository;
             _invitationRepository = invitationRepository;
+            _calendarRepository = calendarRepository;
 
             _calendarService = calendarService;
 
@@ -47,17 +50,35 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<IEnumerable<DomainEvent>> GetEventsAsync(int userId, DateTime startDate, DateTime endDate, params int[] calendarsIds)
         {
-            Expression<Func<Event, bool>> filter = e => (e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
-                || (e.Period != null && e.Period.PeriodStart >= startDate && e.Period.PeriodEnd <= endDate)
-                && (e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds)).Any();
+            // TODO: Needs optimization and refactoring.
+
+            Expression<Func<Event, bool>> filter = e => ((e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
+                || (e.Period != null && e.Period.PeriodStart >= startDate && e.Period.PeriodEnd <= endDate))
+                && e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds).Any();
 
             var dataEvents = (await _eventRepository.FindAllIncludingAsync(filter, e => e.Calendars, e => e.Owner, e => e.Period))
                 .ToList();
 
-            var dataEventCalendars = await _eventCalendarRepository.FindAllIncludingAsync(e => calendarsIds.Contains(e.CalendarId), c => c.Calendar);
-            var dataUserCalendars = await _userCalendarRepository.FindAllIncludingAsync(u => calendarsIds.Contains(u.CalendarId), u => u.Calendar);
+            if (dataEvents?.Any() != true)
+                return null;
 
-            var matchedEvents = from @event in dataEvents
+            var dataEventCalendars = (await _eventCalendarRepository.FindAllIncludingAsync(e => calendarsIds.Contains(e.CalendarId), c => c.Calendar))
+                .ToList();
+            
+            var dataUserCalendars = (await _userCalendarRepository.FindAllIncludingAsync(u => calendarsIds.Contains(u.CalendarId) && u.UserId == userId, u => u.Calendar))
+                .ToList();
+
+            var userOwnCalendars = (await _calendarRepository.FindAllAsync(c => c.OwnerId == userId))
+                .Select(c => new UserCalendar
+                {
+                    UserId = userId,
+                    CalendarId = c.Id,
+                    Calendar = c
+                });
+
+            dataUserCalendars.AddRange(userOwnCalendars);
+
+            var matchedEvents = (from @event in dataEvents
                                 join evCalendar in dataEventCalendars on @event.Id equals evCalendar.EventId
                                 join usCalendar in dataUserCalendars on evCalendar.CalendarId equals usCalendar.CalendarId
                                 select new
@@ -65,7 +86,7 @@ namespace AprioritWebCalendar.Business.Services
                                     EventId = @event.Id,
                                     CalendarId = usCalendar.CalendarId,
                                     Color = usCalendar.Calendar.Color
-                                };
+                                }).ToList();
 
             dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
 
