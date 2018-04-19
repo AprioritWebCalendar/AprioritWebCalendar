@@ -119,8 +119,16 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// </summary>
         /// <param name="calendarId">ID of the calendar.</param>
         /// <param name="userId">ID of the user.</param>
-        /// <returns></returns>
+        /// <returns>true - user's owner of shared with the calendar.</returns>
         Task<bool> IsOwnerOrSharedWithAsync(int calendarId, int userId);
+
+        /// <summary>
+        /// Checks user is owner or shared with all the calendars.
+        /// </summary>
+        /// <param name="calendarsIds">Calendars' IDs.</param>
+        /// <param name="userId">ID of the user.</param>
+        /// <returns>true - user's owner or shared with all the calendars.</returns>
+        Task<bool> IsOwnerOrSharedWithAsync(IEnumerable<int> calendarsIds, int userId);
 
         /// <summary>
         /// Checks user permissions to edit a calendar.

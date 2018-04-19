@@ -36,10 +36,9 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// Creates a new event.
         /// </summary>
         /// <param name="eventDomain">Event domain model</param>
-        /// <param name="calendarId">ID of the calendar to store event there</param>
         /// <param name="ownerId">Owner ID</param>
         /// <returns>Id of created event.</returns>
-        Task<int> CreateEventAsync(Event eventDomain, int calendarId, int ownerId);
+        Task<int> CreateEventAsync(Event eventDomain, int ownerId);
 
         /// <summary>
         /// Updates an existing event.
