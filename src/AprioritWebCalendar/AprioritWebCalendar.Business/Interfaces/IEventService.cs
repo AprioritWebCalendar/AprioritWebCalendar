@@ -121,6 +121,8 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <returns></returns>
         Task<bool> IsOwnerAsync(int eventId, int userId);
 
+        Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId);
+
         /// <summary>
         /// Checks can user edit event.
         /// </summary>

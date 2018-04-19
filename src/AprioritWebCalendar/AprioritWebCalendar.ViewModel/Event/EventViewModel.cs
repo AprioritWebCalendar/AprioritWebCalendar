@@ -29,8 +29,8 @@ namespace AprioritWebCalendar.ViewModel.Event
         public PeriodViewModel Period { get; set; }
         public UserViewModel Owner { get; set; }
 
-        public int CalendarId { get; set; }
+        public int? CalendarId { get; set; }
         public string Color { get; set; }
-        public bool IsReadOnly { get; set; }
+        public bool? IsReadOnly { get; set; }
     }
 }

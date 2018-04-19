@@ -114,7 +114,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<DomainEvent> GetEventByIdAsync(int eventId, params string[] includeProperties)
         {
-            var dataEvent = await _eventRepository.FindAllIncludingAsync(e => e.Id == eventId, includeProperties);
+            var dataEvent = (await _eventRepository.FindAllIncludingAsync(e => e.Id == eventId, includeProperties))
+                .FirstOrDefault();
 
             if (dataEvent == null)
                 throw new NotFoundException();
@@ -313,6 +314,17 @@ namespace AprioritWebCalendar.Business.Services
         {
             return (await _GetEventAsync(eventId)).OwnerId == userId;
         }
+
+        public async Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId)
+        {
+            var eventCalendars = (await _eventCalendarRepository
+                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar))
+                .AsEnumerable();
+
+            return eventCalendars.Any(e => e.Calendar.OwnerId == userId);
+        }
+
+        // TODO: Union into one method.
 
         public async Task<bool> CanEditAsync(int eventId, int userId)
         {
