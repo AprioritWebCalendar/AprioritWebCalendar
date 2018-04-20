@@ -76,7 +76,13 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpGet("{id}/Users")]
         public async Task<IActionResult> GetInvitedUsers(int id)
         {
-            throw new NotImplementedException();
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+            {
+                return this.BadRequestError("Only owner can see invited users.");
+            }
+
+            var users = await _eventService.GetInvitedUsersAsync(id);
+            return this.OkOrNoContent(users);
         }
 
         #endregion
@@ -109,8 +115,7 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You don't have any permissions to edit that event.");
 
             var eventDomain = await _eventService.GetEventByIdAsync(id, "Period");
-
-            // There might be some errors.
+            
             eventDomain = _mapper.Map(model, eventDomain);
             eventDomain.Id = id;
             await _eventService.UpdateEventAsync(eventDomain);
@@ -119,39 +124,71 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPut("{id}/Move"), ValidateApiModelFilter]
-        public async Task<IActionResult> Move(int id)
+        public async Task<IActionResult> Move(int id, [FromBody]EventMoveRequest model)
         {
-            throw new NotImplementedException();
+            var userId = this.GetUserId();
+
+            if (!await _calendarService.IsOwnerAsync(model.OldCalendar.Value, userId)
+                || !await _calendarService.IsOwnerAsync(model.NewCalendar.Value, userId))
+            {
+                return this.BadRequestError("You are not owner of one of these calendars.");
+            }
+
+            await _eventService.MoveEventAsync(id, model.OldCalendar.Value, model.NewCalendar.Value);
+            return Ok();
         }
 
         [HttpPut("{id}/Invite")]
         public async Task<IActionResult> InviteUser(int id, [FromBody]InviteViewModel model)
         {
-            throw new NotImplementedException();
+            var userId = this.GetUserId();
+
+            if (model.UserId == userId)
+                return this.BadRequestError("You can't invite yourself.");
+
+            if (!await _eventService.IsOwnerAsync(id, userId))
+                return this.BadRequestError("Only owner can invite users.");
+
+            await _eventService.InviteUserAsync(id, model.UserId, userId, model.IsReadOnly);
+            return Ok();
         }
 
         [HttpPut("{id}/Accept")]
         public async Task<IActionResult> AcceptInvitation(int id)
         {
-            throw new NotImplementedException();
+            await _eventService.AcceptInvatationAsync(id, this.GetUserId());
+            return Ok();
         }
 
         [HttpPut("{id}/Reject")]
         public async Task<IActionResult> RejectInvitation(int id)
         {
-            throw new NotImplementedException();
+            await _eventService.RejectInvitationAsync(id, this.GetUserId());
+            return Ok();
         }
 
         [HttpPut("{id}/ReadOnly/{userId}")]
         public async Task<IActionResult> SetEventReadOnlyState(int id, int userId, [FromBody]bool isReadOnly)
         {
-            throw new NotImplementedException();
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+            {
+                return this.BadRequestError("Only owner can change read-only state.");
+            }
+
+            await _eventService.UpdateEventReadOnlyStateAsync(id, userId, isReadOnly);
+            return Ok();
         }
 
         [HttpPut("{id}/Invitation/ReadOnly/{userId}")]
         public async Task<IActionResult> SetInvitationReadOnlyState(int id, int userId, [FromBody]bool isReadOnly)
         {
-            throw new NotImplementedException();
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+            {
+                return this.BadRequestError("Only owner can change read-only state.");
+            }
+
+            await _eventService.UpdateInvitationReadOnlyAsync(id, userId, isReadOnly);
+            return Ok();
         }
 
         #endregion
@@ -161,13 +198,31 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            throw new NotImplementedException();
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+                return this.BadRequestError("Only owner can delete this event.");
+
+            await _eventService.DeleteEventAsync(id);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/Invited/{userId}")]
+        public async Task<IActionResult> DeleteInvitedUser(int id, int userId)
+        {
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+                return this.BadRequestError("Only owner can delete invited user.");
+
+            await _eventService.DeleteIntvitedUserAsync(id, userId);
+            return Ok();
         }
 
         [HttpDelete("{id}/Invitation/{userId}")]
-        public async Task<IActionResult> DeleteInvitation(int id, [FromBody]int userId)
+        public async Task<IActionResult> DeleteInvitation(int id, int userId)
         {
-            throw new NotImplementedException();
+            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+                return this.BadRequestError("Only owner can delete invitation.");
+
+            await _eventService.RejectInvitationAsync(id, userId);
+            return Ok();
         }
 
         #endregion

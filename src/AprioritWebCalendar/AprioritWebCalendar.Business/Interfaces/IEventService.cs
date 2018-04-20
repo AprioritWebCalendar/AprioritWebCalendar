@@ -74,7 +74,7 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// </summary>
         /// <param name="eventId">Event ID</param>
         /// <returns>Enumeration of users.</returns>
-        Task<IEnumerable<User>> GetInvitedUsersAsync(int eventId);
+        Task<IEnumerable<UserInvitation>> GetInvitedUsersAsync(int eventId);
 
         /// <summary>
         /// Invites user to event.

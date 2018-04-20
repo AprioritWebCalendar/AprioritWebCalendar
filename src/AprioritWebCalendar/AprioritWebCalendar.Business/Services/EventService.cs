@@ -169,7 +169,7 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task DeleteEventAsync(int eventId)
         {
-            var ev = await _GetEventAsync(eventId);
+            var ev = await _GetEventAsync(eventId, e => e.Owner, e => e.Calendars, e => e.Period, e => e.Invitations);
 
             await _eventRepository.RemoveAsync(ev);
             await _eventRepository.SaveAsync();
@@ -182,13 +182,16 @@ namespace AprioritWebCalendar.Business.Services
             if (eventCalendar == null)
                 throw new NotFoundException();
 
+            await _eventCalendarRepository.RemoveAsync(eventCalendar);
+            await _eventCalendarRepository.SaveAsync();
+
             eventCalendar.CalendarId = calendarId;
 
-            await _eventCalendarRepository.UpdateAsync(eventCalendar);
+            await _eventCalendarRepository.CreateAsync(eventCalendar);
             await _eventCalendarRepository.SaveAsync();
         }
 
-        public async Task<IEnumerable<DomainUser>> GetInvitedUsersAsync(int eventId)
+        public async Task<IEnumerable<DomainModels.UserInvitation>> GetInvitedUsersAsync(int eventId)
         {
             var ev = await _GetEventAsync(eventId);
 
@@ -220,6 +223,14 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task InviteUserAsync(int eventId, int userId, int invitatorId, bool isReadOnly)
         {
+            var eventCalendars = await _eventCalendarRepository.FindAllIncludingAsync(e => e.EventId == eventId && e.Calendar.OwnerId == userId,
+                e => e.Calendar);
+
+            // User is already invited.
+
+            if (eventCalendars.Any())
+                throw new InvalidOperationException();
+
             var invitation = new Invitation
             {
                 EventId = eventId,
@@ -234,12 +245,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task AcceptInvatationAsync(int eventId, int userId)
         {
-            //var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
-            //    .FirstOrDefault();
-
-            // TODO: If it doesn't work, replace with the commented method.
-
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
@@ -267,7 +274,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task RejectInvitationAsync(int eventId, int userId)
         {
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
@@ -293,7 +301,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task UpdateInvitationReadOnlyAsync(int eventId, int userId, bool isReadOnly)
         {
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                   .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
