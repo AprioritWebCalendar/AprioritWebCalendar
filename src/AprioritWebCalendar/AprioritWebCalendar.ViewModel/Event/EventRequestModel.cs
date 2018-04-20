@@ -24,6 +24,7 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public bool IsAllDay { get; set; }
         public int? RemindBefore { get; set; }
+        public bool IsPrivate { get; set; } = true;
 
         public LocationViewModel Location { get; set; }
         public PeriodViewModel Period { get; set; }

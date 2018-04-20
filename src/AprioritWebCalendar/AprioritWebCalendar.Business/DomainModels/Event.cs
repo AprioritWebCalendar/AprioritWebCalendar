@@ -18,6 +18,7 @@ namespace AprioritWebCalendar.Business.DomainModels
         
         public bool IsAllDay { get; set; }
         public int? RemindBefore { get; set; }
+        public bool IsPrivate { get; set; } = true;
 
         public Period Period { get; set; }
 
