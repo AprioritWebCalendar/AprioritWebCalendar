@@ -6,38 +6,38 @@ import { NgForm } from '@angular/forms';
 import { Response } from '@angular/http';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html'
+    selector: 'app-login',
+    templateUrl: './login.component.html'
 })
 export class LoginComponent {
 
-  constructor(
-    private authService: AuthenticationService,
-    private router: Router) { }
+    constructor(
+        private authService: AuthenticationService,
+        private router: Router) { }
 
-  private loginModel: LoginModel = new LoginModel();
-  private errors: string[];
+    public loginModel: LoginModel = new LoginModel();
+    public errors: string[] = [];
 
-  login(loginForm: NgForm) {
-    this.errors = null;
+    login(loginForm: NgForm) {
+        this.errors = null;
 
-    if (!loginForm.valid)
-      return;
+        if (!loginForm.valid)
+            return;
 
-    this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password)
-      .subscribe((response: Response) => {
-        if (this.authService.isAuthenticated()) {
-          this.router.navigate(['/']);
-        }
-      },
-      (response: Response) => {
-        var result = response.json();
+        this.authService.login(this.loginModel.emailOrUserName, this.loginModel.password)
+            .subscribe((response: Response) => {
+                if (this.authService.isAuthenticated()) {
+                    this.router.navigate(['/']);
+                }
+            },
+                (response: Response) => {
+                    var result = response.json();
 
-        if (result instanceof Array){
-          this.errors = result as string[];
-        } else {
-          this.errors.push("Something happened. Try again!");
-        }
-      });
-  }
+                    if (result instanceof Array) {
+                        this.errors = result as string[];
+                    } else {
+                        this.errors.push("Something happened. Try again!");
+                    }
+                });
+    }
 }
