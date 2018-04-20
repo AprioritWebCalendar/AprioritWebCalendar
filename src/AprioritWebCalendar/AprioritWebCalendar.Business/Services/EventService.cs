@@ -123,6 +123,24 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<DomainEvent>(dataEvent);
         }
 
+        public async Task<DomainEvent> GetEventByIdAsync(int eventId, int userId)
+        {
+            var eventCalendar = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.EventId == eventId && e.Calendar.OwnerId == userId, 
+                    e => e.Calendar, e => e.Event, e => e.Event.Owner, e => e.Event.Period))
+                .FirstOrDefault();
+
+            if (eventCalendar == null)
+                throw new NotFoundException();
+
+            var domainEvent = _mapper.Map<DomainEvent>(eventCalendar.Event);
+
+            domainEvent.IsReadOnly = eventCalendar.IsReadOnly;
+            domainEvent.CalendarId = eventCalendar.CalendarId;
+            domainEvent.Color = eventCalendar.Calendar.Color;
+
+            return domainEvent;
+        }
+
         public async Task<int> CreateEventAsync(DomainEvent eventDomain, int ownerId)
         {
             var dataEvent = _mapper.Map<Event>(eventDomain);
@@ -318,10 +336,10 @@ namespace AprioritWebCalendar.Business.Services
         public async Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId)
         {
             var eventCalendars = (await _eventCalendarRepository
-                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar))
+                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Event))
                 .AsEnumerable();
 
-            return eventCalendars.Any(e => e.Calendar.OwnerId == userId);
+            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && (!e.Event.IsPrivate || e.Event.OwnerId == userId));
         }
 
         // TODO: Union into one method.
@@ -329,10 +347,10 @@ namespace AprioritWebCalendar.Business.Services
         public async Task<bool> CanEditAsync(int eventId, int userId)
         {
             var eventCalendars = (await _eventCalendarRepository
-                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar))
+                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Event))
                 .AsEnumerable();
 
-            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && !e.IsReadOnly);
+            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && !e.IsReadOnly && (!e.Event.IsPrivate || e.Event.OwnerId == userId));
         }
 
         #region Private methods.

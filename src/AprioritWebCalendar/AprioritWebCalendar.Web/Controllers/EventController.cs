@@ -69,8 +69,7 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You don't have any permissions to this event.");
             }
 
-            // TODO: Add Color(?), IsReadOnly and CalendarId.
-            var eventDomain = await _eventService.GetEventByIdAsync(id, "Period", "Owner");
+            var eventDomain = await _eventService.GetEventByIdAsync(id, userId);
             return Ok(_mapper.Map<EventViewModel>(eventDomain));
         }
 

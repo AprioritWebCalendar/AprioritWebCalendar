@@ -33,6 +33,15 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Event> GetEventByIdAsync(int eventId, params string[] includeProperties);
 
         /// <summary>
+        /// Gets event by ID with relates entities.
+        /// Also gets IsReadOnly, CalendarId and Color for user.
+        /// </summary>
+        /// <param name="eventId">Event ID</param>
+        /// <param name="userId">UserID</param>
+        /// <returns>Event</returns>
+        Task<Event> GetEventByIdAsync(int eventId, int userId);
+
+        /// <summary>
         /// Creates a new event.
         /// </summary>
         /// <param name="eventDomain">Event domain model</param>
@@ -121,6 +130,12 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <returns></returns>
         Task<bool> IsOwnerAsync(int eventId, int userId);
 
+        /// <summary>
+        /// Checks user is owner or invited on event.
+        /// </summary>
+        /// <param name="eventId">Event ID</param>
+        /// <param name="userId">User ID</param>
+        /// <returns></returns>
         Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId);
 
         /// <summary>
