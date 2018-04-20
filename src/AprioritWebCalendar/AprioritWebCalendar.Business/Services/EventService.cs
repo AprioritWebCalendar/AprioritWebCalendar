@@ -22,6 +22,7 @@ namespace AprioritWebCalendar.Business.Services
         private readonly IRepository<EventCalendar> _eventCalendarRepository;
         private readonly IRepository<UserCalendar> _userCalendarRepository;
         private readonly IRepository<Invitation> _invitationRepository;
+        private readonly IRepository<Calendar> _calendarRepository;
 
         private readonly ICalendarService _calendarService;
 
@@ -32,6 +33,7 @@ namespace AprioritWebCalendar.Business.Services
             IRepository<EventCalendar> eventCalendarRepository,
             IRepository<UserCalendar> userCalendarRepository,
             IRepository<Invitation> invitationRepository,
+            IRepository<Calendar> calendarRepository,
             ICalendarService calendarService,
             IMapper mapper)
         {
@@ -39,6 +41,7 @@ namespace AprioritWebCalendar.Business.Services
             _eventCalendarRepository = eventCalendarRepository;
             _userCalendarRepository = userCalendarRepository;
             _invitationRepository = invitationRepository;
+            _calendarRepository = calendarRepository;
 
             _calendarService = calendarService;
 
@@ -47,25 +50,45 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<IEnumerable<DomainEvent>> GetEventsAsync(int userId, DateTime startDate, DateTime endDate, params int[] calendarsIds)
         {
-            Expression<Func<Event, bool>> filter = e => (e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
-                || (e.Period != null && e.Period.PeriodStart >= startDate && e.Period.PeriodEnd <= endDate)
-                && (e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds)).Any();
+            // TODO: Needs optimization and refactoring.
+
+            Expression<Func<Event, bool>> filter = e => ((e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
+                || (e.Period != null && e.Period.PeriodStart >= startDate && e.Period.PeriodEnd <= endDate))
+                && e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds).Any();
 
             var dataEvents = (await _eventRepository.FindAllIncludingAsync(filter, e => e.Calendars, e => e.Owner, e => e.Period))
                 .ToList();
 
-            var dataEventCalendars = await _eventCalendarRepository.FindAllIncludingAsync(e => calendarsIds.Contains(e.CalendarId), c => c.Calendar);
-            var dataUserCalendars = await _userCalendarRepository.FindAllIncludingAsync(u => calendarsIds.Contains(u.CalendarId), u => u.Calendar);
+            if (dataEvents?.Any() != true)
+                return null;
 
-            var matchedEvents = from @event in dataEvents
+            var dataEventCalendars = (await _eventCalendarRepository.FindAllIncludingAsync(e => calendarsIds.Contains(e.CalendarId), c => c.Calendar))
+                .ToList();
+            
+            var dataUserCalendars = (await _userCalendarRepository.FindAllIncludingAsync(u => calendarsIds.Contains(u.CalendarId) && u.UserId == userId, u => u.Calendar))
+                .ToList();
+
+            var userOwnCalendars = (await _calendarRepository.FindAllAsync(c => c.OwnerId == userId))
+                .Select(c => new UserCalendar
+                {
+                    UserId = userId,
+                    CalendarId = c.Id,
+                    Calendar = c,
+                    IsReadOnly = false
+                });
+
+            dataUserCalendars.AddRange(userOwnCalendars);
+
+            var matchedEvents = (from @event in dataEvents
                                 join evCalendar in dataEventCalendars on @event.Id equals evCalendar.EventId
                                 join usCalendar in dataUserCalendars on evCalendar.CalendarId equals usCalendar.CalendarId
                                 select new
                                 {
                                     EventId = @event.Id,
                                     CalendarId = usCalendar.CalendarId,
-                                    Color = usCalendar.Calendar.Color
-                                };
+                                    Color = usCalendar.Calendar.Color,
+                                    IsReadOnly = usCalendar.IsReadOnly
+                                }).ToList();
 
             dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
 
@@ -73,8 +96,11 @@ namespace AprioritWebCalendar.Business.Services
 
             foreach (var ev in domainEvents)
             {
-                ev.CalendarId = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id).CalendarId;
-                ev.Color = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id).Color;
+                var match = matchedEvents.FirstOrDefault(e => e.EventId == ev.Id);
+
+                ev.CalendarId = match.CalendarId;
+                ev.Color = match.Color;
+                ev.IsReadOnly = match.IsReadOnly;
             }
 
             return domainEvents;
@@ -88,12 +114,31 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<DomainEvent> GetEventByIdAsync(int eventId, params string[] includeProperties)
         {
-            var dataEvent = await _eventRepository.FindAllIncludingAsync(e => e.Id == eventId, includeProperties);
+            var dataEvent = (await _eventRepository.FindAllIncludingAsync(e => e.Id == eventId, includeProperties))
+                .FirstOrDefault();
 
             if (dataEvent == null)
                 throw new NotFoundException();
 
             return _mapper.Map<DomainEvent>(dataEvent);
+        }
+
+        public async Task<DomainEvent> GetEventByIdAsync(int eventId, int userId)
+        {
+            var eventCalendar = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.EventId == eventId && e.Calendar.OwnerId == userId, 
+                    e => e.Calendar, e => e.Event, e => e.Event.Owner, e => e.Event.Period))
+                .FirstOrDefault();
+
+            if (eventCalendar == null)
+                throw new NotFoundException();
+
+            var domainEvent = _mapper.Map<DomainEvent>(eventCalendar.Event);
+
+            domainEvent.IsReadOnly = eventCalendar.IsReadOnly;
+            domainEvent.CalendarId = eventCalendar.CalendarId;
+            domainEvent.Color = eventCalendar.Calendar.Color;
+
+            return domainEvent;
         }
 
         public async Task<int> CreateEventAsync(DomainEvent eventDomain, int ownerId)
@@ -124,7 +169,7 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task DeleteEventAsync(int eventId)
         {
-            var ev = await _GetEventAsync(eventId);
+            var ev = await _GetEventAsync(eventId, e => e.Owner, e => e.Calendars, e => e.Period, e => e.Invitations);
 
             await _eventRepository.RemoveAsync(ev);
             await _eventRepository.SaveAsync();
@@ -137,13 +182,16 @@ namespace AprioritWebCalendar.Business.Services
             if (eventCalendar == null)
                 throw new NotFoundException();
 
+            await _eventCalendarRepository.RemoveAsync(eventCalendar);
+            await _eventCalendarRepository.SaveAsync();
+
             eventCalendar.CalendarId = calendarId;
 
-            await _eventCalendarRepository.UpdateAsync(eventCalendar);
+            await _eventCalendarRepository.CreateAsync(eventCalendar);
             await _eventCalendarRepository.SaveAsync();
         }
 
-        public async Task<IEnumerable<DomainUser>> GetInvitedUsersAsync(int eventId)
+        public async Task<IEnumerable<DomainModels.UserInvitation>> GetInvitedUsersAsync(int eventId)
         {
             var ev = await _GetEventAsync(eventId);
 
@@ -175,6 +223,14 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task InviteUserAsync(int eventId, int userId, int invitatorId, bool isReadOnly)
         {
+            var eventCalendars = await _eventCalendarRepository.FindAllIncludingAsync(e => e.EventId == eventId && e.Calendar.OwnerId == userId,
+                e => e.Calendar);
+
+            // User is already invited.
+
+            if (eventCalendars.Any())
+                throw new InvalidOperationException();
+
             var invitation = new Invitation
             {
                 EventId = eventId,
@@ -189,12 +245,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task AcceptInvatationAsync(int eventId, int userId)
         {
-            //var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
-            //    .FirstOrDefault();
-
-            // TODO: If it doesn't work, replace with the commented method.
-
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
@@ -222,7 +274,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task RejectInvitationAsync(int eventId, int userId)
         {
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
@@ -248,7 +301,8 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task UpdateInvitationReadOnlyAsync(int eventId, int userId, bool isReadOnly)
         {
-            var invitation = await _invitationRepository.FindByKeysAsync(userId, eventId);
+            var invitation = (await _invitationRepository.FindAllAsync(i => i.EventId == eventId && i.UserId == userId))
+                   .FirstOrDefault();
 
             // TODO: Replace with another exception.
 
@@ -288,13 +342,24 @@ namespace AprioritWebCalendar.Business.Services
             return (await _GetEventAsync(eventId)).OwnerId == userId;
         }
 
+        public async Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId)
+        {
+            var eventCalendars = (await _eventCalendarRepository
+                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Event))
+                .AsEnumerable();
+
+            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && (!e.Event.IsPrivate || e.Event.OwnerId == userId));
+        }
+
+        // TODO: Union into one method.
+
         public async Task<bool> CanEditAsync(int eventId, int userId)
         {
             var eventCalendars = (await _eventCalendarRepository
-                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar))
+                .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Event))
                 .AsEnumerable();
 
-            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && !e.IsReadOnly);
+            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && !e.IsReadOnly && (!e.Event.IsPrivate || e.Event.OwnerId == userId));
         }
 
         #region Private methods.
