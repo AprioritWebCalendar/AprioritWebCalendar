@@ -45,6 +45,7 @@ import { SelectUserShareComponent } from './calendar/components/select-user-shar
 import { CalendarViewSwitcherComponent } from './calendar/components/calendar-view-switcher/calendar-view-switcher.component';
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
 import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
+import { EventService } from './event/services/event.service';
 
 @NgModule({
   declarations: [
@@ -102,7 +103,8 @@ import { NotificationsPopoverComponent } from './authentication/components/notif
     AnonymousGuard,
 
     CalendarService,
-    UserService
+    UserService,
+    EventService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
