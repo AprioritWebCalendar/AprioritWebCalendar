@@ -163,6 +163,11 @@ namespace AprioritWebCalendar.Business.Services
             var dataEvent = await _GetEventAsync(eventDomain.Id);
             _mapper.MapToEntity(eventDomain, dataEvent);
 
+            if (dataEvent.IsPrivate)
+            {
+                await _invitationRepository.RemoveRangeAsync(i => i.EventId == dataEvent.Id);
+            }
+
             await _eventRepository.UpdateAsync(dataEvent);
             await _eventRepository.SaveAsync();
         }
@@ -335,6 +340,11 @@ namespace AprioritWebCalendar.Business.Services
 
             await _eventCalendarRepository.UpdateAsync(eventCalendar);
             await _eventCalendarRepository.SaveAsync();
+        }
+
+        public async Task<bool> IsPrivateAsync(int eventId)
+        {
+            return (await _GetEventAsync(eventId)).IsPrivate;
         }
 
         public async Task<bool> IsOwnerAsync(int eventId, int userId)

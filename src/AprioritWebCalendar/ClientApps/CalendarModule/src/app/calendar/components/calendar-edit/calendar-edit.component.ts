@@ -42,7 +42,7 @@ export class CalendarEditComponent extends DialogComponent<ICalendarEditModel, I
         let calendar = new Calendar();
         calendar.Name = this.Name;
         calendar.Description = this.Description;
-        calendar.Color = this.Color;
+        calendar.Color = this.Color.toUpperCase();
 
         this.calendarService.updateCalendar(this.Id, calendar)
             .subscribe((isOk: boolean) => {

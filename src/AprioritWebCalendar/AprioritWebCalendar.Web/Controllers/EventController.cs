@@ -17,7 +17,6 @@ using AprioritWebCalendar.Infrastructure.Extensions;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
-    // TODO: Private events.
     // TODO: Whole days count (for Period).
 
     [Produces("application/json")]
@@ -148,6 +147,9 @@ namespace AprioritWebCalendar.Web.Controllers
 
             if (!await _eventService.IsOwnerAsync(id, userId))
                 return this.BadRequestError("Only owner can invite users.");
+
+            if (await _eventService.IsPrivateAsync(id))
+                return this.BadRequestError("You can't invite users on private event.");
 
             await _eventService.InviteUserAsync(id, model.UserId, userId, model.IsReadOnly);
             return Ok();

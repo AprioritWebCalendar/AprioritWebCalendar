@@ -1,0 +1,2 @@
+ng build
+cmd /k

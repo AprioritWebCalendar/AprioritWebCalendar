@@ -123,6 +123,13 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task UpdateEventReadOnlyStateAsync(int eventId, int userId, bool isReadOnly);
 
         /// <summary>
+        /// Checks event is private.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns>Private or no.</returns>
+        Task<bool> IsPrivateAsync(int eventId);
+
+        /// <summary>
         /// Checks user is owner of event.
         /// </summary>
         /// <param name="eventId">Event ID</param>
