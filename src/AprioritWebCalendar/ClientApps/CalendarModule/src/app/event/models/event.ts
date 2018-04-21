@@ -10,8 +10,8 @@ export class Event {
     public StartDate?: Date;
     public EndDate?: Date;
 
-    public StartTime?: Date;
-    public EndTime?: Date;
+    public StartTime?: string;
+    public EndTime?: string;
 
     public IsAllDay: boolean;
     public IsPrivate: boolean;

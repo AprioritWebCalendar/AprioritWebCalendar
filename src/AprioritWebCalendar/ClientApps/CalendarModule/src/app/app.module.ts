@@ -46,6 +46,7 @@ import { CalendarViewSwitcherComponent } from './calendar/components/calendar-vi
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
 import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 import { EventService } from './event/services/event.service';
+import { EventDatesService } from './event/services/event.dates.service';
 
 @NgModule({
   declarations: [
@@ -104,7 +105,8 @@ import { EventService } from './event/services/event.service';
 
     CalendarService,
     UserService,
-    EventService
+    EventService,
+    EventDatesService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

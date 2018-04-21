@@ -41,6 +41,8 @@ export class LeftCalendarMenuComponent implements OnInit {
                 this.model.Calendars.forEach(function(value) {
                     value.IsChecked = true;
                 });
+
+                this.calendarsChanged();
             },
             (response: Response) => {
                 this.model.IsError = true;
