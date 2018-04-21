@@ -84,7 +84,7 @@ export class EventService {
             .catch(e => Observable.throw(e));
     }
 
-    public setEventReadOnlyState(id: number, userId: number, isReadOnly: boolean) {
+    public setEventReadOnlyState(id: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
@@ -95,13 +95,31 @@ export class EventService {
             .catch(e => Observable.throw(e));
     }
 
-    public setInvitationReadOnlyState(id: number, userId: number, isReadOnly: boolean) {
+    public setInvitationReadOnlyState(id: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
         this.customHttp.attachToken(opts);
 
         return this.customHttp.put(`${this.baseUrl}${id}/Invitation/ReadOnly/${userId}`, isReadOnly)
+            .map(r => true)
+            .catch(e => Observable.throw(e));
+    }
+
+    public deleteEvent(id: number) : Observable<boolean> {
+        return this.customHttp.delete(`${this.baseUrl}${id}`)
+            .map(r => true)
+            .catch(e => Observable.throw(e));
+    }
+
+    public deleteInvitedUser(id: number, userId: number) : Observable<boolean> {
+        return this.customHttp.delete(`${this.baseUrl}${id}/Invited/${userId}`)
+            .map(r => true)
+            .catch(e => Observable.throw(e));
+    }
+
+    public deleteInvitation(id: number, userId: number) : Observable<boolean> {
+        return this.customHttp.delete(`${this.baseUrl}${id}/Invitation/${userId}`)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
