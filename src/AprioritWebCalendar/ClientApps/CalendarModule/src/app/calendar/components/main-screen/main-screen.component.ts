@@ -38,11 +38,17 @@ export class MainScreenComponent implements OnInit {
         this.locale = navigator.language.split("-")[0];
         this.localeData =  moment.localeData(this.locale);
         this.weekStartsOn = this.localeData.firstDayOfWeek();
-        
     }
 
     setCalendars(ids: number[]) {
         this.calendars = ids;
+
+        if (ids == null || ids.length === 0){
+            this.dataEvents = [];
+            this.calendarEvents = [];
+            return;
+        }
+
         this.loadEvents();
     }
 
@@ -86,9 +92,12 @@ export class MainScreenComponent implements OnInit {
                     console.log(events);
 
                     this.dataEvents = events;
+
                     this.mapEvents();
 
                     console.log(this.calendarEvents);
+                } else {
+                    this.calendarEvents = [];
                 }
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
@@ -96,56 +105,70 @@ export class MainScreenComponent implements OnInit {
     }
 
     mapEvents() {
-        this.calendarEvents = this.dataEvents.filter(e => e.Period == null).map(e => {
+        let events: CalendarEvent<Event>[] = [];
+
+        this.dataEvents.forEach(e => {
+            if (e.Period == null) {
+                events.push(this.fromDefaultEvent(e));
+            } else {
+                let list = this.fromRecurringEvent(e);
+
+                list.forEach(rEvent => events.push(rEvent));
+            }
+        });
+
+        this.calendarEvents = events;
+    }
+
+    fromDefaultEvent(event: Event): CalendarEvent<Event> {
+        let eventCal;
+
+        eventCal = {
+            title: event.Name,
+            color: { primary: event.Color },
+            meta: event
+        };
+
+        eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
+
+        if (event.IsAllDay) {
+            eventCal.start = new Date(event.StartDate);
+            eventCal.end = setEndOfDay(new Date(event.EndDate));
+        } else {
+            eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));
+            eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
+        }
+
+        return eventCal;
+    }
+
+    fromRecurringEvent(event: Event) : CalendarEvent<Event>[] {
+        let list: CalendarEvent<Event>[] = [];
+        var rule = getRule(event.Period);
+
+        rule.all().forEach(date => {
             let eventCal;
 
             eventCal = {
-                title: e.Name,
-                color: { primary: e.Color, secondary: '#FDF1BA' },
-                meta: e
+                title: event.Name,
+                color: { primary: event.Color },
+                meta: event
             };
 
-            eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : e.Color;
+            eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
 
-            if (e.IsAllDay) {
-                eventCal.start = new Date(e.StartDate);
-                eventCal.end = setEndOfDay(new Date(e.EndDate));
+            if (event.IsAllDay) {
+                eventCal.start = date;
+                eventCal.end = setEndOfDay(date);
             } else {
-                eventCal.start = getLocalTime(mergeDateTime(e.StartDate, e.StartTime));
-                eventCal.end = getLocalTime(mergeDateTime(e.EndDate, e.EndTime));
+                eventCal.start = getLocalTime(mergeDateTime(date, event.StartTime));
+                eventCal.end = getLocalTime(mergeDateTime(date, event.EndTime));
             }
 
-            return eventCal;
+            list.push(eventCal);
         });
 
-        this.mapRecurringEvents();
-    }
-
-    mapRecurringEvents() {
-        this.dataEvents.filter(e => e.Period != null)
-            .forEach(e => {
-                var rule = getRule(e.Period);
-
-                rule.all().forEach(d => {
-                    let eventCal;
-
-                    eventCal = {
-                        title: e.Name,
-                        color: { primary: e.Color, secondary: '#FDF1BA' },
-                        meta: e
-                    };
-
-                    if (e.IsAllDay) {
-                        eventCal.start = d;
-                        eventCal.end = setEndOfDay(d);
-                    } else {
-                        eventCal.start = getLocalTime(mergeDateTime(d, e.StartTime));
-                        eventCal.end = getLocalTime(mergeDateTime(d, e.EndTime));
-                    }
-                    
-                    this.calendarEvents.push(eventCal);
-                });
-            });
+        return list;
     }
 
     getDates() : DatesModel {
