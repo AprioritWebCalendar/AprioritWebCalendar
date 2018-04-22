@@ -5,7 +5,7 @@ import { DatesModel } from './dates.model';
 import * as moment from 'moment';
 import { EventService } from '../../../event/services/event.service';
 import { ToastsManager } from 'ng2-toastr';
-import { EventDatesService } from '../../../event/services/event.dates.service';
+import { mergeDateTime, getRule, setEndOfDay } from '../../../event/services/datetime.functions';
 
 @Component({
     selector: 'app-main-screen',
@@ -21,7 +21,6 @@ export class MainScreenComponent {
 
     constructor(
         private eventService: EventService,
-        private eventDatesService: EventDatesService,
         private toasts: ToastsManager
     ) { }
 
@@ -73,8 +72,8 @@ export class MainScreenComponent {
             eventCal = {
                 title: e.Name,
                 color: { primary: e.Color, secondary: '#FDF1BA' },
-                start: this.eventDatesService.getStartDate(e),
-                end: this.eventDatesService.getEndDate(e),
+                start: mergeDateTime(e.StartDate, e.StartTime),
+                end: mergeDateTime(e.EndDate, e.EndTime),
                 meta: e
             };
 
@@ -87,7 +86,7 @@ export class MainScreenComponent {
     mapRecurringEvents() {
         this.dataEvents.filter(e => e.Period != null)
             .forEach(e => {
-                var rule = this.eventDatesService.getRule(e.Period);
+                var rule = getRule(e.Period);
 
                 rule.all().forEach(d => {
                     let eventCal;
@@ -100,20 +99,10 @@ export class MainScreenComponent {
 
                     if (e.IsAllDay) {
                         eventCal.start = d;
-                        eventCal.end = moment(d).add(1, 'day').subtract(1, 'minute').toDate();
+                        eventCal.end = setEndOfDay(d);
                     } else {
-                        var startTime = this.eventDatesService.getTimeAsDate(e.StartTime);
-                        var endTime = this.eventDatesService.getTimeAsDate(e.EndTime);
-
-                        eventCal.start = moment(d)
-                            .add(startTime.getHours(), 'hour')
-                            .add(startTime.getMinutes(), 'minute')
-                            .toDate();
-
-                        eventCal.end = moment(d)
-                            .add(endTime.getHours(), 'hour')
-                            .add(endTime.getMinutes(), 'minute')
-                            .toDate();
+                        eventCal.start = mergeDateTime(d, e.StartTime);
+                        eventCal.end = mergeDateTime(d, e.EndTime);
                     }
                     
                     this.calendarEvents.push(eventCal);
