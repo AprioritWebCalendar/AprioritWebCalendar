@@ -14,7 +14,7 @@ export class EventService {
 
     }
 
-    public getEvents(startDate: Date, endDate: Date, calendars: number[]) : Observable<Event[]> {
+    public getEvents(startDate: string, endDate: string, calendars: number[]) : Observable<Event[]> {
         var params = {
             StartDate: startDate,
             EndDate: endDate,

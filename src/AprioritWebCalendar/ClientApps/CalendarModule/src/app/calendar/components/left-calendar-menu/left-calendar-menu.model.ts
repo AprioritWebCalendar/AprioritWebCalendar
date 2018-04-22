@@ -6,14 +6,8 @@ export class LeftCalendarMenuModel {
     public IsError: boolean = false;
 
     public getCheckedCalendarsId() : Number[] {
-        let ids: Number[] = [];
-
-        this.Calendars.forEach(function(value){
-            if (value.IsChecked){
-                ids.push(value.Id);
-            }
-        });
-
-        return ids;
+        return this.Calendars
+            .filter(c => c.IsChecked)
+            .map(c => c.Id);
     }
 }

@@ -1,7 +1,8 @@
-<app-left-calendar-menu (onCalendarsChanged)="loadEvents($event)"></app-left-calendar-menu>
+<app-left-calendar-menu (onCalendarsChanged)="setCalendars($event)"></app-left-calendar-menu>
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">{{ viewDate | calendarDate:(viewMode + 'ViewTitle'):'en' }}</h1>
+    <h1 *ngIf="viewMode != 'week'" class="page-header">{{ viewDate | calendarDate:(viewMode + 'ViewTitle'):'locale' }}</h1>
+    <h1 *ngIf="viewMode == 'week'" class="page-header">{{weekPeriod}}</h1>
 
     <div class="row">
         <app-calendar-view-switcher 
@@ -32,17 +33,22 @@
     <div [ngSwitch]="viewMode" class="row">
         <mwl-calendar-day-view
             *ngSwitchCase="'day'"
-            [events]="events"
+            [locale]="locale"
+            [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-day-view>
 
         <mwl-calendar-week-view
             *ngSwitchCase="'week'"
-            [events]="events"
+            [locale]="locale"
+            [weekStartsOn]="weekStartsOn"
+            [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-week-view>
 
         <mwl-calendar-month-view
             *ngSwitchCase="'month'"
-            [events]="events"
+            [locale]="locale"
+            [weekStartsOn]="weekStartsOn"
+            [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-month-view>
     </div>
 
