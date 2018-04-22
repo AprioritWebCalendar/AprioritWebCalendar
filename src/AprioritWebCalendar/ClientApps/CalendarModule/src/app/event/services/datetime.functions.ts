@@ -7,11 +7,11 @@ import { PeriodType } from "../models/period.type";
 
 export function mergeDateTime(date: Date, time: string = null) : Date {
     if (time == null) {
-        return new Date(date);
+        return moment(date).toDate();
     } else {
         let timeAsDate = getTimeAsDate(time);
 
-        return moment(new Date(date))
+        return moment(date)
             .add(timeAsDate.getHours(), 'hour')
             .add(timeAsDate.getMinutes(), 'minute')
             .toDate();
@@ -19,7 +19,7 @@ export function mergeDateTime(date: Date, time: string = null) : Date {
 }
 
 export function setEndOfDay(date: Date) : Date {
-    return moment(new Date(date))
+    return moment(date)
         .add(1, 'day')
         .subtract(1, 'minute')
         .toDate();
@@ -27,6 +27,19 @@ export function setEndOfDay(date: Date) : Date {
 
 export function getTimeAsDate(time: string) : Date {
     return moment(time, "HH:mm:ss").toDate();
+}
+
+export function getUtc(date: Date) : Date {
+    return moment(date).utc().toDate();
+}
+
+export function getLocalTime(date: Date) : Date {
+    // Yes! This is shit, trash, crutch.
+    // I don't know, but it works.
+
+    var local = moment.utc(moment(date).local().toString()).local().toDate();
+    console.log(local);
+    return local;
 }
 
 export function getRule(period: Period) : RRule {

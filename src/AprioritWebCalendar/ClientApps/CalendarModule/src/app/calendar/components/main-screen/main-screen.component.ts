@@ -5,7 +5,7 @@ import { DatesModel } from './dates.model';
 import * as moment from 'moment';
 import { EventService } from '../../../event/services/event.service';
 import { ToastsManager } from 'ng2-toastr';
-import { mergeDateTime, getRule, setEndOfDay } from '../../../event/services/datetime.functions';
+import { mergeDateTime, getRule, setEndOfDay, getLocalTime } from '../../../event/services/datetime.functions';
 
 @Component({
     selector: 'app-main-screen',
@@ -77,6 +77,11 @@ export class MainScreenComponent {
                 meta: e
             };
 
+            if (!e.IsAllDay) {
+                eventCal.start = getLocalTime(eventCal.start);
+                eventCal.end = getLocalTime(eventCal.end);
+            }
+
             return eventCal;
         });
 
@@ -101,8 +106,8 @@ export class MainScreenComponent {
                         eventCal.start = d;
                         eventCal.end = setEndOfDay(d);
                     } else {
-                        eventCal.start = mergeDateTime(d, e.StartTime);
-                        eventCal.end = mergeDateTime(d, e.EndTime);
+                        eventCal.start = getLocalTime(mergeDateTime(d, e.StartTime));
+                        eventCal.end = getLocalTime(mergeDateTime(d, e.EndTime));
                     }
                     
                     this.calendarEvents.push(eventCal);
