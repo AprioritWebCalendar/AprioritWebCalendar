@@ -7,11 +7,11 @@ import { PeriodType } from "../models/period.type";
 
 export function mergeDateTime(date: Date, time: string = null) : Date {
     if (time == null) {
-        return new Date(date.toLocaleString());
+        return new Date(date);
     } else {
         let timeAsDate = getTimeAsDate(time);
 
-        return moment(date.toLocaleString())
+        return moment(new Date(date))
             .add(timeAsDate.getHours(), 'hour')
             .add(timeAsDate.getMinutes(), 'minute')
             .toDate();
@@ -19,7 +19,7 @@ export function mergeDateTime(date: Date, time: string = null) : Date {
 }
 
 export function setEndOfDay(date: Date) : Date {
-    return moment(date.toLocaleString())
+    return moment(new Date(date))
         .add(1, 'day')
         .subtract(1, 'minute')
         .toDate();
