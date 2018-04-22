@@ -48,15 +48,7 @@ export class MainScreenComponent implements OnInit {
 
     changeViewMode(viewMode: string) {
         this.viewMode = viewMode;
-
-        if (this.viewMode == "week") {
-            var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
-            var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
-            
-            this.weekPeriod = `${start} - ${end}`;
-            console.log("Week period: " + this.weekPeriod);
-        }
-
+        this.changeWeekPeriod();
         this.loadEvents();
     }
 
@@ -67,11 +59,22 @@ export class MainScreenComponent implements OnInit {
     viewDateChanged(date: Date) {
         console.log(`View date has been changed ${date}`);
 
+        this.changeWeekPeriod();
         this.loadEvents();
     }
 
     openCreateEventModal() {
         alert("There will be a modal window to create an event.");
+    }
+
+    changeWeekPeriod() {
+        if (this.viewMode == "week") {
+            var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
+            var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
+            
+            this.weekPeriod = `${start} - ${end}`;
+            console.log("Week period: " + this.weekPeriod);
+        }
     }
 
     loadEvents() {
@@ -94,19 +97,22 @@ export class MainScreenComponent implements OnInit {
 
     mapEvents() {
         this.calendarEvents = this.dataEvents.filter(e => e.Period == null).map(e => {
-            let eventCal: CalendarEvent<Event>;
+            let eventCal;
 
             eventCal = {
                 title: e.Name,
                 color: { primary: e.Color, secondary: '#FDF1BA' },
-                start: mergeDateTime(e.StartDate, e.StartTime),
-                end: mergeDateTime(e.EndDate, e.EndTime),
                 meta: e
             };
 
-            if (!e.IsAllDay) {
-                eventCal.start = getLocalTime(eventCal.start);
-                eventCal.end = getLocalTime(eventCal.end);
+            eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : e.Color;
+
+            if (e.IsAllDay) {
+                eventCal.start = new Date(e.StartDate);
+                eventCal.end = setEndOfDay(new Date(e.EndDate));
+            } else {
+                eventCal.start = getLocalTime(mergeDateTime(e.StartDate, e.StartTime));
+                eventCal.end = getLocalTime(mergeDateTime(e.EndDate, e.EndTime));
             }
 
             return eventCal;
@@ -144,17 +150,18 @@ export class MainScreenComponent implements OnInit {
 
     getDates() : DatesModel {
         var dates = new DatesModel();
+        var curMoment = moment(this.viewDate).locale(this.locale);
 
         if (this.viewMode == "day") {
-            dates.StartDate = moment(this.viewDate).startOf("day").format("YYYY-MM-DD").toString();
-            dates.EndDate = moment(this.viewDate).endOf("day").format("YYYY-MM-DD").toString();
+            dates.StartDate = curMoment.startOf("day").format("YYYY-MM-DD").toString();
+            dates.EndDate = curMoment.endOf("day").format("YYYY-MM-DD").toString();
         } else if (this.viewMode == "week") {
-            dates.StartDate = moment(this.viewDate).startOf("week").format("YYYY-MM-DD").toString();
-            dates.EndDate = moment(this.viewDate).endOf("week").format("YYYY-MM-DD").toString();
+            dates.StartDate = curMoment.startOf("week").format("YYYY-MM-DD").toString();
+            dates.EndDate = curMoment.endOf("week").format("YYYY-MM-DD").toString();
         }
         else {
-            dates.StartDate = moment(this.viewDate).startOf("month").format("YYYY-MM-DD").toString();
-            dates.EndDate = moment(this.viewDate).endOf("month").format("YYYY-MM-DD").toString();
+            dates.StartDate = curMoment.startOf("month").format("YYYY-MM-DD").toString();
+            dates.EndDate = curMoment.endOf("month").format("YYYY-MM-DD").toString();
         }
 
         console.log(dates);
