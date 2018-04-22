@@ -6,12 +6,17 @@ import * as moment from 'moment';
 import { EventService } from '../../../event/services/event.service';
 import { ToastsManager } from 'ng2-toastr';
 import { mergeDateTime, getRule, setEndOfDay, getLocalTime } from '../../../event/services/datetime.functions';
+import { CalendarDateFormatter, CalendarNativeDateFormatter } from 'angular-calendar';
 
 @Component({
     selector: 'app-main-screen',
-    templateUrl: './main-screen.component.html'
+    templateUrl: './main-screen.component.html',
+    providers: [{
+        provide: CalendarDateFormatter,
+        useClass: CalendarNativeDateFormatter
+    }]
 })
-export class MainScreenComponent {
+export class MainScreenComponent implements OnInit {
     dataEvents: Event[] = [];
     calendarEvents: CalendarEvent<Event>[] = [];
     calendars: number[] = [];
@@ -19,10 +24,22 @@ export class MainScreenComponent {
     public viewDate: Date = new Date();
     public viewMode: string = "month";
 
+    public localeData: moment.Locale;
+    public locale: string;
+    public weekStartsOn: number;
+    public weekPeriod: string;
+
     constructor(
         private eventService: EventService,
         private toasts: ToastsManager
     ) { }
+
+    ngOnInit() {
+        this.locale = navigator.language.split("-")[0];
+        this.localeData =  moment.localeData(this.locale);
+        this.weekStartsOn = this.localeData.firstDayOfWeek();
+        
+    }
 
     setCalendars(ids: number[]) {
         this.calendars = ids;
@@ -31,6 +48,15 @@ export class MainScreenComponent {
 
     changeViewMode(viewMode: string) {
         this.viewMode = viewMode;
+
+        if (this.viewMode == "week") {
+            var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
+            var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
+            
+            this.weekPeriod = `${start} - ${end}`;
+            console.log("Week period: " + this.weekPeriod);
+        }
+
         this.loadEvents();
     }
 
@@ -40,6 +66,7 @@ export class MainScreenComponent {
 
     viewDateChanged(date: Date) {
         console.log(`View date has been changed ${date}`);
+
         this.loadEvents();
     }
 
