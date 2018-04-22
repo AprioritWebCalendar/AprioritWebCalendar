@@ -53,7 +53,7 @@ namespace AprioritWebCalendar.Business.Services
             // TODO: Needs optimization and refactoring.
 
             Expression<Func<Event, bool>> filter = e => ((e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
-                || (e.Period != null && e.Period.PeriodStart >= startDate && e.Period.PeriodEnd <= endDate))
+                || (e.Period != null && e.Period.PeriodStart <= startDate && e.Period.PeriodEnd >= endDate))
                 && e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds).Any();
 
             var dataEvents = (await _eventRepository.FindAllIncludingAsync(filter, e => e.Calendars, e => e.Owner, e => e.Period))
