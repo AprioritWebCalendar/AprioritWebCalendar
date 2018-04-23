@@ -13,6 +13,7 @@ using AprioritWebCalendar.Infrastructure.Extensions;
 using DomainEvent = AprioritWebCalendar.Business.DomainModels.Event;
 using DomainEventCalendar = AprioritWebCalendar.Business.DomainModels.EventCalendar;
 using DomainUser = AprioritWebCalendar.Business.DomainModels.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace AprioritWebCalendar.Business.Services
 {
@@ -51,9 +52,11 @@ namespace AprioritWebCalendar.Business.Services
         public async Task<IEnumerable<DomainEvent>> GetEventsAsync(int userId, DateTime startDate, DateTime endDate, params int[] calendarsIds)
         {
             // TODO: Needs optimization and refactoring.
-
-            Expression<Func<Event, bool>> filter = e => ((e.Period == null && e.StartDate >= startDate && e.EndDate <= endDate)
-                || (e.Period != null && e.Period.PeriodStart <= startDate && e.Period.PeriodEnd >= endDate))
+            Expression<Func<Event, bool>> filter = e => ((e.Period == null && 
+                    (EFCore.DateDiff(DatePart.day, startDate, e.StartDate) >= 0 || EFCore.DateDiff(DatePart.day, e.StartDate, startDate) >= 0)
+                    && (EFCore.DateDiff(DatePart.day, endDate, e.EndDate) >= 0 || EFCore.DateDiff(DatePart.day, e.EndDate, endDate) >= 0))
+                || (e.Period != null && (EFCore.DateDiff(DatePart.day, startDate, e.Period.PeriodStart)) >= 0 || EFCore.DateDiff(DatePart.day, e.Period.PeriodStart, startDate) >= 0)
+                    && (EFCore.DateDiff(DatePart.day, endDate, e.Period.PeriodEnd)) >= 0 || EFCore.DateDiff(DatePart.day, e.Period.PeriodEnd, endDate) >= 0)
                 && e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds).Any();
 
             var dataEvents = (await _eventRepository.FindAllIncludingAsync(filter, e => e.Calendars, e => e.Owner, e => e.Period))

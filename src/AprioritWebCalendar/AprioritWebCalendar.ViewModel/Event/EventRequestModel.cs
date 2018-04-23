@@ -16,10 +16,14 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public int CalendarId { get; set; }
 
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTimeOffset? StartDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTimeOffset? EndDate { get; set; }
 
+        [DataType(DataType.Time)]
         public TimeSpan? StartTime { get; set; }
+        [DataType(DataType.Time)]
         public TimeSpan? EndTime { get; set; }
 
         public bool IsAllDay { get; set; }
@@ -31,6 +35,9 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            StartDate = StartDate?.Date;
+            EndDate = EndDate?.Date;
+
             var errors = new List<ValidationResult>();
 
             if (Name?.Length < 3 || Name?.Length > 32)
@@ -45,7 +52,7 @@ namespace AprioritWebCalendar.ViewModel.Event
 
             if (Location != null)
             {
-                errors.AddRange(Location.Validate(new ValidationContext(Location)));
+                errors.AddRange(Location.Validate(validationContext));
             }
 
             if (!string.IsNullOrEmpty(Description) && Description.Length > 256)
@@ -68,7 +75,7 @@ namespace AprioritWebCalendar.ViewModel.Event
 
             if (Period != null)
             {
-                errors.AddRange(Period.Validate(new ValidationContext(Period)));
+                errors.AddRange(Period.Validate(validationContext));
                 StartDate = null;
                 EndDate = null;
             }

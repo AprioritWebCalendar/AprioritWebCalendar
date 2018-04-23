@@ -11,8 +11,8 @@ namespace AprioritWebCalendar.ViewModel.Event
     {
         public PeriodType Type { get; set; }
 
-        public DateTime PeriodStart { get; set; }
-        public DateTime PeriodEnd { get; set; }
+        public DateTimeOffset PeriodStart { get; set; }
+        public DateTimeOffset PeriodEnd { get; set; }
 
         public int? Cycle { get; set; }
 
@@ -21,6 +21,9 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            PeriodStart = PeriodStart.Date;
+            PeriodEnd = PeriodEnd.Date;
+
             if (Type != PeriodType.Custom)
                 Cycle = null;
 
