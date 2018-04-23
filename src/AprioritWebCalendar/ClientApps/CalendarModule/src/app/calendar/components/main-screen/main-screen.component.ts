@@ -10,6 +10,7 @@ import { CalendarDateFormatter, CalendarNativeDateFormatter } from 'angular-cale
 import { DialogService } from 'ng2-bootstrap-modal';
 import { EventCreateComponent } from '../../../event/components/event-create/event-create.component';
 import { Calendar } from '../../models/calendar';
+import { Subject } from 'rxjs/Subject';
 
 @Component({
     selector: 'app-main-screen',
@@ -23,6 +24,8 @@ export class MainScreenComponent implements OnInit {
     dataEvents: Event[] = [];
     calendarEvents: CalendarEvent<Event>[] = [];
     calendars: Calendar[] = [];
+
+    refresh: Subject<any> = new Subject();
 
     public viewDate: Date = new Date();
     public viewMode: string = "month";
@@ -81,6 +84,7 @@ export class MainScreenComponent implements OnInit {
                 if (event == null)
                     return;
 
+                event.Color = this.getCalendarsColor(event.CalendarId);
                 console.log(event);
 
                 this.dataEvents.push(event);
@@ -90,6 +94,8 @@ export class MainScreenComponent implements OnInit {
                 } else {
                     this.fromRecurringEvent(event).forEach(e => this.calendarEvents.push(e));
                 }
+
+                this.refresh.next();
                 this.toasts.success("The event has been created successfully");
             }, e => {
                 this.toasts.error("Unable to create event. Try again or reload the page.");
@@ -212,5 +218,10 @@ export class MainScreenComponent implements OnInit {
 
         console.log(dates);
         return dates;
+    }
+
+    getCalendarsColor(id: number) {
+        return this.calendars.filter(c => c.Id == id)
+            .map(c => c.Color)[0];
     }
 }

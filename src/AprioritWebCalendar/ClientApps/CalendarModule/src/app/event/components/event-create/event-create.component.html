@@ -6,11 +6,56 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">Create a new event</h4>
-            
-                <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-primary">
+                                <input id="IsPrivateSwitch" name="IsPrivateSwitch" type="checkbox" [(ngModel)]="model.IsPrivate" />
+                    
+                                <label for="IsPrivateSwitch">Private</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-primary">
+                                <input id="IsAllDaySwitch" name="IsAllDaySwitch" type="checkbox" 
+                                    [(ngModel)]="model.IsAllDay" />
+                
+                                <label for="IsAllDaySwitch">All Day</label>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-primary">
+                                <input id="IsRecurring" name="IsRecurring" type="checkbox" 
+                                    [(ngModel)]="model.IsRecurrent" />
+                
+                                <label for="IsRecurring">Recurring</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-primary">
+                                <input id="IsLocation" name="IsLocation" type="checkbox" 
+                                    [(ngModel)]="model.IsLocationAttached" />
+                        
+                                <label for="IsLocation">Location</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-body">
+                <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+
                 <div class="form-group">
                     <label class="control-label" for="Name">Name</label>
 
@@ -60,35 +105,25 @@
                     </span>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 checkbox checkbox-primary">
-                        <input id="IsAllDaySwitch" name="IsAllDaySwitch" type="checkbox"
-                            [(ngModel)]="model.IsAllDay" />
-
-                        <label for="IsAllDaySwitch">All Day</label>
-                    </div>
-
-                    <div class="col-md-6 checkbox checkbox-primary">
-                        <input id="IsRecurring" name="IsRecurring" type="checkbox"
-                            [(ngModel)]="model.IsRecurrent" />
-
-                        <label for="IsRecurring">Is recurring</label>
-                    </div>
-                </div>
-
-                <div class="form-group" *ngIf="!model.IsAllDay">
+                <div class="form-group col-md-offset-2" *ngIf="!model.IsAllDay">
                     <div class="row">
-                        <timepicker name="EventStartTime"
-                            class="col-md-6"
-                            [showMeridian]="false"
-                            [(ngModel)]="model.StartTime"
-                            #startTime="ngModel"></timepicker>
-    
-                        <timepicker name="EventEndTime" 
-                            class="col-md-6"
-                            [showMeridian]="false"
-                            [(ngModel)]="model.EndTime"
-                            #endTime="ngModel"></timepicker>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <timepicker name="EventStartTime" 
+                                    [showMeridian]="false" 
+                                    [(ngModel)]="model.StartTime" 
+                                    #startTime="ngModel"></timepicker>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <timepicker name="EventEndTime" 
+                                    [showMeridian]="false" 
+                                    [(ngModel)]="model.EndTime" 
+                                    #endTime="ngModel"></timepicker>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -103,13 +138,9 @@
                     </span>
                 </div>
 
-                <div *ngIf="model.IsLocationAttached">
-                    <app-event-location 
-                        [location]="model.Location"></app-event-location>
-
-                    <button class="btn btn-link btn-sm"
-                        (click)="removeLocation()">Don't attach location.</button>
-                </div>
+                <app-event-location 
+                    *ngIf="model.IsLocationAttached" 
+                    [location]="model.Location"></app-event-location>
 
                 <app-event-period
                     *ngIf="model.IsRecurrent"

@@ -34,12 +34,14 @@
         <mwl-calendar-day-view
             *ngSwitchCase="'day'"
             [locale]="locale"
+            [refresh]="refresh"
             [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-day-view>
 
         <mwl-calendar-week-view
             *ngSwitchCase="'week'"
             [locale]="locale"
+            [refresh]="refresh"
             [weekStartsOn]="weekStartsOn"
             [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-week-view>
@@ -47,6 +49,7 @@
         <mwl-calendar-month-view
             *ngSwitchCase="'month'"
             [locale]="locale"
+            [refresh]="refresh"
             [weekStartsOn]="weekStartsOn"
             [events]="calendarEvents"
             [viewDate]="viewDate"></mwl-calendar-month-view>

@@ -40,6 +40,8 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
     // TODO: Validate datepickers.
 
     createEvent(createForm: NgForm) {
+        this.errors = [];
+
         let event: EventRequestModel = Object.assign(this.model);
         console.log(event);
 

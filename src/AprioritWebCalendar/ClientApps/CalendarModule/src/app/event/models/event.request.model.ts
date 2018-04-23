@@ -27,7 +27,7 @@ export class EventRequestModel {
 
     //
     public IsRecurrent: boolean;
-    public IsLocationAttached: boolean = true;
+    public IsLocationAttached: boolean = false;
     public IsRemindingEnabled: boolean = true;
 
     public ToEvent() : Event {
@@ -36,6 +36,8 @@ export class EventRequestModel {
         event.Id = this.Id
         event.Name = this.Name;
         event.Description = this.Description;
+
+        event.CalendarId = this.CalendarId;
 
         event.StartDate = new Date(this.StartDate);
         event.EndDate = new Date(this.EndDate);
@@ -47,8 +49,11 @@ export class EventRequestModel {
         event.IsPrivate = this.IsPrivate;
         event.RemindBefore = this.RemindBefore;
 
-        event.Location = this.Location;
-        event.Period = this.Period.ToPeriod();
+        if (this.Location != null)
+            event.Location = this.Location;
+
+        if (this.Period != null)
+            event.Period = this.Period.ToPeriod();
 
         return event;
     }
