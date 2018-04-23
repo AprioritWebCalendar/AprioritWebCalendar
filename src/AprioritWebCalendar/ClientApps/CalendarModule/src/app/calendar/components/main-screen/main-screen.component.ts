@@ -6,11 +6,13 @@ import * as moment from 'moment';
 import { EventService } from '../../../event/services/event.service';
 import { ToastsManager } from 'ng2-toastr';
 import { mergeDateTime, getRule, setEndOfDay, getLocalTime, getWithoutTime } from '../../../event/services/datetime.functions';
-import { CalendarDateFormatter, CalendarNativeDateFormatter } from 'angular-calendar';
+import { CalendarDateFormatter, CalendarNativeDateFormatter, CalendarEventAction } from 'angular-calendar';
 import { DialogService } from 'ng2-bootstrap-modal';
 import { EventCreateComponent } from '../../../event/components/event-create/event-create.component';
 import { Calendar } from '../../models/calendar';
 import { Subject } from 'rxjs/Subject';
+import { AuthenticationService } from '../../../authentication/services/authentication.service';
+import { isSameMonth, isSameDay } from 'ngx-bootstrap/chronos/utils/date-getters';
 
 @Component({
     selector: 'app-main-screen',
@@ -25,6 +27,8 @@ export class MainScreenComponent implements OnInit {
     calendarEvents: CalendarEvent<Event>[] = [];
     calendars: Calendar[] = [];
 
+    activeDayIsOpen: boolean = true;
+
     refresh: Subject<any> = new Subject();
 
     public viewDate: Date = new Date();
@@ -38,9 +42,25 @@ export class MainScreenComponent implements OnInit {
     constructor(
         private eventService: EventService,
         private toasts: ToastsManager,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authenticationService: AuthenticationService
     ) { }
 
+    actions: CalendarEventAction[] = [
+        {
+            label: '<i class="fa fa-fw fa-pencil"></i>',
+            onClick: ({ event }: { event: CalendarEvent }): void => {
+                alert("There will be a modal window to edit event.");
+            }
+        },
+        {
+            label: '<i class="fa fa-fw fa-times"></i>',
+            onClick: ({ event }: { event: CalendarEvent }): void => {
+                alert("There will be a modal window to delete event.");
+            }
+        }
+    ];
+    
     ngOnInit() {
         this.locale = navigator.language.split("-")[0];
         this.localeData =  moment.localeData(this.locale);
@@ -65,8 +85,18 @@ export class MainScreenComponent implements OnInit {
         this.loadEvents();
     }
 
-    dayClicked(day: MonthViewDay) {
-        console.log(day);
+    dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }) {
+        if (isSameMonth(date, this.viewDate)) {
+            if (
+                (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
+                events.length === 0
+            ) {
+                this.activeDayIsOpen = false;
+            } else {
+                this.activeDayIsOpen = true;
+                this.viewDate = date;
+            }
+        }
     }
 
     viewDateChanged(date: Date) {
@@ -84,6 +114,8 @@ export class MainScreenComponent implements OnInit {
                 if (event == null)
                     return;
 
+                event.IsReadOnly = false;
+                event.Owner = this.authenticationService.getCurrentUser();
                 event.Color = this.getCalendarsColor(event.CalendarId);
                 console.log(event);
 
@@ -155,7 +187,8 @@ export class MainScreenComponent implements OnInit {
         eventCal = {
             title: event.Name,
             color: { primary: event.Color },
-            meta: event
+            meta: event,
+            actions: []
         };
 
         eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
@@ -166,6 +199,14 @@ export class MainScreenComponent implements OnInit {
         } else {
             eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));
             eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
+        }
+
+        if (!event.IsReadOnly) {
+            eventCal.actions.push(this.actions[0]);
+        }
+
+        if (event.Owner.Id === this.authenticationService.getCurrentUser().Id) {
+            eventCal.actions.push(this.actions[1]);
         }
 
         return eventCal;
@@ -181,7 +222,8 @@ export class MainScreenComponent implements OnInit {
             eventCal = {
                 title: event.Name,
                 color: { primary: event.Color },
-                meta: event
+                meta: event,
+                actions: []
             };
 
             eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
@@ -192,6 +234,14 @@ export class MainScreenComponent implements OnInit {
             } else {
                 eventCal.start = getLocalTime(mergeDateTime(date, event.StartTime));
                 eventCal.end = getLocalTime(mergeDateTime(date, event.EndTime));
+            }
+
+            if (!event.IsReadOnly) {
+                eventCal.actions.push(this.actions[0]);
+            }
+    
+            if (event.Owner.Id === this.authenticationService.getCurrentUser().Id) {
+                eventCal.actions.push(this.actions[1]);
             }
 
             list.push(eventCal);

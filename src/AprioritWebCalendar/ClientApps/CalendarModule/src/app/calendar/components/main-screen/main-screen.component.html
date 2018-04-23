@@ -50,9 +50,13 @@
             *ngSwitchCase="'month'"
             [locale]="locale"
             [refresh]="refresh"
+            [activeDayIsOpen]="activeDayIsOpen"
             [weekStartsOn]="weekStartsOn"
             [events]="calendarEvents"
-            [viewDate]="viewDate"></mwl-calendar-month-view>
+            [viewDate]="viewDate"
+            
+            
+            (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
     </div>
 
     <app-add-event-button (onCreateEventClicked)="openCreateEventModal()"></app-add-event-button>
