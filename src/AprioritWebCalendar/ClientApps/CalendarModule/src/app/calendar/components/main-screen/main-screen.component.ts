@@ -5,8 +5,11 @@ import { DatesModel } from './dates.model';
 import * as moment from 'moment';
 import { EventService } from '../../../event/services/event.service';
 import { ToastsManager } from 'ng2-toastr';
-import { mergeDateTime, getRule, setEndOfDay, getLocalTime } from '../../../event/services/datetime.functions';
+import { mergeDateTime, getRule, setEndOfDay, getLocalTime, getWithoutTime } from '../../../event/services/datetime.functions';
 import { CalendarDateFormatter, CalendarNativeDateFormatter } from 'angular-calendar';
+import { DialogService } from 'ng2-bootstrap-modal';
+import { EventCreateComponent } from '../../../event/components/event-create/event-create.component';
+import { Calendar } from '../../models/calendar';
 
 @Component({
     selector: 'app-main-screen',
@@ -19,7 +22,7 @@ import { CalendarDateFormatter, CalendarNativeDateFormatter } from 'angular-cale
 export class MainScreenComponent implements OnInit {
     dataEvents: Event[] = [];
     calendarEvents: CalendarEvent<Event>[] = [];
-    calendars: number[] = [];
+    calendars: Calendar[] = [];
 
     public viewDate: Date = new Date();
     public viewMode: string = "month";
@@ -31,7 +34,8 @@ export class MainScreenComponent implements OnInit {
 
     constructor(
         private eventService: EventService,
-        private toasts: ToastsManager
+        private toasts: ToastsManager,
+        private dialogService: DialogService
     ) { }
 
     ngOnInit() {
@@ -40,10 +44,10 @@ export class MainScreenComponent implements OnInit {
         this.weekStartsOn = this.localeData.firstDayOfWeek();
     }
 
-    setCalendars(ids: number[]) {
-        this.calendars = ids;
+    setCalendars(calendars: Calendar[]) {
+        this.calendars = calendars;
 
-        if (ids == null || ids.length === 0){
+        if (calendars == null || calendars.length === 0){
             this.dataEvents = [];
             this.calendarEvents = [];
             return;
@@ -70,7 +74,26 @@ export class MainScreenComponent implements OnInit {
     }
 
     openCreateEventModal() {
-        alert("There will be a modal window to create an event.");
+        var calendars = this.calendars.filter(c => c.IsReadOnly != true);
+
+        this.dialogService.addDialog(EventCreateComponent, { calendars: calendars })
+            .subscribe(event => {
+                if (event == null)
+                    return;
+
+                console.log(event);
+
+                this.dataEvents.push(event);
+
+                if (event.Period == null) {
+                    this.calendarEvents.push(this.fromDefaultEvent(event));
+                } else {
+                    this.fromRecurringEvent(event).forEach(e => this.calendarEvents.push(e));
+                }
+                this.toasts.success("The event has been created successfully");
+            }, e => {
+                this.toasts.error("Unable to create event. Try again or reload the page.");
+            });
     }
 
     changeWeekPeriod() {
@@ -86,7 +109,7 @@ export class MainScreenComponent implements OnInit {
     loadEvents() {
         var dates = this.getDates();
         
-        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.calendars)
+        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.calendars.map(c => c.Id as number))
             .subscribe(events => {
                 if (events != null) {
                     console.log(events);
@@ -132,7 +155,7 @@ export class MainScreenComponent implements OnInit {
         eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
 
         if (event.IsAllDay) {
-            eventCal.start = new Date(event.StartDate);
+            eventCal.start = getWithoutTime(new Date(event.StartDate));
             eventCal.end = setEndOfDay(new Date(event.EndDate));
         } else {
             eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));

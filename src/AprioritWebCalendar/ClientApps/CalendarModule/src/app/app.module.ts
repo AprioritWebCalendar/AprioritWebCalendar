@@ -11,9 +11,11 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
-import { TypeaheadModule, ButtonsModule, TooltipModule } from 'ngx-bootstrap';
+import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDatepickerModule } from 'ngx-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
+
+import { AgmCoreModule } from '@agm/core';
 
 import { CalendarModule as ngCalendarModule } from 'angular-calendar';
 
@@ -46,6 +48,9 @@ import { CalendarViewSwitcherComponent } from './calendar/components/calendar-vi
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
 import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 import { EventService } from './event/services/event.service';
+import { EventCreateComponent } from './event/components/event-create/event-create.component';
+import { EventPeriodComponent } from './event/components/event-period/event-period.component';
+import { EventLocationComponent } from './event/components/event-location/event-location.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +70,10 @@ import { EventService } from './event/services/event.service';
     SelectUserShareComponent,
     CalendarViewSwitcherComponent,
     AddEventButtonComponent,
-    NotificationsPopoverComponent
+    NotificationsPopoverComponent,
+    EventCreateComponent,
+    EventPeriodComponent,
+    EventLocationComponent
   ],
   imports: [
     BrowserModule,
@@ -82,7 +90,15 @@ import { EventService } from './event/services/event.service';
     TooltipModule.forRoot(),
     PopoverModule.forRoot(),
 
+    BsDatepickerModule.forRoot(),
+    TimepickerModule.forRoot(),
+
     ngCalendarModule.forRoot(),
+
+
+    AgmCoreModule.forRoot({
+        apiKey: 'AIzaSyBuPpVTIGkimz2VGPdGP5uSYkH4z43zQXM'
+      }),
 
     routing
   ],
@@ -111,7 +127,9 @@ import { EventService } from './event/services/event.service';
       CalendarCreateComponent,
       CalendarEditComponent,
       CalendarDeleteComponent,
-      ShareCalendarComponent
+      ShareCalendarComponent,
+
+      EventCreateComponent
     ]
 })
 export class CalendarModule { }

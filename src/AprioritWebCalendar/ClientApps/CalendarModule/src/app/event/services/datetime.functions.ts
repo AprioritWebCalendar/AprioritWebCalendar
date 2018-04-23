@@ -29,8 +29,14 @@ export function getTimeAsDate(time: string) : Date {
     return moment(time, "HH:mm:ss").toDate();
 }
 
-export function getUtc(date: Date) : Date {
-    return moment(date).utc().toDate();
+export function getTimeAsString(date: Date) : string {
+    return moment(date).utc().format("HH:mm");
+}
+
+export function getWithoutTime(date: Date) : Date {
+    var d = moment(date).startOf('day').toDate();
+    console.log(date + " without time: " + d);
+    return d;
 }
 
 export function getLocalTime(date: Date) : Date {
@@ -38,7 +44,7 @@ export function getLocalTime(date: Date) : Date {
     // I don't know, but it works.
 
     var local = moment.utc(moment(date).local().toString()).local().toDate();
-    console.log(local);
+    console.log("utc: " + date + "; local: " + local);
     return local;
 }
 

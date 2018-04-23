@@ -1,5 +1,6 @@
 import { Period } from "./period";
 import { User } from "../../authentication/models/user";
+import { Location } from "./location";
 
 export class Event {
     public Id: number;

@@ -40,7 +40,7 @@ export class EventService {
 
     public createEvent(event: EventRequestModel) : Observable<number> {
         return this.customHttp.post(this.baseUrl, event)
-            .map(r => r.json())
+            .map(r => r.json().Id)
             .catch(e => Observable.throw(e));
     }
 
