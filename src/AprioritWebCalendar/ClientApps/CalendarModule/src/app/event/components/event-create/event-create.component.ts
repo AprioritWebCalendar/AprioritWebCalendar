@@ -26,6 +26,8 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
     calendars: Calendar[];
 
     startEndDate: string[];
+    startTime?: Date;
+    endTime? :Date;
 
     constructor(
         public dialogService: DialogService,
@@ -43,6 +45,13 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
         this.errors = [];
 
         let event: EventRequestModel = Object.assign(this.model);
+
+        if (!this.model.IsAllDay) {
+            event.StartTime = this.startTime.toTimeString();
+            event.EndTime = this.endTime.toTimeString();
+            console.log([event.StartTime, event.EndTime]);
+        }
+        
         console.log(event);
 
         event.ConvertDateTime(this.startEndDate);
@@ -70,10 +79,5 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
 
     changePeriod(period: PeriodRequestModel) {
         this.model.Period = period;
-    }
-
-    removeLocation() {
-        this.model.Location = new Location();
-        this.model.IsLocationAttached = false;
     }
 }

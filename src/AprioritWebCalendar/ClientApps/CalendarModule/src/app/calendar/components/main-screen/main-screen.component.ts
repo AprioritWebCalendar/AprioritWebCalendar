@@ -13,6 +13,8 @@ import { Calendar } from '../../models/calendar';
 import { Subject } from 'rxjs/Subject';
 import { AuthenticationService } from '../../../authentication/services/authentication.service';
 import { isSameMonth, isSameDay } from 'ngx-bootstrap/chronos/utils/date-getters';
+import { EventEditComponent } from '../../../event/components/event-edit/event-edit.component';
+import { EventRequestModel } from '../../../event/models/event.request.model';
 
 @Component({
     selector: 'app-main-screen',
@@ -50,7 +52,7 @@ export class MainScreenComponent implements OnInit {
         {
             label: '<i class="fa fa-fw fa-pencil"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
-                alert("There will be a modal window to edit event.");
+                this.openEventEditModal(event);
             }
         },
         {
@@ -131,6 +133,38 @@ export class MainScreenComponent implements OnInit {
                 this.toasts.success("The event has been created successfully");
             }, e => {
                 this.toasts.error("Unable to create event. Try again or reload the page.");
+            });
+    }
+
+    openEventEditModal(event: CalendarEvent) {
+        console.log(event.meta);
+
+        let params = { 
+            model: EventRequestModel.FromEvent(<Event>event.meta) 
+        };
+
+        this.dialogService.addDialog(EventEditComponent, params)
+            .subscribe(ev => {
+                console.log(ev);
+
+                ev.Owner = event.meta.Owner;
+                ev.CalendarId = event.meta.CalendarId;
+                ev.Color = event.meta.Color;
+                ev.IsReadOnly = event.meta.IsReadOnly;
+
+                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
+                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
+
+                this.dataEvents.push(ev);
+
+                if (ev.Period == null) {
+                    this.calendarEvents.push(this.fromDefaultEvent(ev));
+                } else {
+                    this.fromRecurringEvent(ev).forEach(e => this.calendarEvents.push(e));
+                }
+
+                this.refresh.next();
+                this.toasts.success("The event has been updated successfully");
             });
     }
 

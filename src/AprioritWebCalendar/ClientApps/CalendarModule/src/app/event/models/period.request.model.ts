@@ -18,4 +18,15 @@ export class PeriodRequestModel {
 
         return period;
     }
+
+    public static FromPeriod(period: Period) : PeriodRequestModel {
+        var model = new PeriodRequestModel;
+
+        model.Type = period.Type;
+        model.PeriodStart = period.PeriodStart.toDateString();
+        model.PeriodEnd = period.PeriodEnd.toDateString();
+        model.Cycle = period.Cycle;
+
+        return model;
+    }
 }

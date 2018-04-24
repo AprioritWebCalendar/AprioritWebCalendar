@@ -1,5 +1,5 @@
 import { Location } from "./location";
-import { mergeDateTime, getWithoutTime, getTimeAsString, getTimeAsDate } from "../services/datetime.functions";
+import { mergeDateTime, getWithoutTime, getTimeAsString, getTimeAsDate, getLocalTime } from "../services/datetime.functions";
 import { Event } from "./event";
 import * as moment from 'moment';
 import { PeriodRequestModel } from "./period.request.model";
@@ -70,20 +70,54 @@ export class EventRequestModel {
             this.Location = null;
 
         if (!this.IsAllDay && !this.IsRecurrent) {
-            let start = mergeDateTime(getWithoutTime(new Date(startEndDate[0])), new Date(this.StartTime).toTimeString());
-            let end = mergeDateTime(getWithoutTime(new Date(startEndDate[1])), new Date(this.EndTime).toTimeString());
+            let start = mergeDateTime(getWithoutTime(new Date(startEndDate[0])), this.StartTime);
+            let end = mergeDateTime(getWithoutTime(new Date(startEndDate[1])), this.EndTime);
 
             this.StartDate = moment(getWithoutTime(start)).format();
             this.EndDate = moment(getWithoutTime(end)).format();
 
             this.StartTime = getTimeAsString(start);
             this.EndTime = getTimeAsString(end);
-        } else if (!this.IsAllDay && this.IsRecurrent) {
-            this.StartTime = getTimeAsString(getTimeAsDate(this.StartTime));
-            this.EndTime = getTimeAsString(getTimeAsDate(this.EndTime));
         } else if (this.IsAllDay && !this.IsRecurrent) {
             this.StartDate = moment(getWithoutTime(new Date(startEndDate[0]))).format();
             this.EndDate = moment(getWithoutTime(new Date(startEndDate[1]))).format();
         }
+    }
+
+    public static FromEvent(event: Event) : EventRequestModel {
+        let model = new EventRequestModel();
+
+        model.Id = event.Id;
+        model.Name = event.Name;
+        model.Description = event.Description;
+        model.CalendarId = event.CalendarId;
+
+        model.StartDate = getLocalTime(mergeDateTime(event.StartDate, event.StartTime)).toDateString();
+        model.EndDate = getLocalTime(mergeDateTime(event.EndDate, event.EndTime)).toDateString();
+
+        model.StartTime = event.StartTime;
+        model.EndTime = event.EndTime;
+
+        model.IsAllDay = event.IsAllDay;
+        model.IsPrivate = event.IsPrivate;
+
+        if (event.RemindBefore != null) {
+            model.RemindBefore = event.RemindBefore;
+            model.IsRemindingEnabled = true;
+        } else {
+            model.IsRemindingEnabled = false;
+        }
+
+        if (event.Location != null) {
+            model.Location = event.Location;
+            model.IsLocationAttached = true;
+        }
+        
+        if (event.Period != null) {
+            model.Period = PeriodRequestModel.FromPeriod(event.Period);
+            model.IsRecurrent = true;
+        }
+
+        return model;
     }
 }

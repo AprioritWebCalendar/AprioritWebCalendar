@@ -10,6 +10,9 @@ import { MouseEvent } from '@agm/core';
 export class EventLocationComponent implements OnInit {
     
     ngOnInit(): void {
+        if (this.location.Lattitude != null && this.location.Longitude != null)
+            return;
+
         let geo = navigator.geolocation;
 
         if (geo) {
