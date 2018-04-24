@@ -15,6 +15,7 @@ import { AuthenticationService } from '../../../authentication/services/authenti
 import { isSameMonth, isSameDay } from 'ngx-bootstrap/chronos/utils/date-getters';
 import { EventEditComponent } from '../../../event/components/event-edit/event-edit.component';
 import { EventRequestModel } from '../../../event/models/event.request.model';
+import { User } from '../../../authentication/models/user';
 
 @Component({
     selector: 'app-main-screen',
@@ -28,6 +29,7 @@ export class MainScreenComponent implements OnInit {
     dataEvents: Event[] = [];
     calendarEvents: CalendarEvent<Event>[] = [];
     calendars: Calendar[] = [];
+    currentUser: User;
 
     activeDayIsOpen: boolean = true;
 
@@ -52,7 +54,7 @@ export class MainScreenComponent implements OnInit {
         {
             label: '<i class="fa fa-fw fa-pencil"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
-                this.openEventEditModal(event);
+                this.openEditEventModal(event);
             }
         },
         {
@@ -63,13 +65,17 @@ export class MainScreenComponent implements OnInit {
         }
     ];
     
-    ngOnInit() {
+    public ngOnInit() : void {
         this.locale = navigator.language.split("-")[0];
         this.localeData =  moment.localeData(this.locale);
         this.weekStartsOn = this.localeData.firstDayOfWeek();
     }
 
-    setCalendars(calendars: Calendar[]) {
+    private setCalendars(calendars: Calendar[]) : void {
+        if (this.currentUser == null) {
+            this.currentUser = this.authenticationService.getCurrentUser();
+        }
+
         this.calendars = calendars;
 
         if (calendars == null || calendars.length === 0){
@@ -81,13 +87,13 @@ export class MainScreenComponent implements OnInit {
         this.loadEvents();
     }
 
-    changeViewMode(viewMode: string) {
+    private changeViewMode(viewMode: string) : void {
         this.viewMode = viewMode;
         this.changeWeekPeriod();
         this.loadEvents();
     }
 
-    dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }) {
+    private dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }) : void {
         if (isSameMonth(date, this.viewDate)) {
             if (
                 (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
@@ -101,14 +107,14 @@ export class MainScreenComponent implements OnInit {
         }
     }
 
-    viewDateChanged(date: Date) {
+    private viewDateChanged(date: Date) : void {
         console.log(`View date has been changed ${date}`);
 
         this.changeWeekPeriod();
         this.loadEvents();
     }
 
-    openCreateEventModal() {
+    private openCreateEventModal() : void {
         var calendars = this.calendars.filter(c => c.IsReadOnly != true);
 
         this.dialogService.addDialog(EventCreateComponent, { calendars: calendars })
@@ -122,21 +128,15 @@ export class MainScreenComponent implements OnInit {
                 console.log(event);
 
                 this.dataEvents.push(event);
-
-                if (event.Period == null) {
-                    this.calendarEvents.push(this.fromDefaultEvent(event));
-                } else {
-                    this.fromRecurringEvent(event).forEach(e => this.calendarEvents.push(e));
-                }
-
-                this.refresh.next();
+                this.mapEvent(event);
+                
                 this.toasts.success("The event has been created successfully");
             }, e => {
                 this.toasts.error("Unable to create event. Try again or reload the page.");
             });
     }
 
-    openEventEditModal(event: CalendarEvent) {
+    private openEditEventModal(event: CalendarEvent) : void {
         console.log(event.meta);
 
         let params = { 
@@ -145,7 +145,8 @@ export class MainScreenComponent implements OnInit {
 
         this.dialogService.addDialog(EventEditComponent, params)
             .subscribe(ev => {
-                console.log(ev);
+                if (ev == null)
+                    return;
 
                 ev.Owner = event.meta.Owner;
                 ev.CalendarId = event.meta.CalendarId;
@@ -155,20 +156,16 @@ export class MainScreenComponent implements OnInit {
                 this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
                 this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
 
-                this.dataEvents.push(ev);
-
-                if (ev.Period == null) {
-                    this.calendarEvents.push(this.fromDefaultEvent(ev));
-                } else {
-                    this.fromRecurringEvent(ev).forEach(e => this.calendarEvents.push(e));
-                }
-
                 this.refresh.next();
+
+                this.dataEvents.push(ev);
+                this.mapEvent(ev);
+
                 this.toasts.success("The event has been updated successfully");
             });
     }
 
-    changeWeekPeriod() {
+    private changeWeekPeriod() : void {
         if (this.viewMode == "week") {
             var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
             var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
@@ -178,7 +175,9 @@ export class MainScreenComponent implements OnInit {
         }
     }
 
-    loadEvents() {
+    private loadEvents() : void {
+        this.dataEvents = [];
+        this.calendarEvents = [];
         var dates = this.getDates();
         
         this.eventService.getEvents(dates.StartDate, dates.EndDate, this.calendars.map(c => c.Id as number))
@@ -188,34 +187,33 @@ export class MainScreenComponent implements OnInit {
 
                     this.dataEvents = events;
 
-                    this.mapEvents();
-
-                    console.log(this.calendarEvents);
-                } else {
-                    this.calendarEvents = [];
+                    this.mapEventList(this.dataEvents);
+                    this.refresh.next();
                 }
+
+                console.log(this.calendarEvents);
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
             });
     }
 
-    mapEvents() {
-        let events: CalendarEvent<Event>[] = [];
-
-        this.dataEvents.forEach(e => {
-            if (e.Period == null) {
-                events.push(this.fromDefaultEvent(e));
-            } else {
-                let list = this.fromRecurringEvent(e);
-
-                list.forEach(rEvent => events.push(rEvent));
-            }
+    private mapEventList(events: Event[]) : void {
+        events.forEach(e => {
+            this.mapEvent(e);
         });
-
-        this.calendarEvents = events;
     }
 
-    fromDefaultEvent(event: Event): CalendarEvent<Event> {
+    private mapEvent(event: Event) : void {
+        if (event.Period == null) {
+            this.mapDefaultEvent(event);
+        } else {
+            this.mapRecurringEvent(event);
+        }
+
+        this.refresh.next();
+    }
+
+    private mapDefaultEvent(event: Event) : void {
         let eventCal;
 
         eventCal = {
@@ -235,19 +233,11 @@ export class MainScreenComponent implements OnInit {
             eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
         }
 
-        if (!event.IsReadOnly) {
-            eventCal.actions.push(this.actions[0]);
-        }
-
-        if (event.Owner.Id === this.authenticationService.getCurrentUser().Id) {
-            eventCal.actions.push(this.actions[1]);
-        }
-
-        return eventCal;
+        this.setEventActions(eventCal, event);
+        this.calendarEvents.push(eventCal);
     }
 
-    fromRecurringEvent(event: Event) : CalendarEvent<Event>[] {
-        let list: CalendarEvent<Event>[] = [];
+    private mapRecurringEvent(event: Event) : void {
         var rule = getRule(event.Period);
 
         rule.all().forEach(date => {
@@ -270,21 +260,22 @@ export class MainScreenComponent implements OnInit {
                 eventCal.end = getLocalTime(mergeDateTime(date, event.EndTime));
             }
 
-            if (!event.IsReadOnly) {
-                eventCal.actions.push(this.actions[0]);
-            }
-    
-            if (event.Owner.Id === this.authenticationService.getCurrentUser().Id) {
-                eventCal.actions.push(this.actions[1]);
-            }
-
-            list.push(eventCal);
+            this.setEventActions(eventCal, event);
+            this.calendarEvents.push(eventCal);
         });
-
-        return list;
     }
 
-    getDates() : DatesModel {
+    private setEventActions(eventCal: CalendarEvent<Event>, event: Event) : void {
+        if (!event.IsReadOnly) {
+            eventCal.actions.push(this.actions[0]);
+        }
+
+        if (event.Owner.Id === this.currentUser.Id) {
+            eventCal.actions.push(this.actions[1]);
+        }
+    }
+
+    private getDates() : DatesModel {
         var dates = new DatesModel();
         var curMoment = moment(this.viewDate).locale(this.locale);
 
@@ -304,7 +295,7 @@ export class MainScreenComponent implements OnInit {
         return dates;
     }
 
-    getCalendarsColor(id: number) {
+    private getCalendarsColor(id: number) : string {
         return this.calendars.filter(c => c.Id == id)
             .map(c => c.Color)[0];
     }

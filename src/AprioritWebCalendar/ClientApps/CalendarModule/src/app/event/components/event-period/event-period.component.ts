@@ -5,8 +5,15 @@ import { PeriodRequestModel } from '../../models/period.request.model';
     selector: 'app-event-period',
     templateUrl: './event-period.component.html'
 })
-export class EventPeriodComponent {
-    startEndDate: string[];
+export class EventPeriodComponent implements OnInit {
+    startEndDate: Date[];
+
+    ngOnInit(): void {
+        this.startEndDate = [
+            new Date(this.period.PeriodStart),
+            new Date(this.period.PeriodEnd)
+        ];
+    }
 
     @Input()
     period: PeriodRequestModel = new PeriodRequestModel();
@@ -15,8 +22,8 @@ export class EventPeriodComponent {
     onPeriodChanged = new EventEmitter<PeriodRequestModel>();
 
     emitPeriodChanged() {
-        this.period.PeriodStart = this.startEndDate[0];
-        this.period.PeriodEnd = this.startEndDate[1];
+        this.period.PeriodStart = this.startEndDate[0].toDateString();
+        this.period.PeriodEnd = this.startEndDate[1].toDateString();
 
         this.onPeriodChanged.emit(this.period);
         console.log(this.period);

@@ -41,7 +41,7 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
     // TODO: Validate timepickers.
     // TODO: Validate datepickers.
 
-    createEvent(createForm: NgForm) {
+    private createEvent(createForm: NgForm) {
         this.errors = [];
 
         let event: EventRequestModel = Object.assign(this.model);
@@ -73,11 +73,11 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
             });
     }
 
-    changeLocation(location: Location) {
+    private changeLocation(location: Location) {
         this.model.Location = location;
     }
 
-    changePeriod(period: PeriodRequestModel) {
+    private changePeriod(period: PeriodRequestModel) {
         this.model.Period = period;
     }
 }

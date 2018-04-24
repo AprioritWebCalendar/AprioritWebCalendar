@@ -50,8 +50,8 @@ export function getLocalTime(date: Date) : Date {
 
 export function getRule(period: Period) : RRule {
     return new RRule({
-        dtstart: new Date(period.PeriodStart.toLocaleString()),
-        until: new Date(period.PeriodEnd.toLocaleString()),
+        dtstart: getWithoutTime(period.PeriodStart),
+        until: getWithoutTime(period.PeriodEnd),
         freq: this.getFrequency(period.Type),
         interval: period.Cycle != null ? period.Cycle : 1,
     });

@@ -33,7 +33,7 @@ export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
         super(dialogService);
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.startEndDate = [
             new Date(this.model.StartDate),
             new Date(this.model.EndDate)
@@ -47,7 +47,7 @@ export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
         console.log(this.model);
     }
 
-    editEvent(editForm: NgForm) {
+    private editEvent(editForm: NgForm) {
         this.errors = [];
 
         if (!editForm.valid)
@@ -55,7 +55,7 @@ export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
 
         let event: EventRequestModel = Object.assign(this.model);
 
-        if (!this.model.IsAllDay) {
+        if (!event.IsAllDay) {
             event.StartTime = this.startTime.toTimeString();
             event.EndTime = this.endTime.toTimeString();
             console.log([event.StartTime, event.EndTime]);
@@ -63,7 +63,7 @@ export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
 
         event.ConvertDateTime([this.startEndDate[0].toDateString(), this.startEndDate[1].toDateString()]);
 
-        this.eventService.updateEvent(this.model.Id, event)
+        this.eventService.updateEvent(event.Id, event)
             .subscribe(isOk => {
                 this.result = event.ToEvent();
                 this.close();
@@ -76,11 +76,11 @@ export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
             });
     }
 
-    changeLocation(location: Location) {
+    private changeLocation(location: Location) {
         this.model.Location = location;
     }
 
-    changePeriod(period: PeriodRequestModel) {
+    private changePeriod(period: PeriodRequestModel) {
         this.model.Period = period;
     }
 }

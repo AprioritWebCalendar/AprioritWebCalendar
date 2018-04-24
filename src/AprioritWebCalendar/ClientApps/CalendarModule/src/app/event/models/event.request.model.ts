@@ -81,6 +81,9 @@ export class EventRequestModel {
         } else if (this.IsAllDay && !this.IsRecurrent) {
             this.StartDate = moment(getWithoutTime(new Date(startEndDate[0]))).format();
             this.EndDate = moment(getWithoutTime(new Date(startEndDate[1]))).format();
+        } else {
+            this.StartTime = getTimeAsString(mergeDateTime(getWithoutTime(new Date()), this.StartTime));
+            this.EndTime = getTimeAsString(mergeDateTime(getWithoutTime(new Date()), this.EndTime));
         }
     }
 
