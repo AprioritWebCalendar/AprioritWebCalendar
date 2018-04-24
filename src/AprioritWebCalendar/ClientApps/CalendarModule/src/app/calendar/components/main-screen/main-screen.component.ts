@@ -16,6 +16,7 @@ import { isSameMonth, isSameDay } from 'ngx-bootstrap/chronos/utils/date-getters
 import { EventEditComponent } from '../../../event/components/event-edit/event-edit.component';
 import { EventRequestModel } from '../../../event/models/event.request.model';
 import { User } from '../../../authentication/models/user';
+import { EventDeleteComponent, IEventDeleteParams } from '../../../event/components/event-delete/event-delete.component';
 
 @Component({
     selector: 'app-main-screen',
@@ -60,7 +61,7 @@ export class MainScreenComponent implements OnInit {
         {
             label: '<i class="fa fa-fw fa-times"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
-                alert("There will be a modal window to delete event.");
+                this.openDeleteEventModal(event);
             }
         }
     ];
@@ -162,6 +163,27 @@ export class MainScreenComponent implements OnInit {
                 this.mapEvent(ev);
 
                 this.toasts.success("The event has been updated successfully");
+            });
+    }
+
+    private openDeleteEventModal(event: CalendarEvent) {
+        let params: IEventDeleteParams = {
+            event: <Event>event.meta,
+            currentUser: this.currentUser
+        };
+
+        this.dialogService.addDialog(EventDeleteComponent, params)
+            .subscribe(id => {
+                if (id == null)
+                    return;
+
+                this.dataEvents = this.dataEvents.filter(e => e.Id != id);
+                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != id);
+                this.refresh.next();
+
+                this.toasts.success("The event has been deleted successfully?");
+            }, e => {
+                this.toasts.error("Unable to delete the event. Try again or reload the page.");
             });
     }
 

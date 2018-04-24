@@ -52,6 +52,7 @@ import { EventCreateComponent } from './event/components/event-create/event-crea
 import { EventPeriodComponent } from './event/components/event-period/event-period.component';
 import { EventLocationComponent } from './event/components/event-location/event-location.component';
 import { EventEditComponent } from './event/components/event-edit/event-edit.component';
+import { EventDeleteComponent } from './event/components/event-delete/event-delete.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { EventEditComponent } from './event/components/event-edit/event-edit.com
     EventCreateComponent,
     EventPeriodComponent,
     EventLocationComponent,
-    EventEditComponent
+    EventEditComponent,
+    EventDeleteComponent
   ],
   imports: [
     BrowserModule,
@@ -132,7 +134,8 @@ import { EventEditComponent } from './event/components/event-edit/event-edit.com
       ShareCalendarComponent,
 
       EventCreateComponent,
-      EventEditComponent
+      EventEditComponent,
+      EventDeleteComponent
     ]
 })
 export class CalendarModule { }
