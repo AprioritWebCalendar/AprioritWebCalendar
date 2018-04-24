@@ -210,11 +210,15 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpDelete("{id}/Invited/{userId}")]
         public async Task<IActionResult> DeleteInvitedUser(int id, int userId)
         {
-            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
-                return this.BadRequestError("Only owner can delete invited user.");
+            var currentUserId = this.GetUserId();
+            
+            if (userId == currentUserId || await _eventService.IsOwnerAsync(id, currentUserId))
+            {
+                await _eventService.DeleteIntvitedUserAsync(id, userId);
+                return Ok();
 
-            await _eventService.DeleteIntvitedUserAsync(id, userId);
-            return Ok();
+            }
+            return this.BadRequestError("Only owner can delete invited user.");
         }
 
         [HttpDelete("{id}/Invitation/{userId}")]
