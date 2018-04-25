@@ -1,7 +1,6 @@
 import { User } from "../../authentication/models/user";
 
-export class UserInvited {
+export class InviteRequestModel {
     public User: User;
-    public IsAccepted: boolean;
     public IsReadOnly: boolean;
 }

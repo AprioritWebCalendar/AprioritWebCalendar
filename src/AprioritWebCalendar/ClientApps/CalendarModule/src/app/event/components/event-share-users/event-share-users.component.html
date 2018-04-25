@@ -1,0 +1,41 @@
+<div class="panel panel-info">
+    <div class="panel-heading">Invited users</div>
+
+    <table class="table table-stripped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Accepted</th>
+                <th>Read Only</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let u of users">
+                <td>{{u.User.UserName}}</td>
+
+                <td>
+                    <div class="checkbox checkbox-primary">
+                        <input type="checkbox" id="user-{{u.User.Id}}-accepted" 
+                            disabled readonly
+                            [checked]="u.IsAccepted" />
+
+                        <label for="user-{{u.User.Id}}-accepted"></label>
+                    </div>
+                </td>
+
+                <td class="material-switch pull-right">
+                    <input type="checkbox" id="user-{{u.User.Id}}-readonly" 
+                            [(ngModel)]="u.IsReadOnly"
+                            (change)="readOnlyStateChanged(u)" />
+
+                    <label for="user-{{u.User.Id}}-readonly" class="label-danger"></label>
+                </td>
+
+                <td>
+                    <a (click)="removeUser(u)"><span class="glyphicon glyphicon-remove icon-red clickable"></span></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

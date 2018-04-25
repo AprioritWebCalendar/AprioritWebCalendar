@@ -36,7 +36,9 @@
             [locale]="locale"
             [refresh]="refresh"
             [events]="calendarEvents"
-            [viewDate]="viewDate"></mwl-calendar-day-view>
+            [viewDate]="viewDate"
+            
+            (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-day-view>
 
         <mwl-calendar-week-view
             *ngSwitchCase="'week'"
@@ -44,7 +46,9 @@
             [refresh]="refresh"
             [weekStartsOn]="weekStartsOn"
             [events]="calendarEvents"
-            [viewDate]="viewDate"></mwl-calendar-week-view>
+            [viewDate]="viewDate"
+            
+            (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-week-view>
 
         <mwl-calendar-month-view
             *ngSwitchCase="'month'"
@@ -55,7 +59,7 @@
             [events]="calendarEvents"
             [viewDate]="viewDate"
             
-            
+            (eventClicked)="openEventShareModal($event.event)"
             (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
     </div>
 

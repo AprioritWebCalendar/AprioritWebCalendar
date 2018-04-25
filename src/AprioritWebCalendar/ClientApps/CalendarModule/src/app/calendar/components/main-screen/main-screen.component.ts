@@ -18,6 +18,7 @@ import { EventRequestModel } from '../../../event/models/event.request.model';
 import { User } from '../../../authentication/models/user';
 import { EventDeleteComponent, IEventDeleteParams } from '../../../event/components/event-delete/event-delete.component';
 import { EventMoveComponent, IEventMoveParams } from '../../../event/components/event-move/event-move.component';
+import { IEventShareParams, EventShareComponent } from '../../../event/components/event-share/event-share.component';
 
 @Component({
     selector: 'app-main-screen',
@@ -113,6 +114,14 @@ export class MainScreenComponent implements OnInit {
                 this.viewDate = date;
             }
         }
+    }
+
+    private openEventShareModal(event: CalendarEvent) {
+        let params: IEventShareParams = {
+            event: event.meta
+        };
+
+        this.dialogService.addDialog(EventShareComponent, params);
     }
 
     private viewDateChanged(date: Date) : void {

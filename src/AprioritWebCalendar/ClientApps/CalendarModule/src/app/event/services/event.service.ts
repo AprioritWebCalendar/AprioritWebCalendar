@@ -67,7 +67,7 @@ export class EventService {
             IsReadOnly: isReadOnly
         };
 
-        return this.customHttp.put(`${this.baseUrl}${id}/InviteUser`, data)
+        return this.customHttp.put(`${this.baseUrl}${id}/Invite`, data)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }

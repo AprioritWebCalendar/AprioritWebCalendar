@@ -54,6 +54,9 @@ import { EventLocationComponent } from './event/components/event-location/event-
 import { EventEditComponent } from './event/components/event-edit/event-edit.component';
 import { EventDeleteComponent } from './event/components/event-delete/event-delete.component';
 import { EventMoveComponent } from './event/components/event-move/event-move.component';
+import { EventShareComponent } from './event/components/event-share/event-share.component';
+import { EventShareUsersComponent } from './event/components/event-share-users/event-share-users.component';
+import { EventSelectUserShareComponent } from './event/components/event-select-user-share/event-select-user-share.component';
 
 @NgModule({
   declarations: [
@@ -79,7 +82,10 @@ import { EventMoveComponent } from './event/components/event-move/event-move.com
     EventLocationComponent,
     EventEditComponent,
     EventDeleteComponent,
-    EventMoveComponent
+    EventMoveComponent,
+    EventShareComponent,
+    EventShareUsersComponent,
+    EventSelectUserShareComponent
   ],
   imports: [
     BrowserModule,
@@ -138,7 +144,8 @@ import { EventMoveComponent } from './event/components/event-move/event-move.com
       EventCreateComponent,
       EventEditComponent,
       EventDeleteComponent,
-      EventMoveComponent
+      EventMoveComponent,
+      EventShareComponent
     ]
 })
 export class CalendarModule { }
