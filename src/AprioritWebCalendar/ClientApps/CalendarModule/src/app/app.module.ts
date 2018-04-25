@@ -53,6 +53,7 @@ import { EventPeriodComponent } from './event/components/event-period/event-peri
 import { EventLocationComponent } from './event/components/event-location/event-location.component';
 import { EventEditComponent } from './event/components/event-edit/event-edit.component';
 import { EventDeleteComponent } from './event/components/event-delete/event-delete.component';
+import { EventMoveComponent } from './event/components/event-move/event-move.component';
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import { EventDeleteComponent } from './event/components/event-delete/event-dele
     EventPeriodComponent,
     EventLocationComponent,
     EventEditComponent,
-    EventDeleteComponent
+    EventDeleteComponent,
+    EventMoveComponent
   ],
   imports: [
     BrowserModule,
@@ -135,7 +137,8 @@ import { EventDeleteComponent } from './event/components/event-delete/event-dele
 
       EventCreateComponent,
       EventEditComponent,
-      EventDeleteComponent
+      EventDeleteComponent,
+      EventMoveComponent
     ]
 })
 export class CalendarModule { }

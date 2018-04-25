@@ -17,6 +17,7 @@ import { EventEditComponent } from '../../../event/components/event-edit/event-e
 import { EventRequestModel } from '../../../event/models/event.request.model';
 import { User } from '../../../authentication/models/user';
 import { EventDeleteComponent, IEventDeleteParams } from '../../../event/components/event-delete/event-delete.component';
+import { EventMoveComponent, IEventMoveParams } from '../../../event/components/event-move/event-move.component';
 
 @Component({
     selector: 'app-main-screen',
@@ -51,7 +52,7 @@ export class MainScreenComponent implements OnInit {
         private authenticationService: AuthenticationService
     ) { }
 
-    actions: CalendarEventAction[] = [
+    private actions: CalendarEventAction[] = [
         {
             label: '<i class="fa fa-fw fa-pencil"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
@@ -62,6 +63,12 @@ export class MainScreenComponent implements OnInit {
             label: '<i class="fa fa-fw fa-times"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
                 this.openDeleteEventModal(event);
+            }
+        },
+        {
+            label: '<i class="fas fa-arrow-right"></i>',
+            onClick: ({ event }: { event: CalendarEvent }): void => {
+                this.openMoveEventModal(event);
             }
         }
     ];
@@ -166,7 +173,7 @@ export class MainScreenComponent implements OnInit {
             });
     }
 
-    private openDeleteEventModal(event: CalendarEvent) {
+    private openDeleteEventModal(event: CalendarEvent) : void {
         let params: IEventDeleteParams = {
             event: <Event>event.meta,
             currentUser: this.currentUser
@@ -184,6 +191,24 @@ export class MainScreenComponent implements OnInit {
                 this.toasts.success("The event has been deleted successfully?");
             }, e => {
                 this.toasts.error("Unable to delete the event. Try again or reload the page.");
+            });
+    }
+
+    private openMoveEventModal(event: CalendarEvent) : void {
+        let params: IEventMoveParams = {
+            event: event.meta,
+            calendars: this.calendars.filter(c => c.Owner.Id == this.currentUser.Id)
+        };
+
+        this.dialogService.addDialog(EventMoveComponent, params)
+            .subscribe(ev => {
+                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
+                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
+
+                this.mapEvent(ev);
+                this.toasts.success("The event has been moved successfully");
+            }, e => {
+                this.toasts.error("Unable to move the event. Try again or reload the page.");
             });
     }
 
@@ -295,6 +320,8 @@ export class MainScreenComponent implements OnInit {
         if (event.Owner.Id === this.currentUser.Id) {
             eventCal.actions.push(this.actions[1]);
         }
+
+        eventCal.actions.push(this.actions[2]);
     }
 
     private getDates() : DatesModel {
