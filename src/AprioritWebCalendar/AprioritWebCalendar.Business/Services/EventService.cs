@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Data.Interfaces;
@@ -11,9 +11,8 @@ using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.Infrastructure.Exceptions;
 using AprioritWebCalendar.Infrastructure.Extensions;
 using DomainEvent = AprioritWebCalendar.Business.DomainModels.Event;
-using DomainEventCalendar = AprioritWebCalendar.Business.DomainModels.EventCalendar;
 using DomainUser = AprioritWebCalendar.Business.DomainModels.User;
-using Microsoft.EntityFrameworkCore;
+using UserInvitation = AprioritWebCalendar.Business.DomainModels.UserInvitation;
 
 namespace AprioritWebCalendar.Business.Services
 {
@@ -199,34 +198,56 @@ namespace AprioritWebCalendar.Business.Services
             await _eventCalendarRepository.SaveAsync();
         }
 
-        public async Task<IEnumerable<DomainModels.UserInvitation>> GetInvitedUsersAsync(int eventId)
+        public async Task<IEnumerable<UserInvitation>> GetInvitedUsersAsync(int eventId)
         {
-            var ev = await _GetEventAsync(eventId);
+            var ev = await _GetEventAsync(eventId, e => e.Owner);
 
             var userAcceptedEvent = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Calendar.Owner))
-                .Select(e => e.Calendar.Owner)
+                .Select(e => new
+                {
+                    User = e.Calendar.Owner,
+                    IsReadOnly = e.IsReadOnly
+                })
                 .ToList();
 
             var invitedUsers = (await _invitationRepository.FindAllIncludingAsync(i => i.EventId == eventId, i => i.User))
-                .Select(i => i.User)
+                .Select(i => new { i.User, i.IsReadOnly })
                 .ToList();
 
             // Removing event's owner from the list that matches events with calendars.
-            userAcceptedEvent.RemoveAll(u => u.Id == ev.Id);
+            userAcceptedEvent.RemoveAll(u => u.User.Id == ev.Owner.Id);
 
-            // Mapping to "UserInvitation".
-            var users = _mapper.Map<List<DomainModels.UserInvitation>>(userAcceptedEvent);
+            var userInvitations = new List<UserInvitation>();
 
-            // Setting "IsAccepted".
-            foreach (var u in users)
+            userInvitations.AddRange(userAcceptedEvent.Select(u => new UserInvitation
             {
-                u.IsAccepted = true;
-            }
+                User = _mapper.Map<DomainUser>(u.User),
+                IsAccepted = true,
+                IsReadOnly = u.IsReadOnly
+            }));
 
-            // Adding users which haven't accepted.
-            users.AddRange(_mapper.Map<List<DomainModels.UserInvitation>>(invitedUsers));
+            userInvitations.AddRange(invitedUsers.Select(u => new UserInvitation
+            {
+                User = _mapper.Map<DomainUser>(u.User),
+                IsAccepted = false,
+                IsReadOnly = u.IsReadOnly
+            }));
 
-            return users;
+            return userInvitations;
+
+            //// Mapping to "UserInvitation".
+            //var users = _mapper.Map<List<DomainModels.UserInvitation>>(userAcceptedEvent);
+
+            //// Setting "IsAccepted".
+            //foreach (var u in users)
+            //{
+            //    u.IsAccepted = true;
+            //}
+
+            //// Adding users which haven't accepted.
+            //users.AddRange(_mapper.Map<List<DomainModels.UserInvitation>>(invitedUsers));
+
+            //return users;
         }
 
         public async Task InviteUserAsync(int eventId, int userId, int invitatorId, bool isReadOnly)
