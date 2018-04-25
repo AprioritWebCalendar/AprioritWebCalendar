@@ -42,6 +42,13 @@ namespace AprioritWebCalendar.Web.Controllers
             var calendars = await _calendarService.GetCalendarsAsync(userId, onlyOwn);
             var viewModels = _mapper.MapToCalendarViewModel(calendars.ToList(), userId);
 
+            // User mustn't know about "IsDefault" state of caledar of another user.
+            foreach (var c in viewModels)
+            {
+                if (c.Owner.Id != userId)
+                    c.IsDefault = null;
+            }
+
             return this.OkOrNoContent(viewModels);
         }
 
@@ -120,6 +127,9 @@ namespace AprioritWebCalendar.Web.Controllers
 
             if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
                 throw new ArgumentException();
+
+            if (await _calendarService.IsDefaultAsync(id))
+                return this.BadRequestError("You can't delete default calendar.");
 
             // TODO: Check for existing events, etc..?
 
