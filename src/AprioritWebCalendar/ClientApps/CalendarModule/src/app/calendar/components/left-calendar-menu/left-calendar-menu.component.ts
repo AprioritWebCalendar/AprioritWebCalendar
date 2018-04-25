@@ -138,9 +138,9 @@ export class LeftCalendarMenuComponent implements OnInit {
     }
 
     @Output()
-    onCalendarsChanged = new EventEmitter<Number[]>();
+    onCalendarsChanged = new EventEmitter<Calendar[]>();
 
     calendarsChanged() {
-        this.onCalendarsChanged.emit(this.model.getCheckedCalendarsId());
+        this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
     }
 }

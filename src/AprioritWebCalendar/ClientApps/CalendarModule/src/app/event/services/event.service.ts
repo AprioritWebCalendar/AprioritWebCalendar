@@ -40,7 +40,7 @@ export class EventService {
 
     public createEvent(event: EventRequestModel) : Observable<number> {
         return this.customHttp.post(this.baseUrl, event)
-            .map(r => r.json())
+            .map(r => r.json().Id)
             .catch(e => Observable.throw(e));
     }
 
@@ -67,7 +67,7 @@ export class EventService {
             IsReadOnly: isReadOnly
         };
 
-        return this.customHttp.put(`${this.baseUrl}${id}/InviteUser`, data)
+        return this.customHttp.put(`${this.baseUrl}${id}/Invite`, data)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
@@ -90,7 +90,7 @@ export class EventService {
         opts.headers.set("Content-Type", "application/json");
         this.customHttp.attachToken(opts);
 
-        return this.customHttp.put(`${this.baseUrl}${id}/ReadOnly/${userId}`, isReadOnly)
+        return this.customHttp.put(`${this.baseUrl}${id}/ReadOnly/${userId}`, isReadOnly, opts)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
@@ -101,7 +101,7 @@ export class EventService {
         opts.headers.set("Content-Type", "application/json");
         this.customHttp.attachToken(opts);
 
-        return this.customHttp.put(`${this.baseUrl}${id}/Invitation/ReadOnly/${userId}`, isReadOnly)
+        return this.customHttp.put(`${this.baseUrl}${id}/Invitation/ReadOnly/${userId}`, isReadOnly, opts)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }

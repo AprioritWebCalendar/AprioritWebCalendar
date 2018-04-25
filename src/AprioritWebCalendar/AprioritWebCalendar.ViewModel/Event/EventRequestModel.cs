@@ -35,10 +35,24 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            StartDate = StartDate?.Date;
-            EndDate = EndDate?.Date;
-
             var errors = new List<ValidationResult>();
+
+            if (Period != null)
+            {
+                errors.AddRange(Period.Validate(validationContext));
+                StartDate = null;
+                EndDate = null;
+            }
+            else
+            {
+                StartDate = StartDate?.Date;
+                EndDate = EndDate?.Date;
+
+                if (StartDate > EndDate)
+                {
+                    errors.AddError("StartDate must not be more than EndDate.", nameof(StartDate), nameof(EndDate));
+                }
+            }
 
             if (Name?.Length < 3 || Name?.Length > 32)
             {
@@ -70,20 +84,6 @@ namespace AprioritWebCalendar.ViewModel.Event
                 if (StartTime > EndTime)
                 {
                     errors.AddError("StartTime must not be more than EndTime.", nameof(StartTime), nameof(EndTime));
-                }
-            }
-
-            if (Period != null)
-            {
-                errors.AddRange(Period.Validate(validationContext));
-                StartDate = null;
-                EndDate = null;
-            }
-            else
-            {
-                if (StartDate > EndDate)
-                {
-                    errors.AddError("StartDate must not be more than EndDate.", nameof(StartDate), nameof(EndDate));
                 }
             }
 

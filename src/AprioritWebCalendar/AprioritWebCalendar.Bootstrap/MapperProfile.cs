@@ -16,9 +16,6 @@ namespace AprioritWebCalendar.Bootstrap
             CreateMap<ApplicationUser, User>()
                 .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
 
-            CreateMap<ApplicationUser, UserInvitation>()
-                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
-
             CreateMap<User, UserViewModel>();
 
             #endregion
