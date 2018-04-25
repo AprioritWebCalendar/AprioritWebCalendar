@@ -16,10 +16,12 @@ export class EventShareUsersComponent {
     onReadOnlyStateChanged = new EventEmitter<UserInvited>();
 
     private removeUser(user: UserInvited) : void {
+        console.log("Removing user.");
         this.onUserRemoved.emit(user);
     }
 
     private readOnlyStateChanged(user: UserInvited) : void {
+        console.log("Changing readonly state.");
         this.onReadOnlyStateChanged.emit(user);
     }
 }

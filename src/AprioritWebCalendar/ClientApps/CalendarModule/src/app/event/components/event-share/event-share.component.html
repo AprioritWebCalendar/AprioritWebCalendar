@@ -23,7 +23,7 @@
             <app-event-share-users
                 *ngIf="users.length > 0"
                 [users]="users"
-                (onReadOnlyState)="changeReadOnlyState($event)"
+                (onReadOnlyStateChanged)="changeReadOnlyState($event)"
                 (onUserRemoved)="removeUser($event)"></app-event-share-users>
         </div>
 

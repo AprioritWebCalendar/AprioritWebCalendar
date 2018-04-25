@@ -66,10 +66,13 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
         if (user.IsAccepted) {
             this.eventService.deleteInvitedUser(this.event.Id, user.User.Id as number)
                 .subscribe(isOk => {
-                    if (isOk)
+                    if (isOk) {
+                        this.users = this.users.filter(u => u.User.Id != user.User.Id);
                         this.successCallback(message);
-                    else
+                    }
+                    else {
                         this.errorCallback(errorMessage);
+                    }
                 }, e => this.errorCallback(errorMessage));
         } else {
             this.eventService.deleteInvitation(this.event.Id, user.User.Id as number)
@@ -85,6 +88,8 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
     private changeReadOnlyState(user: UserInvited) : void {
         let message = "ReadOnly state has been changed.";
         let errorMessage = "Unable to change ReadOnly state. Try to reload the page.";
+
+        console.log("Changing read-only state for: " + user.User.UserName);
 
         if (user.IsAccepted) {
             this.eventService.setEventReadOnlyState(this.event.Id, user.User.Id as number, user.IsReadOnly)

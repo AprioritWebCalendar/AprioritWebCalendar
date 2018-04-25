@@ -24,12 +24,14 @@
                     </div>
                 </td>
 
-                <td class="material-switch pull-right">
-                    <input type="checkbox" id="user-{{u.User.Id}}-readonly" 
+                <td>
+                    <div class="checkbox checkbox-danger">
+                        <input type="checkbox" id="user-{{u.User.Id}}-readonly" 
                             [(ngModel)]="u.IsReadOnly"
                             (change)="readOnlyStateChanged(u)" />
 
-                    <label for="user-{{u.User.Id}}-readonly" class="label-danger"></label>
+                        <label for="user-{{u.User.Id}}-readonly"></label>
+                    </div>
                 </td>
 
                 <td>
