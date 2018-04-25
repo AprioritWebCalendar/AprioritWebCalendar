@@ -1,0 +1,41 @@
+<div class="form-group">
+    <label class="control-label" for="Dates">Start and End dates</label>
+
+    <input type="text" name="Dates" class="form-control" required 
+        bsDaterangepicker
+        [(ngModel)]="startEndDate" #periodStartEndDate="ngModel"
+        (change)="emitPeriodChanged()" />
+
+    <span class="text-danger" *ngIf="!periodStartEndDate.valid && periodStartEndDate.touched">
+        The Start and End dates are required.
+    </span>
+</div>
+
+<div class="form-group">
+    <label class="control-label" for="Type">Type</label>
+
+    <select name="Type" required class="form-control"
+         [(ngModel)]="period.Type" #periodType="ngModel"
+         (change)="emitPeriodChanged()">
+        <option value="0">Custom</option>
+        <option value="1">Weekly</option>
+        <option value="2" selected>Monthly</option>
+        <option value="3">Yearly</option>
+    </select>
+
+    <span class="text-danger" *ngIf="!periodType.valid && periodType.touched">
+        The Type field is required.
+    </span>
+</div>
+
+<div class="form-group" *ngIf="period.Type == 0">
+    <label for="Cycle" class="control-label">Cycle</label>
+
+    <input type="number" class="form-control" required name="Cycle" min="1"
+        [(ngModel)]="period.Cycle" #periodCycle="ngModel"
+        (change)="emitPeriodChanged()" />
+
+    <span class="text-danger" *ngIf="!periodCycle.valid && periodCycle.touched">
+        The cycle field is required.
+    </span>
+</div>

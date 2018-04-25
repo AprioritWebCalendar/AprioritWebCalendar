@@ -1,0 +1,38 @@
+<div class="modal-dialog" role="document">
+    <form #moveForm="ngForm" novalidate>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Move event "{{event.Name}}"</h4>
+            </div>
+
+            <div class="modal-body">
+                <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+
+                <div class="form-group">
+                    <label class="control-label" for="Calendar">Calendar</label>
+
+                    <select name="Calendar" required class="form-control"
+                        [(ngModel)]="calendarToMoveId" #calendarId="ngModel">
+                            <option *ngFor="let c of calendars" [ngValue]="c.Id">{{c.Name}}</option>
+                    </select>
+
+                    <span class="text-danger" *ngIf="!calendarId.valid && calendarId.touched">
+                        The Calendar field is required.
+                    </span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                    [disabled]="!moveForm.valid"
+                    (click)="moveEvent(moveForm)">Move</button>
+
+                <button type="button" class="btn btn-danger" 
+                    (click)="close()">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>

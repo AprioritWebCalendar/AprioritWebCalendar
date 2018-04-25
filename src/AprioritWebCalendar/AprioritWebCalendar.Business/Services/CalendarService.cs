@@ -196,6 +196,14 @@ namespace AprioritWebCalendar.Business.Services
             return calendar.SharedUsers.Any(u => u.UserId == userId);
         }
 
+        public async Task<bool> IsOwnerOrSharedWithAsync(IEnumerable<int> calendarsIds, int userId)
+        {
+            var calendars = (await _calendarRepository.FindAllIncludingAsync(c => calendarsIds.Contains(c.Id), c => c.SharedUsers))
+                .ToList();
+
+            return calendars.TrueForAll(c => c.OwnerId == userId || c.SharedUsers.Any(u => u.UserId == userId));
+        }
+
         public async Task<bool> CanEditAsync(int calendarId, int userId)
         {
             var calendar = await _GetByIdAsync(calendarId, c => c.SharedUsers);

@@ -30,7 +30,7 @@ export class CalendarCreateComponent extends DialogComponent<CalendarCreateModel
         let calendar = new Calendar();
         calendar.Name = this.model.Name;
         calendar.Description = this.model.Description;
-        calendar.Color = this.model.Color;
+        calendar.Color = this.model.Color.toUpperCase();
 
         this.calendarService.createCalendar(calendar)
             .subscribe((id: Number) => {

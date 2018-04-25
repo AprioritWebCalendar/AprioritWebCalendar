@@ -32,12 +32,17 @@ export class LeftCalendarMenuComponent implements OnInit {
     ngOnInit() {
         this.calendarService.getCalendars()
             .subscribe((calendars: Calendar[]) => {
+                this.UserId = this.authService.getCurrentUser().Id;
+
+                if (calendars == null)
+                    return;
+
                 this.model.Calendars = <CalendarCheck[]>calendars;
                 this.model.Calendars.forEach(function(value) {
                     value.IsChecked = true;
                 });
 
-                this.UserId = this.authService.getCurrentUser().Id;
+                this.calendarsChanged();
             },
             (response: Response) => {
                 this.model.IsError = true;
@@ -51,6 +56,9 @@ export class LeftCalendarMenuComponent implements OnInit {
                 if (calendar != null) {
                     calendar.Owner = this.authService.getCurrentUser();
                     this.model.Calendars.push(calendar);
+
+                    console.log(calendar);
+                    console.log(`UserId: ${this.UserId}`);
 
                     this.toastr.success("The calendar has been created successfully.");
                 }
@@ -130,9 +138,9 @@ export class LeftCalendarMenuComponent implements OnInit {
     }
 
     @Output()
-    onCalendarsChanged = new EventEmitter<Number[]>();
+    onCalendarsChanged = new EventEmitter<Calendar[]>();
 
     calendarsChanged() {
-        this.onCalendarsChanged.emit(this.model.getCheckedCalendarsId());
+        this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
     }
 }

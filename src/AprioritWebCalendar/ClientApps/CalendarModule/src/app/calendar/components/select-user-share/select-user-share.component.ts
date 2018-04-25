@@ -29,7 +29,12 @@ export class SelectUserShareComponent {
     ) {
         this.users = Observable.create((observer: any) => {
             userService.findUsersByEmailOrUserName(this.emailOrUserName)
-                .subscribe(users => observer.next(users));
+                .subscribe(users => {
+                    if (users == null)
+                        return;
+
+                    observer.next(users)
+                });
         });
      }
 
