@@ -16,9 +16,6 @@ namespace AprioritWebCalendar.Bootstrap
             CreateMap<ApplicationUser, User>()
                 .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
 
-            CreateMap<ApplicationUser, UserInvitation>()
-                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
-
             CreateMap<User, UserViewModel>();
 
             #endregion
@@ -49,15 +46,21 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.Calendars, opt => opt.Ignore())
                 .ForMember(dest => dest.Invitations, opt => opt.Ignore())
                 .ForMember(dest => dest.Owner, opt => opt.Ignore())
-                .ForMember(dest => dest.Period, opt => opt.Ignore());
+                .ForMember(dest => dest.OwnerId, opt => opt.Ignore());
+                //.ForMember(dest => dest.Period, opt => opt.Ignore());
 
             CreateMap<Data.Models.Event, Business.DomainModels.Event>()
-                .ForMember(dest => dest.Location.Description, opt => opt.MapFrom(src => src.LocationDescription))
-                .ForMember(dest => dest.Location.Longitude, opt => opt.MapFrom(src => src.Longitude))
-                .ForMember(dest => dest.Location.Lattitude, opt => opt.MapFrom(src => src.Lattitude));
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location{ Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude}));
 
 
-            CreateMap<EventViewModel, Business.DomainModels.Event>();
+            CreateMap<EventRequestModel, Business.DomainModels.Event>();
+
+            #endregion
+
+            #region Location.
+
+            CreateMap<Location, LocationViewModel>();
+            CreateMap<LocationViewModel, Location>();
 
             #endregion
 
@@ -97,8 +100,13 @@ namespace AprioritWebCalendar.Bootstrap
 
             #region Period.
 
-            CreateMap<Business.DomainModels.Period, Data.Models.Period>();
+            CreateMap<Business.DomainModels.Period, Data.Models.Period>()
+                .ForMember(dest => dest.EventId, opt => opt.Ignore());
+
             CreateMap<Data.Models.Period, Business.DomainModels.Period>();
+
+            CreateMap<Business.DomainModels.Period, PeriodViewModel>();
+            CreateMap<PeriodViewModel, Business.DomainModels.Period>();
 
             #endregion
         }

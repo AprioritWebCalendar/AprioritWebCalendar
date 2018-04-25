@@ -28,7 +28,7 @@
 
 <div class="col-sm-3 col-md-2 sidebar">
     <div class="nav nav-sidebar">
-        <div *ngIf="model.Calendars.length > 0">
+        <div *ngIf="model.Calendars != null && model.Calendars.length > 0">
             <h4 class="text-center">Calendars</h4>
 
             <li class="checkbox checkbox-primary col-md-offset-1" *ngFor="let c of model.Calendars"

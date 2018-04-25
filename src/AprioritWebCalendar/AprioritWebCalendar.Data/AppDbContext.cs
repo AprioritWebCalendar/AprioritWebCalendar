@@ -33,6 +33,7 @@ namespace AprioritWebCalendar.Data
             builder.Entity<UserCalendar>().HasKey(k => new { k.UserId, k.CalendarId });
             builder.Entity<EventCalendar>().HasKey(k => new { k.EventId, k.CalendarId });
             builder.Entity<Invitation>().HasKey(k => new { k.EventId, k.UserId, k.InvitatorId });
+            EFCore.UseDateDiff(builder);
         }
     }
 }

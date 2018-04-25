@@ -33,13 +33,21 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Event> GetEventByIdAsync(int eventId, params string[] includeProperties);
 
         /// <summary>
+        /// Gets event by ID with relates entities.
+        /// Also gets IsReadOnly, CalendarId and Color for user.
+        /// </summary>
+        /// <param name="eventId">Event ID</param>
+        /// <param name="userId">UserID</param>
+        /// <returns>Event</returns>
+        Task<Event> GetEventByIdAsync(int eventId, int userId);
+
+        /// <summary>
         /// Creates a new event.
         /// </summary>
         /// <param name="eventDomain">Event domain model</param>
-        /// <param name="calendarId">ID of the calendar to store event there</param>
         /// <param name="ownerId">Owner ID</param>
         /// <returns>Id of created event.</returns>
-        Task<int> CreateEventAsync(Event eventDomain, int calendarId, int ownerId);
+        Task<int> CreateEventAsync(Event eventDomain, int ownerId);
 
         /// <summary>
         /// Updates an existing event.
@@ -66,7 +74,7 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// </summary>
         /// <param name="eventId">Event ID</param>
         /// <returns>Enumeration of users.</returns>
-        Task<IEnumerable<User>> GetInvitedUsersAsync(int eventId);
+        Task<IEnumerable<UserInvitation>> GetInvitedUsersAsync(int eventId);
 
         /// <summary>
         /// Invites user to event.
@@ -115,12 +123,27 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task UpdateEventReadOnlyStateAsync(int eventId, int userId, bool isReadOnly);
 
         /// <summary>
+        /// Checks event is private.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns>Private or no.</returns>
+        Task<bool> IsPrivateAsync(int eventId);
+
+        /// <summary>
         /// Checks user is owner of event.
         /// </summary>
         /// <param name="eventId">Event ID</param>
         /// <param name="userId">User ID</param>
         /// <returns></returns>
         Task<bool> IsOwnerAsync(int eventId, int userId);
+
+        /// <summary>
+        /// Checks user is owner or invited on event.
+        /// </summary>
+        /// <param name="eventId">Event ID</param>
+        /// <param name="userId">User ID</param>
+        /// <returns></returns>
+        Task<bool> IsOwnerOrInvitedAsync(int eventId, int userId);
 
         /// <summary>
         /// Checks can user edit event.
