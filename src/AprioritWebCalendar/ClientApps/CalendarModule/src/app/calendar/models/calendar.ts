@@ -9,4 +9,5 @@ export class Calendar {
 
     public IsReadOnly?: boolean;
     public IsSubscribed?: boolean;
+    public IsDefault: boolean;
 }
