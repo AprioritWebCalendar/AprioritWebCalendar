@@ -96,6 +96,8 @@ namespace AprioritWebCalendar.Bootstrap
 
             CreateMap<Data.Models.Invitation, Business.DomainModels.Invitation>();
 
+            CreateMap<Business.DomainModels.Invitation, InvitationViewModel>();
+
             #endregion
 
             #region Period.

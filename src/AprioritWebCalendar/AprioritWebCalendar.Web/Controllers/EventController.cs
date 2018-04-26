@@ -18,6 +18,7 @@ using AprioritWebCalendar.Infrastructure.Extensions;
 namespace AprioritWebCalendar.Web.Controllers
 {
     // TODO: Whole days count (for Period).
+    // TODO: Separated controller for invitations.
 
     [Produces("application/json")]
     [Route("api/Event")]
@@ -82,6 +83,18 @@ namespace AprioritWebCalendar.Web.Controllers
 
             var users = await _eventService.GetInvitedUsersAsync(id);
             return this.OkOrNoContent(users);
+        }
+
+        [HttpGet("Invitation/Incoming")]
+        public async Task<IActionResult> GetIncomingInvitations()
+        {
+            return this.OkOrNoContent(await _eventService.GetIncomingInvitationsAsync(this.GetUserId()));
+        }
+
+        [HttpGet("Invitation/Outcoming")]
+        public async Task<IActionResult> GetOutcomingInvitations()
+        {
+            return this.OkOrNoContent(await _eventService.GetOutcomingInvitationsAsync(this.GetUserId()));
         }
 
         #endregion
