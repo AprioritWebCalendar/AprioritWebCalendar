@@ -1,0 +1,18 @@
+<form class="navbar-form navbar-right">
+    <input type="text" id="searchText" name="searchText" class="form-control" placeholder="Search..."
+        [(ngModel)]="searchText"
+        [typeaheadMinLength]="3"
+        [typeahead]="events"
+        [typeaheadScrollable]="true"
+        [typeaheadItemTemplate]="typeaheadEvents"
+
+        container="body"
+        (typeaheadOnSelect)="eventClicked($event.item)" />
+</form>
+
+<ng-template #typeaheadEvents let-model="item">
+    <a class="list-group-item">
+        <h4 class="list-group-item-heading">{{model.Name}}</h4>
+        <p class="list-group-item-text">There will be some additional info.</p>
+    </a>
+</ng-template>

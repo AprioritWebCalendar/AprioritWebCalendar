@@ -59,6 +59,21 @@ namespace AprioritWebCalendar.Web.Controllers
             return Ok(_mapper.Map<IEnumerable<EventViewModel>>(eventsDomain));
         }
 
+        [HttpGet("Search/{text}/{take?}")]
+        public async Task<IActionResult> Get(string text, int take = 5)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length < 3)
+                return this.BadRequestError("The text to search is required and must be at least than 3 symbols.");
+
+            var events = await _eventService.GetEventsByNameAsync(text, this.GetUserId(), take);
+
+            if (events?.Any() != true)
+                return NoContent();
+
+            var viewEvents = _mapper.Map<IEnumerable<EventSearchResultModel>>(events);
+            return Ok(viewEvents);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {

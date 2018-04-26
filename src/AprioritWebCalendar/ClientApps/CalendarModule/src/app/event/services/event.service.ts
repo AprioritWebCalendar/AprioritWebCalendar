@@ -38,6 +38,12 @@ export class EventService {
             .catch(e => Observable.throw(e));
     }
 
+    public search(text: string, take: number = 5) : Observable<Event[]> {
+        return this.customHttp.get(`${this.baseUrl}Search/${text}/${take}`)
+            .map(r => r.json())
+            .catch(e => Observable.throw(e));
+    }
+
     public createEvent(event: EventRequestModel) : Observable<number> {
         return this.customHttp.post(this.baseUrl, event)
             .map(r => r.json().Id)

@@ -109,6 +109,24 @@ namespace AprioritWebCalendar.Business.Services
             return domainEvents;
         }
 
+        public async Task<IEnumerable<DomainEvent>> GetEventsByNameAsync(string name, int userId, int take)
+        {
+            Expression<Func<EventCalendar, bool>> filter = evCal => evCal.Event.Name.IndexOf(name) >= 0
+                && (evCal.Calendar.OwnerId == userId || evCal.Calendar.SharedUsers.Any(u => u.UserId == userId));
+
+            var dataEvents = (await _eventCalendarRepository.FindAllIncludingAsync(filter,
+                    evCal => evCal.Event, evCal => evCal.Event.Period, evCal => evCal.Calendar, evCal => evCal.Calendar.SharedUsers))
+                .Select(evCal => evCal.Event)
+                .OrderByDescending(e => e.Name.StartsWith(name))
+                .ThenByDescending(e => e.StartDate)
+                .ThenByDescending(e => e.Period.PeriodStart)
+                .Take(take)
+                .ToList();
+
+            dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
+            return _mapper.Map<IEnumerable<DomainEvent>>(dataEvents);
+        }
+
         public async Task<DomainEvent> GetEventByIdAsync(int eventId)
         {
             var dataEvent = await _GetEventAsync(eventId);

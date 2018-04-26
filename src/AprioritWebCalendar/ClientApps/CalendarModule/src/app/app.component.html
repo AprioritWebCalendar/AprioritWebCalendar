@@ -12,9 +12,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <app-auth-panel></app-auth-panel>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
+            <app-event-search *ngIf="authService.isAuthenticated()"></app-event-search>
         </div>
     </div>
 </nav>
