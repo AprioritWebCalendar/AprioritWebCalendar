@@ -57,6 +57,7 @@ import { EventMoveComponent } from './event/components/event-move/event-move.com
 import { EventShareComponent } from './event/components/event-share/event-share.component';
 import { EventShareUsersComponent } from './event/components/event-share-users/event-share-users.component';
 import { EventSelectUserShareComponent } from './event/components/event-select-user-share/event-select-user-share.component';
+import { EventSearchComponent } from './event/components/event-search/event-search.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,8 @@ import { EventSelectUserShareComponent } from './event/components/event-select-u
     EventMoveComponent,
     EventShareComponent,
     EventShareUsersComponent,
-    EventSelectUserShareComponent
+    EventSelectUserShareComponent,
+    EventSearchComponent
   ],
   imports: [
     BrowserModule,
