@@ -42,6 +42,20 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Event> GetEventByIdAsync(int eventId, int userId);
 
         /// <summary>
+        /// Gets incoming invitations.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Enumeration of invitations.</returns>
+        Task<IEnumerable<Invitation>> GetIncomingInvitationsAsync(int userId);
+
+        /// <summary>
+        /// Gets outcoming invitations.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Enumeration of invitations.</returns>
+        Task<IEnumerable<Invitation>> GetOutcomingInvitationsAsync(int userId);
+
+        /// <summary>
         /// Creates a new event.
         /// </summary>
         /// <param name="eventDomain">Event domain model</param>

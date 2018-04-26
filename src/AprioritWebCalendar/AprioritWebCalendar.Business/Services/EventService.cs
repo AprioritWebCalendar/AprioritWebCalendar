@@ -12,6 +12,7 @@ using AprioritWebCalendar.Infrastructure.Exceptions;
 using AprioritWebCalendar.Infrastructure.Extensions;
 using DomainEvent = AprioritWebCalendar.Business.DomainModels.Event;
 using DomainUser = AprioritWebCalendar.Business.DomainModels.User;
+using DomainInvitation = AprioritWebCalendar.Business.DomainModels.Invitation;
 using UserInvitation = AprioritWebCalendar.Business.DomainModels.UserInvitation;
 
 namespace AprioritWebCalendar.Business.Services
@@ -141,6 +142,22 @@ namespace AprioritWebCalendar.Business.Services
             domainEvent.Color = eventCalendar.Calendar.Color;
 
             return domainEvent;
+        }
+
+        public async Task<IEnumerable<DomainInvitation>> GetIncomingInvitationsAsync(int userId)
+        {
+            var invitations = await _invitationRepository.FindAllIncludingAsync(i => i.UserId == userId,
+                i => i.Event, i => i.Event.Period, i => i.User);
+
+            return _mapper.Map<IEnumerable<DomainInvitation>>(invitations);
+        }
+
+        public async Task<IEnumerable<DomainInvitation>> GetOutcomingInvitationsAsync(int userId)
+        {
+            var invitations = await _invitationRepository.FindAllIncludingAsync(i => i.InvitatorId == userId,
+                i => i.Event, i => i.User);
+
+            return _mapper.Map<IEnumerable<DomainInvitation>>(invitations);
         }
 
         public async Task<int> CreateEventAsync(DomainEvent eventDomain, int ownerId)
