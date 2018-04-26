@@ -48,6 +48,14 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<int> CreateCalendarAsync(Calendar calendar, int ownerId);
 
         /// <summary>
+        /// Creates a default calendar for user.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <param name="userName">UserName</param>
+        /// <returns></returns>
+        Task CreateDefaultCalendarAsync(int userId, string userName);
+
+        /// <summary>
         /// Updates an existing calendar.
         /// </summary>
         /// <param name="calendar">Calendar domain model to update.</param>
@@ -129,6 +137,13 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <param name="userId">ID of the user.</param>
         /// <returns>true - user's owner or shared with all the calendars.</returns>
         Task<bool> IsOwnerOrSharedWithAsync(IEnumerable<int> calendarsIds, int userId);
+
+        /// <summary>
+        /// Checks calendar is default.
+        /// </summary>
+        /// <param name="calendarId">Calendar ID</param>
+        /// <returns>true - default, false - no</returns>
+        Task<bool> IsDefaultAsync(int calendarId);
 
         /// <summary>
         /// Checks user permissions to edit a calendar.
