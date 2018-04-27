@@ -14,8 +14,7 @@ export interface IEventEditParams {
 
 @Component({
     selector: 'app-event-edit',
-    templateUrl: './event-edit.component.html',
-    styleUrls: ['./event-edit.component.css']
+    templateUrl: './event-edit.component.html'
 })
 export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
                                 implements OnInit, IEventEditParams {

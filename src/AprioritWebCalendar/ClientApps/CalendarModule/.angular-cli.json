@@ -26,7 +26,8 @@
         "../node_modules/angular-calendar/css/angular-calendar.css",
         "../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
         "styles/checkbox.css",
-        "styles/material.switch.css"
+        "styles/material.switch.css",
+        "styles/modal.scrollable.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",

@@ -16,8 +16,7 @@ export interface IEventCreateParams {
 
 @Component({
     selector: 'app-event-create',
-    templateUrl: './event-create.component.html',
-    styleUrls: ['./event-create.component.css']
+    templateUrl: './event-create.component.html'
 })
 export class EventCreateComponent extends DialogComponent<IEventCreateParams, Event>
                                     implements IEventCreateParams {

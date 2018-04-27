@@ -49,7 +49,8 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.OwnerId, opt => opt.Ignore());
 
             CreateMap<Data.Models.Event, Business.DomainModels.Event>()
-                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location{ Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude}));
+                .ForMember(dest => dest.Location, opt => opt.Condition(src => src.Longitude != null && src.Lattitude != null))
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location { Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude }));
 
 
             CreateMap<EventRequestModel, Business.DomainModels.Event>();
