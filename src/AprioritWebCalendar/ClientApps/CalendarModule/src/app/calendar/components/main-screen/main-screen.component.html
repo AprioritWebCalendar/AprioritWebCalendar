@@ -1,67 +1,46 @@
-<app-left-calendar-menu (onCalendarsChanged)="setCalendars($event)"></app-left-calendar-menu>
+<div>
+    <app-left-calendar-menu (onCalendarsChanged)="setCalendars($event)"></app-left-calendar-menu>
 
-<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 *ngIf="viewMode != 'week'" class="page-header">{{ viewDate | calendarDate:(viewMode + 'ViewTitle'):'locale' }}</h1>
-    <h1 *ngIf="viewMode == 'week'" class="page-header">{{weekPeriod}}</h1>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h1 *ngIf="viewMode != 'week'" class="page-header">{{ viewDate | calendarDate:(viewMode + 'ViewTitle'):'locale' }}</h1>
+        <h1 *ngIf="viewMode == 'week'" class="page-header">{{weekPeriod}}</h1>
 
-    <div class="row">
-        <app-calendar-view-switcher 
-            [viewMode]="viewMode" (onViewModeChanged)="changeViewMode($event)"></app-calendar-view-switcher>
+        <div class="row">
+            <app-calendar-view-switcher [viewMode]="viewMode" (onViewModeChanged)="changeViewMode($event)"></app-calendar-view-switcher>
 
-        <div class="btn-group">
-            <button type="button" class="btn btn-primary"
-                mwlCalendarPreviousView
-                [view]="viewMode"
-                [(viewDate)]="viewDate"
-                (viewDateChange)="viewDateChanged($event)">Previous</button>
-            
-            <button type="button" class="btn btn-primary"
-                mwlCalendarToday
-                [(viewDate)]="viewDate"
-                (viewDateChange)="viewDateChanged($event)">Today</button>
-            
-            <button type="button" class="btn btn-primary"
-                mwlCalendarNextView
-                [view]="viewMode"
-                [(viewDate)]="viewDate"
-                (viewDateChange)="viewDateChanged($event)">Next</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" mwlCalendarPreviousView [view]="viewMode" [(viewDate)]="viewDate" (viewDateChange)="viewDateChanged($event)">Previous</button>
+
+                <button type="button" class="btn btn-primary" mwlCalendarToday [(viewDate)]="viewDate" (viewDateChange)="viewDateChanged($event)">Today</button>
+
+                <button type="button" class="btn btn-primary" mwlCalendarNextView [view]="viewMode" [(viewDate)]="viewDate" (viewDateChange)="viewDateChanged($event)">Next</button>
+            </div>
         </div>
+
+        <hr />
+
+        <div [ngSwitch]="viewMode" class="row">
+            <mwl-calendar-day-view *ngSwitchCase="'day'" [locale]="locale" [refresh]="refresh" [events]="calendarEvents" [viewDate]="viewDate"
+                (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-day-view>
+
+            <mwl-calendar-week-view *ngSwitchCase="'week'" [locale]="locale" [refresh]="refresh" [weekStartsOn]="weekStartsOn" [events]="calendarEvents"
+                [viewDate]="viewDate" (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-week-view>
+
+            <mwl-calendar-month-view *ngSwitchCase="'month'" [locale]="locale" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen"
+                [weekStartsOn]="weekStartsOn" [events]="calendarEvents" [viewDate]="viewDate" (eventClicked)="openEventShareModal($event.event)"
+                (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
+        </div>
+
+        <app-add-event-button
+            *ngIf="!isSidebarOpened"
+            (onCreateEventClicked)="openCreateEventModal()"></app-add-event-button>  
+
+        <app-invitations-incoming-button
+            *ngIf="!isSidebarOpened"
+            (onInvitationsOpenClicked)="changeSidebarOpened()"></app-invitations-incoming-button>
     </div>
 
-    <hr />
-
-    <div [ngSwitch]="viewMode" class="row">
-        <mwl-calendar-day-view
-            *ngSwitchCase="'day'"
-            [locale]="locale"
-            [refresh]="refresh"
-            [events]="calendarEvents"
-            [viewDate]="viewDate"
-            
-            (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-day-view>
-
-        <mwl-calendar-week-view
-            *ngSwitchCase="'week'"
-            [locale]="locale"
-            [refresh]="refresh"
-            [weekStartsOn]="weekStartsOn"
-            [events]="calendarEvents"
-            [viewDate]="viewDate"
-            
-            (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-week-view>
-
-        <mwl-calendar-month-view
-            *ngSwitchCase="'month'"
-            [locale]="locale"
-            [refresh]="refresh"
-            [activeDayIsOpen]="activeDayIsOpen"
-            [weekStartsOn]="weekStartsOn"
-            [events]="calendarEvents"
-            [viewDate]="viewDate"
-            
-            (eventClicked)="openEventShareModal($event.event)"
-            (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
-    </div>
-
-    <app-add-event-button (onCreateEventClicked)="openCreateEventModal()"></app-add-event-button>
+    <app-invitations-incoming 
+        [isSidebarOpened]="isSidebarOpened"
+        (clickOutside)="closeOpenedSidebar($event)"></app-invitations-incoming>
 </div>

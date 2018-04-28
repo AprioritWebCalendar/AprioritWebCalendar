@@ -46,6 +46,8 @@ export class MainScreenComponent implements OnInit {
     public weekStartsOn: number;
     public weekPeriod: string;
 
+    public isSidebarOpened: boolean;
+
     constructor(
         private eventService: EventService,
         private toasts: ToastsManager,
@@ -219,6 +221,15 @@ export class MainScreenComponent implements OnInit {
             }, e => {
                 this.toasts.error("Unable to move the event. Try again or reload the page.");
             });
+    }
+
+    private changeSidebarOpened() {
+        this.isSidebarOpened = !this.isSidebarOpened;
+    }
+
+    private closeOpenedSidebar(e: MouseEvent) {
+        if (e.toElement.id != "incoming-invitations-button")
+            this.isSidebarOpened = false;
     }
 
     private changeWeekPeriod() : void {

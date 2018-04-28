@@ -1,0 +1,6 @@
+.btn-inverted {
+    bottom: 50%;
+    right: 0;
+    position: fixed;
+    transform: rotate(90deg);
+}
