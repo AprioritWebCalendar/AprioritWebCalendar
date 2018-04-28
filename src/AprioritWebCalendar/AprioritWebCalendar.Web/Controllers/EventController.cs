@@ -103,13 +103,23 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpGet("Invitation/Incoming")]
         public async Task<IActionResult> GetIncomingInvitations()
         {
-            return this.OkOrNoContent(await _eventService.GetIncomingInvitationsAsync(this.GetUserId()));
+            var invitations = await _eventService.GetIncomingInvitationsAsync(this.GetUserId());
+
+            if (invitations?.Any() != true)
+                return NoContent();
+
+            return Ok(invitations);
         }
 
         [HttpGet("Invitation/Outcoming")]
         public async Task<IActionResult> GetOutcomingInvitations()
         {
-            return this.OkOrNoContent(await _eventService.GetOutcomingInvitationsAsync(this.GetUserId()));
+            var invitations = await _eventService.GetOutcomingInvitationsAsync(this.GetUserId());
+
+            if (invitations?.Any() != true)
+                return NoContent();
+
+            return Ok(invitations);
         }
 
         #endregion
