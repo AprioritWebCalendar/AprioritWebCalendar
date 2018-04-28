@@ -19,6 +19,8 @@ import { User } from '../../../authentication/models/user';
 import { EventDeleteComponent, IEventDeleteParams } from '../../../event/components/event-delete/event-delete.component';
 import { EventMoveComponent, IEventMoveParams } from '../../../event/components/event-move/event-move.component';
 import { IEventShareParams, EventShareComponent } from '../../../event/components/event-share/event-share.component';
+import { Invitation } from '../../../invitation/models/invitation';
+import { MainScreenModel } from './main-screen.model';
 
 @Component({
     selector: 'app-main-screen',
@@ -29,22 +31,7 @@ import { IEventShareParams, EventShareComponent } from '../../../event/component
     }]
 })
 export class MainScreenComponent implements OnInit {
-    dataEvents: Event[] = [];
-    calendarEvents: CalendarEvent<Event>[] = [];
-    calendars: Calendar[] = [];
-    currentUser: User;
-
-    activeDayIsOpen: boolean = true;
-
-    refresh: Subject<any> = new Subject();
-
-    public viewDate: Date = new Date();
-    public viewMode: string = "month";
-
-    public localeData: moment.Locale;
-    public locale: string;
-    public weekStartsOn: number;
-    public weekPeriod: string;
+    public model: MainScreenModel = new MainScreenModel();
 
     public isSidebarOpened: boolean;
 
@@ -53,7 +40,9 @@ export class MainScreenComponent implements OnInit {
         private toasts: ToastsManager,
         private dialogService: DialogService,
         private authenticationService: AuthenticationService
-    ) { }
+    ) {
+        this.model.actions = this.actions;
+     }
 
     private actions: CalendarEventAction[] = [
         {
@@ -77,21 +66,20 @@ export class MainScreenComponent implements OnInit {
     ];
     
     public ngOnInit() : void {
-        this.locale = navigator.language.split("-")[0];
-        this.localeData =  moment.localeData(this.locale);
-        this.weekStartsOn = this.localeData.firstDayOfWeek();
+        this.model.locale = navigator.language.split("-")[0];
+        this.model.localeData =  moment.localeData(this.model.locale);
+        this.model.weekStartsOn = this.model.localeData.firstDayOfWeek();
     }
 
     private setCalendars(calendars: Calendar[]) : void {
-        if (this.currentUser == null) {
-            this.currentUser = this.authenticationService.getCurrentUser();
+        if (this.model.currentUser == null) {
+            this.model.currentUser = this.authenticationService.getCurrentUser();
         }
 
-        this.calendars = calendars;
+        this.model.calendars = calendars;
 
         if (calendars == null || calendars.length === 0){
-            this.dataEvents = [];
-            this.calendarEvents = [];
+            this.model.clearAllEvents();
             return;
         }
 
@@ -99,21 +87,21 @@ export class MainScreenComponent implements OnInit {
     }
 
     private changeViewMode(viewMode: string) : void {
-        this.viewMode = viewMode;
+        this.model.viewMode = viewMode;
         this.changeWeekPeriod();
         this.loadEvents();
     }
 
     private dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }) : void {
-        if (isSameMonth(date, this.viewDate)) {
+        if (isSameMonth(date, this.model.viewDate)) {
             if (
-                (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
+                (isSameDay(this.model.viewDate, date) && this.model.activeDayIsOpen === true) ||
                 events.length === 0
             ) {
-                this.activeDayIsOpen = false;
+                this.model.activeDayIsOpen = false;
             } else {
-                this.activeDayIsOpen = true;
-                this.viewDate = date;
+                this.model.activeDayIsOpen = true;
+                this.model.viewDate = date;
             }
         }
     }
@@ -134,7 +122,7 @@ export class MainScreenComponent implements OnInit {
     }
 
     private openCreateEventModal() : void {
-        var calendars = this.calendars.filter(c => c.IsReadOnly != true);
+        var calendars = this.model.getEditableCalendars();
 
         this.dialogService.addDialog(EventCreateComponent, { calendars: calendars })
             .subscribe(event => {
@@ -143,11 +131,10 @@ export class MainScreenComponent implements OnInit {
 
                 event.IsReadOnly = false;
                 event.Owner = this.authenticationService.getCurrentUser();
-                event.Color = this.getCalendarsColor(event.CalendarId);
+                event.Color = this.model.getCalendarColor(event.CalendarId);
                 console.log(event);
 
-                this.dataEvents.push(event);
-                this.mapEvent(event);
+                this.model.pushEvent(event);
                 
                 this.toasts.success("The event has been created successfully");
             }, e => {
@@ -172,13 +159,8 @@ export class MainScreenComponent implements OnInit {
                 ev.Color = event.meta.Color;
                 ev.IsReadOnly = event.meta.IsReadOnly;
 
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
-                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
-
-                this.refresh.next();
-
-                this.dataEvents.push(ev);
-                this.mapEvent(ev);
+                this.model.removeEvent(ev.Id);
+                this.model.pushEvent(ev);
 
                 this.toasts.success("The event has been updated successfully");
             });
@@ -187,7 +169,7 @@ export class MainScreenComponent implements OnInit {
     private openDeleteEventModal(event: CalendarEvent) : void {
         let params: IEventDeleteParams = {
             event: <Event>event.meta,
-            currentUser: this.currentUser
+            currentUser: this.model.currentUser
         };
 
         this.dialogService.addDialog(EventDeleteComponent, params)
@@ -195,9 +177,8 @@ export class MainScreenComponent implements OnInit {
                 if (id == null)
                     return;
 
-                this.dataEvents = this.dataEvents.filter(e => e.Id != id);
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != id);
-                this.refresh.next();
+                this.model.removeEvent(id);
+                this.model.refreshCalendar();
 
                 this.toasts.success("The event has been deleted successfully?");
             }, e => {
@@ -208,15 +189,14 @@ export class MainScreenComponent implements OnInit {
     private openMoveEventModal(event: CalendarEvent) : void {
         let params: IEventMoveParams = {
             event: event.meta,
-            calendars: this.calendars.filter(c => c.Owner.Id == this.currentUser.Id)
+            calendars: this.model.getOwnCalendars()
         };
 
         this.dialogService.addDialog(EventMoveComponent, params)
             .subscribe(ev => {
-                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
+                this.model.removeEvent(ev.Id);
+                this.model.pushEvent(ev);
 
-                this.mapEvent(ev);
                 this.toasts.success("The event has been moved successfully");
             }, e => {
                 this.toasts.error("Unable to move the event. Try again or reload the page.");
@@ -233,139 +213,28 @@ export class MainScreenComponent implements OnInit {
     }
 
     private changeWeekPeriod() : void {
-        if (this.viewMode == "week") {
-            var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
-            var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
+        if (this.model.viewMode == "week") {
+            var start = moment(this.model.viewDate).locale(this.model.locale).startOf("week").toDate().toLocaleDateString();
+            var end = moment(this.model.viewDate).locale(this.model.locale).endOf("week").toDate().toLocaleDateString();
             
-            this.weekPeriod = `${start} - ${end}`;
-            console.log("Week period: " + this.weekPeriod);
+            this.model.weekPeriod = `${start} - ${end}`;
+            console.log("Week period: " + this.model.weekPeriod);
         }
     }
 
     private loadEvents() : void {
-        this.dataEvents = [];
-        this.calendarEvents = [];
-        var dates = this.getDates();
+        this.model.dataEvents = [];
+        this.model.calendarEvents = [];
+        var dates = this.model.getDates();
         
-        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.calendars.map(c => c.Id as number))
+        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.model.calendars.map(c => c.Id as number))
             .subscribe(events => {
                 if (events != null) {
-                    console.log(events);
-
-                    this.dataEvents = events;
-
-                    this.mapEventList(this.dataEvents);
-                    this.refresh.next();
+                    this.model.dataEvents = events;
+                    this.model.mapEventList(this.model.dataEvents);
                 }
-
-                console.log(this.calendarEvents);
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
             });
-    }
-
-    private mapEventList(events: Event[]) : void {
-        events.forEach(e => {
-            this.mapEvent(e);
-        });
-    }
-
-    private mapEvent(event: Event) : void {
-        if (event.Period == null) {
-            this.mapDefaultEvent(event);
-        } else {
-            this.mapRecurringEvent(event);
-        }
-
-        this.refresh.next();
-    }
-
-    private mapDefaultEvent(event: Event) : void {
-        let eventCal;
-
-        eventCal = {
-            title: event.Name,
-            color: { primary: event.Color },
-            meta: event,
-            actions: []
-        };
-
-        eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
-
-        if (event.IsAllDay) {
-            eventCal.start = getWithoutTime(new Date(event.StartDate));
-            eventCal.end = setEndOfDay(new Date(event.EndDate));
-        } else {
-            eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));
-            eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
-        }
-
-        this.setEventActions(eventCal, event);
-        this.calendarEvents.push(eventCal);
-    }
-
-    private mapRecurringEvent(event: Event) : void {
-        var rule = getRule(event.Period);
-
-        rule.all().forEach(date => {
-            let eventCal;
-
-            eventCal = {
-                title: event.Name,
-                color: { primary: event.Color },
-                meta: event,
-                actions: []
-            };
-
-            eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
-
-            if (event.IsAllDay) {
-                eventCal.start = date;
-                eventCal.end = setEndOfDay(date);
-            } else {
-                eventCal.start = getLocalTime(mergeDateTime(date, event.StartTime));
-                eventCal.end = getLocalTime(mergeDateTime(date, event.EndTime));
-            }
-
-            this.setEventActions(eventCal, event);
-            this.calendarEvents.push(eventCal);
-        });
-    }
-
-    private setEventActions(eventCal: CalendarEvent<Event>, event: Event) : void {
-        if (!event.IsReadOnly) {
-            eventCal.actions.push(this.actions[0]);
-        }
-
-        if (event.Owner.Id === this.currentUser.Id) {
-            eventCal.actions.push(this.actions[1]);
-        }
-
-        eventCal.actions.push(this.actions[2]);
-    }
-
-    private getDates() : DatesModel {
-        var dates = new DatesModel();
-        var curMoment = moment(this.viewDate).locale(this.locale);
-
-        if (this.viewMode == "day") {
-            dates.StartDate = curMoment.startOf("day").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("day").format("YYYY-MM-DD").toString();
-        } else if (this.viewMode == "week") {
-            dates.StartDate = curMoment.startOf("week").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("week").format("YYYY-MM-DD").toString();
-        }
-        else {
-            dates.StartDate = curMoment.startOf("month").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("month").format("YYYY-MM-DD").toString();
-        }
-
-        console.log(dates);
-        return dates;
-    }
-
-    private getCalendarsColor(id: number) : string {
-        return this.calendars.filter(c => c.Id == id)
-            .map(c => c.Color)[0];
     }
 }
