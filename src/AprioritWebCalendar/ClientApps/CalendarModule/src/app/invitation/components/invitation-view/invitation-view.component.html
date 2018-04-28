@@ -1,0 +1,28 @@
+<div class="panel panel-info">
+    <div class="panel-heading">{{eventInfo.Name}} ({{invitation.Invitator.UserName}})</div>
+
+    <div class="panel-body">
+        <p *ngIf="eventInfo.Description != null">{{eventInfo.Description}}</p>
+
+        <dt>Start: </dt>
+        <dd>{{eventInfo.Start}}</dd>
+        
+        <dt>End: </dt>
+        <dd>{{eventInfo.End}}</dd>
+        
+        <i *ngIf="eventInfo.IsRecurring">
+            Recurring
+            <span *ngIf="!eventInfo.IsAllDay"> 
+                ({{eventInfo.PeriodStart}} - {{eventInfo.PeriodEnd}})
+            </span>
+        </i>
+    </div>
+
+    <div class="panel-footer">
+        <button class="btn btn-primary" type="button"
+            (click)="accept()">Accept</button>
+
+        <button class="btn btn-default" type="button"
+            (click)="reject()">Reject</button>
+    </div>
+</div>

@@ -212,6 +212,17 @@ export class MainScreenComponent implements OnInit {
             this.isSidebarOpened = false;
     }
 
+    private addInvitationEvent(invitation: Invitation) {
+        let event = invitation.Event;
+        let defaultCalendar = this.model.getDefaultCalendar();
+
+        event.IsReadOnly = invitation.IsReadOnly;
+        event.CalendarId = <number>defaultCalendar.Id;
+        event.Color = defaultCalendar.Color;
+
+        this.model.mapEvent(event);
+    }
+
     private changeWeekPeriod() : void {
         if (this.model.viewMode == "week") {
             var start = moment(this.model.viewDate).locale(this.model.locale).startOf("week").toDate().toLocaleDateString();

@@ -42,5 +42,6 @@
 
     <app-invitations-incoming 
         [isSidebarOpened]="isSidebarOpened"
+        (onInvitationAccepted)="addInvitationEvent($event)"
         (clickOutside)="closeOpenedSidebar($event)"></app-invitations-incoming>
 </div>

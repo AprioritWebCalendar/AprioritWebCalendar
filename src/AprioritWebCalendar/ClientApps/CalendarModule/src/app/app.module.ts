@@ -62,6 +62,7 @@ import { EventSearchComponent } from './event/components/event-search/event-sear
 import { InvitationsIncomingComponent } from './invitation/components/invitations-incoming/invitations-incoming.component';
 import { InvitationsIncomingButtonComponent } from './invitation/components/invitations-incoming-button/invitations-incoming-button.component';
 import { InvitationService } from './invitation/services/invitation.service';
+import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
 
 @NgModule({
   declarations: [
@@ -93,7 +94,8 @@ import { InvitationService } from './invitation/services/invitation.service';
     EventSelectUserShareComponent,
     EventSearchComponent,
     InvitationsIncomingComponent,
-    InvitationsIncomingButtonComponent
+    InvitationsIncomingButtonComponent,
+    InvitationViewComponent
   ],
   imports: [
     BrowserModule,

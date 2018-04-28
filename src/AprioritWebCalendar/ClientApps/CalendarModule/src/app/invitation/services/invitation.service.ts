@@ -3,6 +3,7 @@ import { CustomHttp } from "../../services/custom.http";
 import { Observable } from "rxjs/Observable";
 import { RequestOptions, Headers } from "@angular/http";
 import { UserInvited } from "../../event/models/user.invited";
+import { Invitation } from "../models/invitation";
 
 @Injectable()
 export class InvitationService {
@@ -11,48 +12,60 @@ export class InvitationService {
     constructor(private customHttp: CustomHttp) {
     }
 
-    public getUsers(id: number) : Observable<UserInvited[]> {
-        return this.customHttp.get(`${this.baseUrl}${id}/Users`)
+    public getIncomingInvitations() : Observable<Invitation[]> {
+        return this.customHttp.get(`${this.baseUrl}Invitation/Incoming`)
             .map(r => r.json())
             .catch(e => Observable.throw(e));
     }
 
-    public inviteUser(id: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
+    public getOutcomingInvitations() : Observable<Invitation[]> {
+        return this.customHttp.get(`${this.baseUrl}Invitation/Outcoming`)
+            .map(r => r.json())
+            .catch(e => Observable.throw(e));
+    }
+
+    public getUsers(eventId: number) : Observable<UserInvited[]> {
+        return this.customHttp.get(`${this.baseUrl}${eventId}/Users`)
+            .map(r => r.json())
+            .catch(e => Observable.throw(e));
+    }
+
+    public inviteUser(eventId: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
         var data = {
             UserId: userId,
             IsReadOnly: isReadOnly
         };
 
-        return this.customHttp.put(`${this.baseUrl}${id}/Invite`, data)
+        return this.customHttp.put(`${this.baseUrl}${eventId}/Invite`, data)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
 
-    public acceptInvitation(id: number) : Observable<boolean> {
-        return this.customHttp.put(`${this.baseUrl}${id}/Accept`, {})
+    public acceptInvitation(eventId: number) : Observable<boolean> {
+        return this.customHttp.put(`${this.baseUrl}${eventId}/Accept`, {})
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
 
-    public rejectInvitation(id: number) : Observable<boolean> {
-        return this.customHttp.put(`${this.baseUrl}${id}/Reject`, {})
+    public rejectInvitation(eventId: number) : Observable<boolean> {
+        return this.customHttp.put(`${this.baseUrl}${eventId}/Reject`, {})
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
 
-    public setInvitationReadOnlyState(id: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
+    public setInvitationReadOnlyState(eventId: number, userId: number, isReadOnly: boolean) : Observable<boolean> {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
         this.customHttp.attachToken(opts);
 
-        return this.customHttp.put(`${this.baseUrl}${id}/Invitation/ReadOnly/${userId}`, isReadOnly, opts)
+        return this.customHttp.put(`${this.baseUrl}${eventId}/Invitation/ReadOnly/${userId}`, isReadOnly, opts)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }
 
-    public deleteInvitation(id: number, userId: number) : Observable<boolean> {
-        return this.customHttp.delete(`${this.baseUrl}${id}/Invitation/${userId}`)
+    public deleteInvitation(eventId: number, userId: number) : Observable<boolean> {
+        return this.customHttp.delete(`${this.baseUrl}${eventId}/Invitation/${userId}`)
             .map(r => true)
             .catch(e => Observable.throw(e));
     }

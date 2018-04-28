@@ -96,7 +96,7 @@ export class MainScreenModel {
     }
 
     public setEventActions(eventCal: CalendarEvent<Event>, event: Event) : void {
-        if (!event.IsReadOnly) {
+        if (event.IsReadOnly == false) {
             eventCal.actions.push(this.actions[0]);
         }
 
