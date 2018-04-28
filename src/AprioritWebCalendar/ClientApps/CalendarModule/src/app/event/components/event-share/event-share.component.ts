@@ -5,6 +5,7 @@ import { EventService } from '../../services/event.service';
 import { UserInvited } from '../../models/user.invited';
 import { ToastsManager } from 'ng2-toastr';
 import { InviteRequestModel } from '../../models/invite.request.model';
+import { InvitationService } from '../../../invitation/services/invitation.service';
 
 export interface IEventShareParams {
     event: Event;
@@ -20,6 +21,7 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
     constructor(
         public dialogService: DialogService,
         private eventService: EventService,
+        private invitationService: InvitationService,
         private toastr: ToastsManager
     ) {
         super(dialogService);
@@ -30,7 +32,7 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
     isError: boolean = false;
 
     public ngOnInit() : void {
-        this.eventService.getUsers(this.event.Id)
+        this.invitationService.getUsers(this.event.Id)
             .subscribe(u => {
                 if (u == null)
                     return;
@@ -42,7 +44,7 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
     private inviteUser(invitation: InviteRequestModel) {
         let errorMessage = "Unable to invite user. Try to reload the page";
 
-        this.eventService.inviteUser(this.event.Id, invitation.User.Id as number, invitation.IsReadOnly)
+        this.invitationService.inviteUser(this.event.Id, invitation.User.Id as number, invitation.IsReadOnly)
             .subscribe(isOk => {
                 if (!isOk) {
                     this.errorCallback(errorMessage);
@@ -67,7 +69,7 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
             this.eventService.deleteInvitedUser(this.event.Id, user.User.Id as number)
                 .subscribe(isOk => {
                     if (isOk) {
-                        this.users = this.users.filter(u => u.User.Id != user.User.Id);
+                        this.users.splice(this.users.indexOf(user), 1);
                         this.successCallback(message);
                     }
                     else {
@@ -75,10 +77,12 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
                     }
                 }, e => this.errorCallback(errorMessage));
         } else {
-            this.eventService.deleteInvitation(this.event.Id, user.User.Id as number)
+            this.invitationService.deleteInvitation(this.event.Id, user.User.Id as number)
                 .subscribe(isOk => {
-                    if (isOk)
+                    if (isOk) {
+                        this.users.splice(this.users.indexOf(user), 1);
                         this.successCallback(message);
+                    }
                     else
                         this.errorCallback(errorMessage);
                 }, e => this.errorCallback(errorMessage));
@@ -100,7 +104,7 @@ export class EventShareComponent extends DialogComponent<IEventShareParams, bool
                     this.errorCallback(errorMessage);
             }, e => this.errorCallback(errorMessage));
         } else {
-            this.eventService.setInvitationReadOnlyState(this.event.Id, user.User.Id as number, user.IsReadOnly).subscribe(isOk => {
+            this.invitationService.setInvitationReadOnlyState(this.event.Id, user.User.Id as number, user.IsReadOnly).subscribe(isOk => {
                 if (isOk)
                     this.successCallback(message);
                 else

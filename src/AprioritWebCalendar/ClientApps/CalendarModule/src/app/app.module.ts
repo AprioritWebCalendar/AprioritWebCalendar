@@ -59,8 +59,9 @@ import { EventShareComponent } from './event/components/event-share/event-share.
 import { EventShareUsersComponent } from './event/components/event-share-users/event-share-users.component';
 import { EventSelectUserShareComponent } from './event/components/event-select-user-share/event-select-user-share.component';
 import { EventSearchComponent } from './event/components/event-search/event-search.component';
-import { InvitationsIncomingComponent } from './user/components/invitations-incoming/invitations-incoming.component';
-import { InvitationsIncomingButtonComponent } from './user/components/invitations-incoming-button/invitations-incoming-button.component';
+import { InvitationsIncomingComponent } from './invitation/components/invitations-incoming/invitations-incoming.component';
+import { InvitationsIncomingButtonComponent } from './invitation/components/invitations-incoming-button/invitations-incoming-button.component';
+import { InvitationService } from './invitation/services/invitation.service';
 
 @NgModule({
   declarations: [
@@ -140,7 +141,8 @@ import { InvitationsIncomingButtonComponent } from './user/components/invitation
 
     CalendarService,
     UserService,
-    EventService
+    EventService,
+    InvitationService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
