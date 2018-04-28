@@ -11,7 +11,8 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <div class="checkbox checkbox-primary">
-                                <input id="IsPrivateSwitch" name="IsPrivateSwitch" type="checkbox" [(ngModel)]="model.IsPrivate" />
+                                <input id="IsPrivateSwitch" name="IsPrivateSwitch" type="checkbox"
+                                    [(ngModel)]="model.IsPrivate" />
                     
                                 <label for="IsPrivateSwitch">Private</label>
                             </div>
@@ -73,33 +74,6 @@
                             </span>
                         </div>
         
-                        <!-- Description -->
-                        <div class="form-group">
-                            <label class="control-label" for="Description">Description</label>
-        
-                            <textarea class="form-control" id="Description" name="Description" maxlength="256" 
-                                placeholder="Enter description no more than 256 symbols."
-                                [(ngModel)]="model.Description" #description="ngModel"></textarea>
-        
-                            <span class="text-danger" *ngIf="!description.valid && description.touched">
-                                The Name must be a string no more than 256 symbols.
-                            </span>
-                        </div>
-
-                        <!-- Calendar -->
-                        <div class="form-group">
-                            <label class="control-label" for="Calendar">Calendar</label>
-        
-                            <select name="Author" required class="form-control"
-                                [(ngModel)]="model.CalendarId" #calendarId="ngModel">
-                                    <option *ngFor="let c of calendars" [ngValue]="c.Id">{{c.Name}}</option>
-                            </select>
-        
-                            <span class="text-danger" *ngIf="!calendarId.valid && calendarId.touched">
-                                The Calendar field is required.
-                            </span>
-                        </div>
-        
                         <!-- Start, End -->
                         <div class="form-group" *ngIf="!model.IsRecurrent">
                             <label class="control-label" for="Dates">Start and End dates</label>
@@ -134,6 +108,33 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+        
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label class="control-label" for="Description">Description</label>
+        
+                            <textarea class="form-control" id="Description" name="Description" maxlength="256" 
+                                placeholder="Enter description no more than 256 symbols."
+                                [(ngModel)]="model.Description" #description="ngModel"></textarea>
+        
+                            <span class="text-danger" *ngIf="!description.valid && description.touched">
+                                The Name must be a string no more than 256 symbols.
+                            </span>
+                        </div>
+
+                        <!-- Calendar -->
+                        <div class="form-group">
+                            <label class="control-label" for="Calendar">Calendar</label>
+        
+                            <select name="Author" required class="form-control"
+                                [(ngModel)]="model.CalendarId" #calendarId="ngModel">
+                                    <option *ngFor="let c of calendars" [ngValue]="c.Id">{{c.Name}}</option>
+                            </select>
+        
+                            <span class="text-danger" *ngIf="!calendarId.valid && calendarId.touched">
+                                The Calendar field is required.
+                            </span>
                         </div>
 
                         <!-- Remind Before -->
