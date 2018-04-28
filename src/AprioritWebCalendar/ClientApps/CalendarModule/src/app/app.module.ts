@@ -14,6 +14,7 @@ import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDatepickerModule } from 'ngx-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
+import { ClickOutsideModule } from 'ng-click-outside';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -58,6 +59,10 @@ import { EventShareComponent } from './event/components/event-share/event-share.
 import { EventShareUsersComponent } from './event/components/event-share-users/event-share-users.component';
 import { EventSelectUserShareComponent } from './event/components/event-select-user-share/event-select-user-share.component';
 import { EventSearchComponent } from './event/components/event-search/event-search.component';
+import { InvitationsIncomingComponent } from './invitation/components/invitations-incoming/invitations-incoming.component';
+import { InvitationsIncomingButtonComponent } from './invitation/components/invitations-incoming-button/invitations-incoming-button.component';
+import { InvitationService } from './invitation/services/invitation.service';
+import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +92,10 @@ import { EventSearchComponent } from './event/components/event-search/event-sear
     EventShareComponent,
     EventShareUsersComponent,
     EventSelectUserShareComponent,
-    EventSearchComponent
+    EventSearchComponent,
+    InvitationsIncomingComponent,
+    InvitationsIncomingButtonComponent,
+    InvitationViewComponent
   ],
   imports: [
     BrowserModule,
@@ -106,6 +114,7 @@ import { EventSearchComponent } from './event/components/event-search/event-sear
 
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
+    ClickOutsideModule,
 
     ngCalendarModule.forRoot(),
 
@@ -134,7 +143,8 @@ import { EventSearchComponent } from './event/components/event-search/event-sear
 
     CalendarService,
     UserService,
-    EventService
+    EventService,
+    InvitationService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

@@ -19,7 +19,7 @@ export class EventRequestModel {
     public EndTime?: string;
 
     public IsAllDay: boolean;
-    public IsPrivate: boolean;
+    public IsPrivate: boolean = false;
     public RemindBefore?: number = 15;
 
     public Location: Location = new Location();
@@ -45,8 +45,8 @@ export class EventRequestModel {
         event.StartTime = this.StartTime;
         event.EndTime = this.EndTime;
 
-        event.IsAllDay = this.IsAllDay;
         event.IsPrivate = this.IsPrivate;
+        event.IsAllDay = this.IsAllDay;
         event.RemindBefore = this.RemindBefore;
 
         if (this.Location != null)

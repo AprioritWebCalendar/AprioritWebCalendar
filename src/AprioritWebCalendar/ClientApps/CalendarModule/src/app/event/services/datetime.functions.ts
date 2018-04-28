@@ -34,41 +34,34 @@ export function getTimeAsString(date: Date) : string {
 }
 
 export function getWithoutTime(date: Date) : Date {
-    var d = moment(date).startOf('day').toDate();
-    console.log(date + " without time: " + d);
-    return d;
+    return moment(date).startOf('day').toDate();
 }
 
 export function getLocalTime(date: Date) : Date {
     // Yes! This is shit, trash, crutch.
     // I don't know, but it works.
 
-    var local = moment.utc(moment(date).local().toString()).local().toDate();
-    console.log("utc: " + date + "; local: " + local);
-    return local;
+    return moment.utc(moment(date).local().toString()).local().toDate();
 }
 
 export function getRule(period: Period) : RRule {
-    return new RRule({
+    var rrule = new RRule({
         dtstart: getWithoutTime(period.PeriodStart),
         until: getWithoutTime(period.PeriodEnd),
         freq: this.getFrequency(period.Type),
-        interval: period.Cycle != null ? period.Cycle : 1,
+        interval: period.Cycle == null ? 1 : period.Cycle,
     });
+
+    return rrule;
 }
 
 export function getFrequency(type: PeriodType) : RRule.Frequency {
-    switch (type) {
-        case PeriodType.Yearly:
-            return RRule.YEARLY;
-
-        case PeriodType.Monthly:
-            return RRule.MONTHLY;
-
-        case PeriodType.Weekly:
-            return RRule.WEEKLY;
-
-        default:
-            return RRule.DAILY;
-    }
+    if (type == PeriodType.Yearly)
+        return RRule.YEARLY;
+    else if (type == PeriodType.Monthly)
+        return RRule.MONTHLY;
+    else if (type == PeriodType.Weekly)
+        return RRule.WEEKLY;
+    else
+        return RRule.DAILY;
 }

@@ -165,7 +165,7 @@ namespace AprioritWebCalendar.Business.Services
         public async Task<IEnumerable<DomainInvitation>> GetIncomingInvitationsAsync(int userId)
         {
             var invitations = await _invitationRepository.FindAllIncludingAsync(i => i.UserId == userId,
-                i => i.Event, i => i.Event.Period, i => i.User);
+                i => i.Event, i => i.Event.Period, i => i.Invitator);
 
             return _mapper.Map<IEnumerable<DomainInvitation>>(invitations);
         }

@@ -1,0 +1,25 @@
+<div class="col-xs-7 col-sm-3 col-md-3 sidebar sidebar-right sidebar-animate"
+        [class.sidebar-open]="isSidebarOpened">
+    <div class="nav navbar-stacked">
+        <app-alert
+            *ngIf="isError"
+            [alertType]="'danger'"
+            [innerText]="'It seems we have some problems. Try to reload the page.'"></app-alert>
+
+        <app-alert
+            *ngIf="isLoading"
+            [alertType]="'info'"
+            [innerText]="'Loading...'"></app-alert>
+
+        <div class="invitations-list" *ngIf="!isError && !isLoading && invitations.length > 0">
+            <h4>Events, you have been invited to join.</h4>
+
+            <app-invitation-view 
+                *ngFor="let i of invitations"
+                [invitation]="i"
+                (onAccepted)="acceptInvitation($event)"
+                (onRejected)="rejectInvitation($event)"></app-invitation-view>
+            
+        </div>
+    </div>
+</div>
