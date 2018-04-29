@@ -2,7 +2,7 @@
 
 namespace AprioritWebCalendar.Business.DomainModels
 {
-    public class Event
+    public class Event : IComparable<Event>
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -25,5 +25,17 @@ namespace AprioritWebCalendar.Business.DomainModels
         public int CalendarId { get; set; }
         public string Color { get; set; }
         public bool IsReadOnly { get; set; }
+
+        public int CompareTo(Event other)
+        {
+            if (Period == null)
+            {
+                return StartDate.Value.CompareTo(other.StartDate ?? other.Period.PeriodStart);
+            }
+            else
+            {
+                return Period.PeriodStart.CompareTo(other.StartDate ?? other.Period.PeriodStart);
+            }
+        }
     }
 }
