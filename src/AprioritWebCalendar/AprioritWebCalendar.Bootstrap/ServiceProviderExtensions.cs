@@ -59,6 +59,7 @@ namespace AprioritWebCalendar.Bootstrap
             services.AddTransient<IEventService, EventService>();
 
             services.AddTransient<INotificationService, NotificationService>();
+            services.AddSingleton<IEmailService, EmailService>();
         }
     }
 }

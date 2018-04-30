@@ -29,7 +29,8 @@ namespace AprioritWebCalendar.Web
 
             var custConfigBuilder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath + "\\configs\\")
-                .AddJsonFile("jwtOptions.json", true, true);
+                .AddJsonFile("jwtOptions.json", true, true)
+                .AddJsonFile("smtpOptions.json", true, true);
 
             CustomConfiguration = custConfigBuilder.Build();
         }
@@ -44,6 +45,7 @@ namespace AprioritWebCalendar.Web
             services.AddOptions();
 
             services.Configure<JwtOptions>(CustomConfiguration.GetSection("JwtOptions"));
+            services.Configure<SmtpOptions>(CustomConfiguration.GetSection("SmtpOptions"));
 
             services.UseAppDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.UseIdentity();

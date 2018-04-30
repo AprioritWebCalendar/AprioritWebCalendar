@@ -322,3 +322,4 @@ ASALocalRun/
 src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/jwtOptions.json
 src/AprioritWebCalendar/AprioritWebCalendar.Web/wwwroot/*
 src/AprioritWebCalendar/ClientApps/CalendarModule/dist/
+src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/smtpOptions.json

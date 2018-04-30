@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="MailKit" Version="2.0.3" />
     <PackageReference Include="Ralms.Microsoft.EntityFrameworkCore.Extensions" Version="0.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.1" />
   </ItemGroup>
