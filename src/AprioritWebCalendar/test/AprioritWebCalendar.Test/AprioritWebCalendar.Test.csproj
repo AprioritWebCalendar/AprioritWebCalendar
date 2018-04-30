@@ -14,4 +14,9 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\AprioritWebCalendar.Bootstrap\AprioritWebCalendar.Bootstrap.csproj" />
+    <ProjectReference Include="..\..\AprioritWebCalendar.Business\AprioritWebCalendar.Business.csproj" />
+  </ItemGroup>
+
 </Project>

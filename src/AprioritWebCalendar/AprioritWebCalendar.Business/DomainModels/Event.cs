@@ -2,7 +2,7 @@
 
 namespace AprioritWebCalendar.Business.DomainModels
 {
-    public class Event : IComparable<Event>
+    public class Event : IComparable<Event>, ICloneable
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -25,6 +25,34 @@ namespace AprioritWebCalendar.Business.DomainModels
         public int CalendarId { get; set; }
         public string Color { get; set; }
         public bool IsReadOnly { get; set; }
+
+        public object Clone()
+        {
+            return new Event
+            {
+                Id = Id,
+                Name = Name,
+                Description = Description,
+
+                Location = Location,
+                Owner = Owner,
+
+                StartDate = StartDate,
+                EndDate = EndDate,
+                StartTime = StartTime,
+                EndTime = EndTime,
+
+                IsAllDay = IsAllDay,
+                RemindBefore = RemindBefore,
+                IsPrivate = IsPrivate,
+
+                Period = Period,
+
+                CalendarId = CalendarId,
+                Color = Color,
+                IsReadOnly = IsReadOnly
+            };
+        }
 
         public int CompareTo(Event other)
         {
