@@ -95,6 +95,20 @@ namespace AprioritWebCalendar.Test.Services
         }
 
         [Fact]
+        public async Task GetEventsForNotify_AllDay_5()
+        {
+            SetupMock(GetEventCalendars());
+
+            var notificationService = new NotificationService(_mock.Object, _mapper);
+            var dateTime = new DateTime(2018, 6, 29, 23, 30, 0);
+            var expectedCount = 1;
+
+            var events = await notificationService.GetEventsToNotifyAsync(dateTime);
+
+            Assert.Equal(expectedCount, events.Count());
+        }
+
+        [Fact]
         public async Task GetEventsForNotify_Period_1()
         {
             SetupMock(GetEventCalendars());
@@ -274,6 +288,17 @@ namespace AprioritWebCalendar.Test.Services
                                 new UserCalendar { IsSubscribed = true }
                             }
                         }
+                    },
+
+                    new EventCalendar
+                    {
+                        Event = new Event
+                        {
+                            RemindBefore = 30,
+                            StartDate = new DateTime(2018, 6, 30),
+                            IsAllDay = true
+                        },
+                        Calendar = new Calendar { }
                     }
                 };
 

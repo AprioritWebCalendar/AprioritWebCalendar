@@ -27,27 +27,31 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<IEnumerable<EventUser>> GetEventsToNotifyAsync(DateTime dateTime)
         {
+            dateTime = dateTime.AddSeconds(-dateTime.Second);
             var dateDate = dateTime.Date;
 
             Expression<Func<EventCalendar, bool>> filter = e => e.Event.RemindBefore != null &&
                 ((e.Event.Period != null && dateDate >= e.Event.Period.PeriodStart && dateDate <= e.Event.Period.PeriodEnd)
-                || (e.Event.Period == null && !e.Event.IsAllDay && dateTime.AddMinutes(e.Event.RemindBefore.Value) == e.Event.StartDate.Value.AddMinutes(e.Event.StartTime.Value.TotalMinutes))
-                || (e.Event.Period == null && e.Event.IsAllDay && dateTime.AddMinutes(e.Event.RemindBefore.Value) == e.Event.StartDate.Value));
+                || (e.Event.Period == null && !e.Event.IsAllDay && EFFunctions.DateDiffMinute(e.Event.StartDate.Value.AddMinutes(e.Event.StartTime.Value.TotalMinutes).AddMinutes(-e.Event.RemindBefore.Value), dateTime) == 0)
+                || (e.Event.Period == null && e.Event.IsAllDay && EFFunctions.DateDiffMinute(e.Event.StartDate.Value.AddMinutes(-e.Event.RemindBefore.Value), dateTime) == 0));
 
             var eventCalendars = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.Calendar, e => e.Calendar.Owner, e => e.Calendar.SharedUsers,
                         e => e.Event, e => e.Event.Period))
                 .Where(filter)
                 .AsNoTracking()
                 .ToList();
-
+            
             if (!eventCalendars.Any())
                 return null;
 
             var domainEventCalendars = _mapper.Map<List<DomainEventCalendar>>(eventCalendars);
 
             domainEventCalendars = CalculateRecurrences(domainEventCalendars)
-                .Where(e => dateTime.AddMinutes(e.Event.RemindBefore.Value) == e.Event.StartDate.Value.Add(e.Event.StartTime ?? new TimeSpan(0)))
+                .Where(e => EFFunctions.DateDiffMinute(dateTime, e.Event.StartDate.Value.AddMinutes(e.Event.StartTime?.TotalMinutes ?? 0).AddMinutes(-e.Event.RemindBefore.Value)) == 0)
                 .ToList();
+
+            if (!domainEventCalendars.Any())
+                return null;
 
             var eventUsers = domainEventCalendars.SelectMany(e => e.Calendar.SharedUsers.Where(u => u.IsSubscribed).Select(c => new EventUser
             {

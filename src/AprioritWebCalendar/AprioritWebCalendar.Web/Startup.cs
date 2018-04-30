@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AprioritWebCalendar.Bootstrap;
 using AprioritWebCalendar.Infrastructure.Options;
+using AprioritWebCalendar.Web.Jobs;
 
 namespace AprioritWebCalendar.Web
 {
@@ -104,11 +105,13 @@ namespace AprioritWebCalendar.Web
                     // In release it's compressed.
                     opt.SerializerSettings.Formatting = Formatting.Indented;
 #endif
-                }); ;
+                });
+
+            services.AddTransient<NotificationJob>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider container)
         {
             if (env.IsDevelopment())
             {
@@ -134,6 +137,8 @@ namespace AprioritWebCalendar.Web
             app.UseStaticFiles();
 
             app.UseMvc();
+
+            JobStarter.RegisterJobs(container);
         }
     }
 }
