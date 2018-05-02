@@ -27,7 +27,7 @@ namespace AprioritWebCalendar.Web.Controllers
             _calendarExportService = calendarExportService;
         }
 
-        [HttpGet("Export/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Export(int id)
         {
             var userId = this.GetUserId();

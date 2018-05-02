@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
@@ -15,16 +14,14 @@ namespace AprioritWebCalendar.Business.Services
     {
         public Calendar ExportCalendar(DomainCalendar calendar)
         {
-            var iCalendar = new Calendar
-            {
-                Name = calendar.Name
-            };
+            var iCalendar = new Calendar();
+            iCalendar.TimeZones.Add(new VTimeZone(TimeZoneInfo.Utc.Id));
 
             foreach (var e in calendar.Events)
             {
                 var iEvent = new CalendarEvent
                 {
-                    Name = e.Event.Name,
+                    Summary = e.Event.Name,
                     Description = e.Event.Description,
                     IsAllDay = e.Event.IsAllDay
                 };
@@ -61,7 +58,7 @@ namespace AprioritWebCalendar.Business.Services
                         iEvent.DtEnd = new CalDateTime(e.Event.Period.PeriodEnd.Add(e.Event.EndTime.Value));
                     }
 
-                    iEvent.RecurrenceRules = new List<RecurrencePattern> { _GetRecurrencePattern(e.Event.Period) };
+                    iEvent.RecurrenceRules = new List<RecurrencePattern> { _GetRecurrencePattern(e.Event) };
                 }
 
                 iCalendar.Events.Add(iEvent);
@@ -75,14 +72,15 @@ namespace AprioritWebCalendar.Business.Services
             return new CalendarSerializer(iCalendar).SerializeToString();
         }
 
-        private RecurrencePattern _GetRecurrencePattern(DomainModels.Period period)
+        private RecurrencePattern _GetRecurrencePattern(DomainModels.Event ev)
         {
             var rule = new RecurrencePattern
             {
-                Interval = period.Type == PeriodType.Custom ? period.Cycle.Value : 1
+                Interval = ev.Period.Type == PeriodType.Custom ? ev.Period.Cycle.Value : 1,
+                Until = ev.Period.PeriodEnd
             };
 
-            switch (period.Type)
+            switch (ev.Period.Type)
             {
                 case PeriodType.Yearly:
                     rule.Frequency = FrequencyType.Yearly;

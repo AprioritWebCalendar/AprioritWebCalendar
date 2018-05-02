@@ -63,6 +63,8 @@ import { InvitationsIncomingComponent } from './invitation/components/invitation
 import { InvitationsIncomingButtonComponent } from './invitation/components/invitations-incoming-button/invitations-incoming-button.component';
 import { InvitationService } from './invitation/services/invitation.service';
 import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
+import { CalendarExportComponent } from './calendar/components/calendar-export/calendar-export.component';
+import { CalendarIcalService } from './calendar/services/calendar.ical.service';
 
 @NgModule({
   declarations: [
@@ -95,7 +97,8 @@ import { InvitationViewComponent } from './invitation/components/invitation-view
     EventSearchComponent,
     InvitationsIncomingComponent,
     InvitationsIncomingButtonComponent,
-    InvitationViewComponent
+    InvitationViewComponent,
+    CalendarExportComponent
   ],
   imports: [
     BrowserModule,
@@ -144,7 +147,8 @@ import { InvitationViewComponent } from './invitation/components/invitation-view
     CalendarService,
     UserService,
     EventService,
-    InvitationService
+    InvitationService,
+    CalendarIcalService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
@@ -152,6 +156,7 @@ import { InvitationViewComponent } from './invitation/components/invitation-view
       CalendarEditComponent,
       CalendarDeleteComponent,
       ShareCalendarComponent,
+      CalendarExportComponent,
 
       EventCreateComponent,
       EventEditComponent,
