@@ -40,6 +40,14 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<Calendar> GetCalendarByIdAsync(int calendarId, params string[] includeProperties);
 
         /// <summary>
+        /// Gets a calendar by Id with events and their periods.
+        /// </summary>
+        /// <param name="calendarId">ID of the calendar.</param>
+        /// <param name="userId">User ID</param>
+        /// <returns>Calendar domain model.</returns>
+        Task<Calendar> GetCalendarReadyToExportAsync(int calendarId, int userId);
+
+        /// <summary>
         /// Creates a new calendar.
         /// </summary>
         /// <param name="calendar">Calendar domain model.</param>

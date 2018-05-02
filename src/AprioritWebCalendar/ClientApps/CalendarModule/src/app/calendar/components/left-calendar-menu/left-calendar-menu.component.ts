@@ -10,6 +10,7 @@ import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/cale
 import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.component';
 import { ShareCalendarComponent } from '../share-calendar/share-calendar.component';
 import { ToastsManager } from 'ng2-toastr';
+import { ICalendarExportParams, CalendarExportComponent } from '../calendar-export/calendar-export.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -107,6 +108,15 @@ export class LeftCalendarMenuComponent implements OnInit {
         };
 
         this.dialogService.addDialog(ShareCalendarComponent, model);
+    }
+
+    showExportModal(calendar: CalendarCheck) {
+        let params: ICalendarExportParams = {
+            id: calendar.Id as number,
+            fileName: calendar.Name
+        };
+
+        this.dialogService.addDialog(CalendarExportComponent, params);
     }
 
     subscribeCalendar(calendar: CalendarCheck) {

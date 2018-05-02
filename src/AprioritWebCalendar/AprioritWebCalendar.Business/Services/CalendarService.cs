@@ -18,16 +18,19 @@ namespace AprioritWebCalendar.Business.Services
     {
         private readonly IRepository<Calendar> _calendarRepository;
         private readonly IRepository<UserCalendar> _userCalendarRepository;
+        private readonly IRepository<EventCalendar> _eventCalendarRepository;
 
         private readonly IMapper _mapper;
 
         public CalendarService(
             IRepository<Calendar> calendarRepository,
             IRepository<UserCalendar> userCalendarRepository,
+            IRepository<EventCalendar> eventCalendarRepository,
             IMapper mapper)
         {
             _calendarRepository = calendarRepository;
             _userCalendarRepository = userCalendarRepository;
+            _eventCalendarRepository = eventCalendarRepository;
             _mapper = mapper;
         }
 
@@ -60,6 +63,20 @@ namespace AprioritWebCalendar.Business.Services
                 throw new NotFoundException();
 
             return _mapper.Map<DomainCalendar>(calendar);
+        }
+
+        public async Task<DomainCalendar> GetCalendarReadyToExportAsync(int calendarId, int userId)
+        {
+            var calendar = await GetCalendarByIdAsync(calendarId);
+
+            var dataEvents = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.CalendarId == calendarId,
+                    e => e.Event, e => e.Event.Period))
+                .ToList();
+
+            dataEvents.RemoveAll(e => e.Event.IsPrivate && e.Event.OwnerId != userId);
+
+            calendar.Events = _mapper.Map<IEnumerable<DomainModels.EventCalendar>>(dataEvents);
+            return calendar;
         }
 
         public async Task<int?> GetUserDefaultCalendarIdAsync(int userId)

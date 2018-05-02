@@ -11,6 +11,10 @@
                 <a class="dropdown-item" (click)="showDeleteModal(calendarMenu.get('item'))">Delete</a>
             </li>
 
+            <li>
+                <a class="dropdown-item" (click)="showExportModal(calendarMenu.get('item'))">Export</a>
+            </li>
+
             <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId">
                 <a class="dropdown-item" (click)="showShareModal(calendarMenu.get('item'))">Share</a>
             </li>
