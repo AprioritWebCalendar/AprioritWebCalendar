@@ -33,7 +33,8 @@
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",
         "../node_modules/bootstrap/dist/js/bootstrap.min.js",
-        "../node_modules/ng2-toastr/bundles/ng2-toastr.min.js"
+        "../node_modules/ng2-toastr/bundles/ng2-toastr.min.js",
+        "../node_modules/@aspnet/signalr/dist/browser/signalr.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

@@ -10,6 +10,8 @@ namespace AprioritWebCalendar.Web.Extensions
     {
         public static int GetUserId(this Controller controller)
         {
+            // TODO: Delete this method and use ClaimsPrincipalExtensions.GetUserId instead.
+
             string strId = controller.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var success = int.TryParse(strId, out int id);

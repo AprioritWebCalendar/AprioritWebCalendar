@@ -65,6 +65,7 @@ import { InvitationService } from './invitation/services/invitation.service';
 import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
 import { CalendarExportComponent } from './calendar/components/calendar-export/calendar-export.component';
 import { CalendarIcalService } from './calendar/services/calendar.ical.service';
+import { NotificationListener } from './notification/notification.listener';
 
 @NgModule({
   declarations: [
@@ -120,11 +121,10 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
     ClickOutsideModule,
 
     ngCalendarModule.forRoot(),
-
-
+    
     AgmCoreModule.forRoot({
         apiKey: 'AIzaSyBuPpVTIGkimz2VGPdGP5uSYkH4z43zQXM'
-      }),
+    }),
 
     routing
   ],
@@ -148,7 +148,9 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
     UserService,
     EventService,
     InvitationService,
-    CalendarIcalService
+    CalendarIcalService,
+
+    NotificationListener
   ],
   bootstrap: [AppComponent],
   entryComponents: [

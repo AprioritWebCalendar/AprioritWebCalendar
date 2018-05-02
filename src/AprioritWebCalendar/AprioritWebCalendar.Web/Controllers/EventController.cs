@@ -14,6 +14,7 @@ using AprioritWebCalendar.ViewModel.Event;
 using AprioritWebCalendar.Web.Filters;
 using AprioritWebCalendar.Web.Extensions;
 using AprioritWebCalendar.Infrastructure.Extensions;
+using AprioritWebCalendar.Web.SignalR.Notifications;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -27,15 +28,19 @@ namespace AprioritWebCalendar.Web.Controllers
     {
         private readonly IEventService _eventService;
         private readonly ICalendarService _calendarService;
+        private readonly NotificationHubManager _notificationManager;
+
         private readonly IMapper _mapper;
 
         public EventController(
             IEventService eventService,
             ICalendarService calendarService,
+            NotificationHubManager notificationHubManager,
             IMapper mapper)
         {
             _eventService = eventService;
             _calendarService = calendarService;
+            _notificationManager = notificationHubManager;
             _mapper = mapper;
         }
 
@@ -129,7 +134,7 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPost, ValidateApiModelFilter]
         public async Task<IActionResult> Create([FromBody]EventRequestModel model)
         {
-            var userId = this.GetUserId();
+            var userId = User.GetUserId();
 
             if (!await _calendarService.CanEditAsync(model.CalendarId, userId))
             {
@@ -138,6 +143,12 @@ namespace AprioritWebCalendar.Web.Controllers
 
             var eventDomain = _mapper.Map<Event>(model);
             var id = await _eventService.CreateEventAsync(eventDomain, userId);
+
+            var calendar = await _calendarService.GetCalendarByIdAsync(model.CalendarId, nameof(Calendar.Owner));
+
+            if (userId != calendar.Owner.Id)
+                await _notificationManager.EventInCalendarCreatedAsync(calendar.Owner.Id, User.Identity.Name, model.Name, calendar.Name);
+
             return Ok(new { Id = id });
         }
 
@@ -148,14 +159,19 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPut("{id}"), ValidateApiModelFilter]
         public async Task<IActionResult> Update(int id, [FromBody]EventRequestModel model)
         {
-            if (!await _eventService.CanEditAsync(id, this.GetUserId()))
+            var userId = User.GetUserId();
+
+            if (!await _eventService.CanEditAsync(id, userId))
                 return this.BadRequestError("You don't have any permissions to edit that event.");
 
-            var eventDomain = await _eventService.GetEventByIdAsync(id, "Period");
+            var eventDomain = await _eventService.GetEventByIdAsync(id, "Period", nameof(Event.Owner));
             
             eventDomain = _mapper.Map(model, eventDomain);
             eventDomain.Id = id;
             await _eventService.UpdateEventAsync(eventDomain);
+
+            if (userId != eventDomain.Owner.Id)
+                await _notificationManager.EventEditedAsync(eventDomain.Owner.Id, User.Identity.Name, eventDomain.Name, model.Name);
 
             return Ok();
         }
@@ -178,7 +194,7 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPut("{id}/Invite")]
         public async Task<IActionResult> InviteUser(int id, [FromBody]InviteViewModel model)
         {
-            var userId = this.GetUserId();
+            var userId = User.GetUserId();
 
             if (model.UserId == userId)
                 return this.BadRequestError("You can't invite yourself.");
@@ -190,13 +206,22 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You can't invite users on private event.");
 
             await _eventService.InviteUserAsync(id, model.UserId, userId, model.IsReadOnly);
+
+            var eventName = (await _eventService.GetEventByIdAsync(id)).Name;
+            await _notificationManager.UserInvitedAsync(model.UserId, eventName, User.Identity.Name);
+
             return Ok();
         }
 
         [HttpPut("{id}/Accept")]
         public async Task<IActionResult> AcceptInvitation(int id)
         {
-            await _eventService.AcceptInvatationAsync(id, this.GetUserId());
+            var userId = this.GetUserId();
+            await _eventService.AcceptInvatationAsync(id, userId);
+
+            var ev = await _eventService.GetEventByIdAsync(id, nameof(Event.Owner));
+            await _notificationManager.InvitationAcceptedAsync(ev.Owner.Id, ev.Name, User.Identity.Name);
+
             return Ok();
         }
 
@@ -204,18 +229,27 @@ namespace AprioritWebCalendar.Web.Controllers
         public async Task<IActionResult> RejectInvitation(int id)
         {
             await _eventService.RejectInvitationAsync(id, this.GetUserId());
+
+            var ev = await _eventService.GetEventByIdAsync(id, nameof(Event.Owner));
+            await _notificationManager.InvitationRejectedAsync(ev.Owner.Id, ev.Name, User.Identity.Name);
+
             return Ok();
         }
 
         [HttpPut("{id}/ReadOnly/{userId}")]
         public async Task<IActionResult> SetEventReadOnlyState(int id, int userId, [FromBody]bool isReadOnly)
         {
-            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+            var ev = await _eventService.GetEventByIdAsync(id);
+            var currentUserId = this.GetUserId();
+
+            if (ev.Owner.Id != currentUserId)
             {
                 return this.BadRequestError("Only owner can change read-only state.");
             }
 
             await _eventService.UpdateEventReadOnlyStateAsync(id, userId, isReadOnly);
+
+            await _notificationManager.EventReadOnlyChangedAsync(userId, ev.Name, User.Identity.Name, isReadOnly);
             return Ok();
         }
 
@@ -248,13 +282,15 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpDelete("{id}/Invited/{userId}")]
         public async Task<IActionResult> DeleteInvitedUser(int id, int userId)
         {
-            var currentUserId = this.GetUserId();
+            var currentUserId = User.GetUserId();
+            var ev = await _eventService.GetEventByIdAsync(id, nameof(Event.Owner));
             
-            if (userId == currentUserId || await _eventService.IsOwnerAsync(id, currentUserId))
+            if (userId == currentUserId || ev.Owner.Id == currentUserId)
             {
                 await _eventService.DeleteIntvitedUserAsync(id, userId);
-                return Ok();
+                await _notificationManager.RemovedFromEventAsync(userId, ev.Name, ev.Owner.UserName);
 
+                return Ok();
             }
             return this.BadRequestError("Only owner can delete invited user.");
         }
@@ -262,10 +298,15 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpDelete("{id}/Invitation/{userId}")]
         public async Task<IActionResult> DeleteInvitation(int id, int userId)
         {
-            if (!await _eventService.IsOwnerAsync(id, this.GetUserId()))
+            var currentUserId = User.GetUserId();
+            var ev = await _eventService.GetEventByIdAsync(id, nameof(Event.Owner));
+
+            if (ev.Owner.Id != currentUserId)
                 return this.BadRequestError("Only owner can delete invitation.");
 
             await _eventService.RejectInvitationAsync(id, userId);
+            await _notificationManager.InvitationDeletedAsync(userId, ev.Name, ev.Owner.UserName);
+
             return Ok();
         }
 

@@ -21,6 +21,7 @@ import { EventMoveComponent, IEventMoveParams } from '../../../event/components/
 import { IEventShareParams, EventShareComponent } from '../../../event/components/event-share/event-share.component';
 import { Invitation } from '../../../invitation/models/invitation';
 import { MainScreenModel } from './main-screen.model';
+import { NotificationListener } from '../../../notification/notification.listener';
 
 @Component({
     selector: 'app-main-screen',
@@ -39,7 +40,8 @@ export class MainScreenComponent implements OnInit {
         private eventService: EventService,
         private toasts: ToastsManager,
         private dialogService: DialogService,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private notificationListener: NotificationListener
     ) {
         this.model.actions = this.actions;
      }
@@ -74,6 +76,7 @@ export class MainScreenComponent implements OnInit {
     private setCalendars(calendars: Calendar[]) : void {
         if (this.model.currentUser == null) {
             this.model.currentUser = this.authenticationService.getCurrentUser();
+            this.notificationListener.Start();
         }
 
         this.model.calendars = calendars;
