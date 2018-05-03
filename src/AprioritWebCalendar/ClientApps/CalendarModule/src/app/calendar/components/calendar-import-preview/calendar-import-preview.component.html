@@ -1,0 +1,33 @@
+<app-alert [alertType]="'warning'" [innerText]="'All dates and time are shown in UTC.'"></app-alert>
+
+<div class="panel panel-info">
+    <div class="panel-heading">Calendar "{{model.Calendar.Name}}"</div>
+
+    <div class="list-group" *ngIf="model.Calendar.Events != null && model.Calendar.Events.length > 0">
+        <div class="list-group-item" *ngFor="let e of events">
+            <h4 class="list-group-item-heading">{{e.Name}}</h4>
+
+            <p class="list-group-item-text" *ngIf="e.Period == null && e.IsAllDay">
+                {{getLocaleDate(e.StartDate)}} - {{getLocaleDate(e.EndDate)}}
+            </p>
+
+            <p class="list-group-item-text" *ngIf="e.Period == null && !e.IsAllDay">
+                {{getLocaleDate(e.StartDate)}} {{e.StartTime}} - {{getLocaleDate(e.EndDate)}} {{e.EndTime}}
+            </p>
+
+            <p class="list-group-item-text" *ngIf="e.Period != null && e.IsAllDay">
+                <span>{{getLocaleDate(e.Period.PeriodStart)}} - {{getLocaleDate(e.Period.PeriodEnd)}}</span>
+                <br />
+                <i>Recurring</i>
+            </p>
+
+            <p class="list-group-item-text" *ngIf="e.Period != null && !e.IsAllDay">
+                <span>{{getLocaleDate(e.Period.PeriodStart)}} - {{getLocaleDate(e.Period.PeriodEnd)}}</span>
+                <br />
+                <span>Time: {{e.StartTime}} - {{e.EndTime}}</span>
+                <br />
+                <i>Recurring</i>
+            </p>
+        </div>
+    </div>
+</div>

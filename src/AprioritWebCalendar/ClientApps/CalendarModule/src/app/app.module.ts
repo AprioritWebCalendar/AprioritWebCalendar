@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ApplicationModule, APP_INITIALIZER } from '@angular/core';
 
-
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -66,6 +65,9 @@ import { InvitationService } from './invitation/services/invitation.service';
 import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
 import { CalendarExportComponent } from './calendar/components/calendar-export/calendar-export.component';
 import { CalendarIcalService } from './calendar/services/calendar.ical.service';
+import { CalendarImportComponent } from './calendar/components/calendar-import/calendar-import.component';
+import { CalendarImportPreviewComponent } from './calendar/components/calendar-import-preview/calendar-import-preview.component';
+import { DateFormatPipe } from './pipes/date.format.pipe';
 
 @NgModule({
   declarations: [
@@ -99,7 +101,11 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
     InvitationsIncomingComponent,
     InvitationsIncomingButtonComponent,
     InvitationViewComponent,
-    CalendarExportComponent
+    CalendarExportComponent,
+    CalendarImportComponent,
+    CalendarImportPreviewComponent,
+
+    DateFormatPipe
   ],
   imports: [
     BrowserModule,
@@ -159,6 +165,7 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
       CalendarDeleteComponent,
       ShareCalendarComponent,
       CalendarExportComponent,
+      CalendarImportComponent,
 
       EventCreateComponent,
       EventEditComponent,

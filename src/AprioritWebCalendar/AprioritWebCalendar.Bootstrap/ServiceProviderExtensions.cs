@@ -60,8 +60,11 @@ namespace AprioritWebCalendar.Bootstrap
 
             services.AddTransient<INotificationService, NotificationService>();
 
+            services.AddTransient<ICalendarExportService, CalendarExportService>();
+            services.AddTransient<ICalendarImportService, CalendarImportService>();
+
             services.AddSingleton<IEmailService, EmailService>();
-            services.AddSingleton<ICalendarExportService, CalendarExportService>();
+            services.AddSingleton<ICacheService, MemoryCacheService>();
         }
     }
 }

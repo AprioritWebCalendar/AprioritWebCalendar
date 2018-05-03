@@ -1,4 +1,5 @@
 import { User } from "../../authentication/models/user";
+import { EventCalendar } from "./event.calendar";
 
 export class Calendar {
     public Id: Number;
@@ -10,4 +11,6 @@ export class Calendar {
     public IsReadOnly?: boolean;
     public IsSubscribed?: boolean;
     public IsDefault: boolean;
+
+    public Events: EventCalendar[];
 }
