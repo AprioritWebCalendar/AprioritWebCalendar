@@ -9,24 +9,36 @@
             <app-calendar-view-switcher [viewMode]="model.viewMode" (onViewModeChanged)="changeViewMode($event)"></app-calendar-view-switcher>
 
             <div class="btn-group">
-                <button type="button" class="btn btn-primary" mwlCalendarPreviousView [view]="model.viewMode" [(viewDate)]="model.viewDate" (viewDateChange)="viewDateChanged($event)">Previous</button>
+                <button id="calendar-previous-btn" type="button" class="btn btn-primary" 
+                    tooltip="ALT + P" placement="top" container="body"
+                    mwlCalendarPreviousView [view]="model.viewMode" [(viewDate)]="model.viewDate" 
+                    (viewDateChange)="viewDateChanged($event)">Previous</button>
 
-                <button type="button" class="btn btn-primary" mwlCalendarToday [(viewDate)]="model.viewDate" (viewDateChange)="viewDateChanged($event)">Today</button>
+                <button id="calendar-today-btn" type="button" class="btn btn-primary" 
+                    tooltip="ALT + T" placement="top" container="body"
+                    mwlCalendarToday [(viewDate)]="model.viewDate" 
+                    (viewDateChange)="viewDateChanged($event)">Today</button>
 
-                <button type="button" class="btn btn-primary" mwlCalendarNextView [view]="model.viewMode" [(viewDate)]="model.viewDate" (viewDateChange)="viewDateChanged($event)">Next</button>
+                <button id="calendar-next-btn" type="button" class="btn btn-primary" 
+                    tooltip="ALT + N" placement="top" container="body"
+                    mwlCalendarNextView [view]="model.viewMode" [(viewDate)]="model.viewDate" 
+                    (viewDateChange)="viewDateChanged($event)">Next</button>
             </div>
         </div>
 
         <hr />
 
         <div [ngSwitch]="model.viewMode" class="row">
-            <mwl-calendar-day-view *ngSwitchCase="'day'" [locale]="model.locale" [refresh]="model.refresh" [events]="model.calendarEvents" [viewDate]="model.viewDate"
+            <mwl-calendar-day-view *ngSwitchCase="'day'" 
+                [locale]="model.locale" [refresh]="model.refresh" [events]="model.calendarEvents" [viewDate]="model.viewDate"
                 (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-day-view>
 
-            <mwl-calendar-week-view *ngSwitchCase="'week'" [locale]="model.locale" [refresh]="model.refresh" [weekStartsOn]="model.weekStartsOn" [events]="model.calendarEvents"
+            <mwl-calendar-week-view *ngSwitchCase="'week'"
+                [locale]="model.locale" [refresh]="model.refresh" [weekStartsOn]="model.weekStartsOn" [events]="model.calendarEvents"
                 [viewDate]="model.viewDate" (eventClicked)="openEventShareModal($event.event)"></mwl-calendar-week-view>
 
-            <mwl-calendar-month-view *ngSwitchCase="'month'" [locale]="model.locale" [refresh]="model.refresh" [activeDayIsOpen]="model.activeDayIsOpen"
+            <mwl-calendar-month-view *ngSwitchCase="'month'"
+                [locale]="model.locale" [refresh]="model.refresh" [activeDayIsOpen]="model.activeDayIsOpen"
                 [weekStartsOn]="model.weekStartsOn" [events]="model.calendarEvents" [viewDate]="model.viewDate" (eventClicked)="openEventShareModal($event.event)"
                 (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
         </div>
