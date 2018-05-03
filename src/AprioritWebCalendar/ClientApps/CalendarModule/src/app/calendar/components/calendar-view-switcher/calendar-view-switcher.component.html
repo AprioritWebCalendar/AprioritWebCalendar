@@ -1,5 +1,10 @@
 <div class="btn-group">
-    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="day">Day</label>
-    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="week">Week</label>
-    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="month">Month</label>
+    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="day"
+        tooltip="ALT + D" placement="top" container="body">Day</label>
+
+    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="week"
+        tooltip="ALT + W" placement="top" container="body">Week</label>
+
+    <label class="btn btn-primary" [(ngModel)]="viewMode" (click)="onCalendarViewModeChanged()" btnRadio="month"
+        tooltip="ALT + M" placement="top" container="body">Month</label>
 </div>

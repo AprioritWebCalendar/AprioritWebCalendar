@@ -15,6 +15,7 @@ import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDate
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
+import { HotkeyModule } from 'angular2-hotkeys';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -118,6 +119,7 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
     ClickOutsideModule,
+    HotkeyModule.forRoot(),
 
     ngCalendarModule.forRoot(),
 

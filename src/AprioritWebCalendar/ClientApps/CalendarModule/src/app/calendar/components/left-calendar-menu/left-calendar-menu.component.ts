@@ -11,6 +11,7 @@ import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.comp
 import { ShareCalendarComponent } from '../share-calendar/share-calendar.component';
 import { ToastsManager } from 'ng2-toastr';
 import { ICalendarExportParams, CalendarExportComponent } from '../calendar-export/calendar-export.component';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -24,13 +25,16 @@ export class LeftCalendarMenuComponent implements OnInit {
         private calendarService: CalendarService,
         private authService: AuthenticationService,
         private dialogService: DialogService,
-        private toastr: ToastsManager
+        private toastr: ToastsManager,
+        private hotkeysService: HotkeysService
     ) {
      }
 
     public UserId: Number;
 
     ngOnInit() {
+        this.configureHotkeys();
+
         this.calendarService.getCalendars()
             .subscribe((calendars: Calendar[]) => {
                 this.UserId = this.authService.getCurrentUser().Id;
@@ -152,5 +156,14 @@ export class LeftCalendarMenuComponent implements OnInit {
 
     calendarsChanged() {
         this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
+    }
+
+    private configureHotkeys() : void {
+        this.hotkeysService.add(new Hotkey("alt+c", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.showCreateModal();
+
+            return false;
+        }));
     }
 }

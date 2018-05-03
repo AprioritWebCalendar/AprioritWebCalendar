@@ -21,6 +21,7 @@ import { EventMoveComponent, IEventMoveParams } from '../../../event/components/
 import { IEventShareParams, EventShareComponent } from '../../../event/components/event-share/event-share.component';
 import { Invitation } from '../../../invitation/models/invitation';
 import { MainScreenModel } from './main-screen.model';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 
 @Component({
     selector: 'app-main-screen',
@@ -39,7 +40,8 @@ export class MainScreenComponent implements OnInit {
         private eventService: EventService,
         private toasts: ToastsManager,
         private dialogService: DialogService,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private hotkeysService: HotkeysService
     ) {
         this.model.actions = this.actions;
      }
@@ -69,6 +71,8 @@ export class MainScreenComponent implements OnInit {
         this.model.locale = navigator.language.split("-")[0];
         this.model.localeData =  moment.localeData(this.model.locale);
         this.model.weekStartsOn = this.model.localeData.firstDayOfWeek();
+
+        this.configureHotkeys();
     }
 
     private setCalendars(calendars: Calendar[]) : void {
@@ -247,5 +251,51 @@ export class MainScreenComponent implements OnInit {
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
             });
+    }
+
+    private configureHotkeys() : void {
+        this.hotkeysService.add(new Hotkey("alt+e", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.openCreateEventModal();
+            console.log(e);
+
+            return false;
+        }));
+
+        this.hotkeysService.add(new Hotkey("alt+i", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.changeSidebarOpened();
+            return false;
+        }));
+
+        this.hotkeysService.add(new Hotkey(["alt+d", "alt+w", "alt+m"], (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+
+            let dict = {
+                "d": "day",
+                "w": "week",
+                "m": "month"
+            };
+
+            let newViewMode = dict[e.key];
+
+            if (newViewMode !== this.model.viewMode)
+                this.changeViewMode(dict[e.key]);
+
+            return false;
+        }));
+
+        this.hotkeysService.add(new Hotkey(["alt+p", "alt+t", "alt+n"], (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+
+            let dict = {
+                "p": "calendar-previous-btn",
+                "t": "calendar-today-btn",
+                "n": "calendar-next-btn"
+            };
+
+            document.getElementById(dict[e.key]).click();
+            return false;
+        }));
     }
 }
