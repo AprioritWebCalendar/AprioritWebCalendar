@@ -12,6 +12,7 @@ import { ShareCalendarComponent } from '../share-calendar/share-calendar.compone
 import { ToastsManager } from 'ng2-toastr';
 import { ICalendarExportParams, CalendarExportComponent } from '../calendar-export/calendar-export.component';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+import { CalendarImportComponent } from '../calendar-import/calendar-import.component';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -100,6 +101,7 @@ export class LeftCalendarMenuComponent implements OnInit {
                     return;
 
                 this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
+                this.calendarsChanged();
                 this.toastr.success("The calendar has been deleted successfully.");
             });
     }
@@ -121,6 +123,18 @@ export class LeftCalendarMenuComponent implements OnInit {
         };
 
         this.dialogService.addDialog(CalendarExportComponent, params);
+    }
+
+    showImportModal() {
+        this.dialogService.addDialog(CalendarImportComponent)
+            .subscribe((calendar: CalendarCheck) => {
+                if (calendar != null) {
+                    calendar.Owner = this.authService.getCurrentUser();
+                    this.model.Calendars.push(calendar);
+                    this.calendarsChanged();
+                    this.toastr.success("The calendar has been imported successfully.");
+                }
+            });
     }
 
     subscribeCalendar(calendar: CalendarCheck) {

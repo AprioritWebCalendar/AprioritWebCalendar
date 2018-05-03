@@ -56,6 +56,8 @@ namespace AprioritWebCalendar.Web
 
             services.AddAutoMapper();
 
+            services.AddMemoryCache();
+
             #region JWT Configuring.
 
             var jwtOptions = CustomConfiguration.GetSection("JwtOptions");

@@ -61,9 +61,17 @@
     <hr>
     
     <div class="nav nav-sidebar">
-        <button type="button" class="btn btn-success col-md-offset-3" (click)="showCreateModal()"
-            tooltip="Create a new calendar (ALT + C)" placement="top" container="body">
-                Create new
-        </button>
+        <div class="col-md-offset-2">
+            <button type="button" class="btn btn-success" (click)="showCreateModal()"
+                tooltip="Create a new calendar (ALT + C)" placement="top" container="body">
+                    Create new
+            </button>
+
+            <button type="button" class="btn btn-warning"
+                tooltip="Import a calendar from .ics file" placement="top" container="body"
+                (click)="showImportModal()">
+                    Import
+            </button>
+        </div>
     </div>
 </div>
