@@ -66,6 +66,7 @@ import { InvitationViewComponent } from './invitation/components/invitation-view
 import { CalendarExportComponent } from './calendar/components/calendar-export/calendar-export.component';
 import { CalendarIcalService } from './calendar/services/calendar.ical.service';
 import { NotificationListener } from './notification/notification.listener';
+import { PushNotificationService } from './services/push.notification.service';
 
 @NgModule({
   declarations: [
@@ -150,7 +151,9 @@ import { NotificationListener } from './notification/notification.listener';
     InvitationService,
     CalendarIcalService,
 
-    NotificationListener
+    NotificationListener,
+
+    PushNotificationService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
