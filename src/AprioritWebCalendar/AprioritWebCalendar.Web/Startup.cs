@@ -19,6 +19,9 @@ using Newtonsoft.Json.Serialization;
 using AprioritWebCalendar.Bootstrap;
 using AprioritWebCalendar.Infrastructure.Options;
 using AprioritWebCalendar.Web.Jobs;
+using AprioritWebCalendar.Web.SignalR.Notifications;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 
 namespace AprioritWebCalendar.Web
 {
@@ -80,6 +83,19 @@ namespace AprioritWebCalendar.Web
                 {
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = tokenValidationParameters;
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = ctx =>
+                        {
+                            if (ctx.HttpContext.Request.Path.Value.StartsWith("/notification-hub") && ctx.Request.Query.ContainsKey("token"))
+                            {
+                                ctx.Token = ctx.Request.Query["token"];
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services.AddAuthorization(opts =>
@@ -90,6 +106,17 @@ namespace AprioritWebCalendar.Web
             });
 
             #endregion
+
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("AllowAllOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
+            });
 
             services
                 .AddMvc()
@@ -109,7 +136,15 @@ namespace AprioritWebCalendar.Web
 #endif
                 });
 
+            services.Configure<MvcOptions>(opt =>
+            {
+                opt.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigin"));
+            });
+
+            services.AddSignalR();
+
             services.AddTransient<NotificationJob>();
+            services.AddTransient<NotificationHubManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -138,7 +173,13 @@ namespace AprioritWebCalendar.Web
             app.UseMvcWithDefaultRoute();
             app.UseStaticFiles();
 
+            app.UseCors("AllowAllOrigin");
             app.UseMvc();
+
+            app.UseSignalR(c =>
+            {
+                c.MapHub<NotificationHub>("/notification-hub");
+            });
 
             JobStarter.RegisterJobs(container);
         }

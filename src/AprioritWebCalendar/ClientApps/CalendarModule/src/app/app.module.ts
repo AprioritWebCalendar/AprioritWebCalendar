@@ -68,6 +68,8 @@ import { CalendarIcalService } from './calendar/services/calendar.ical.service';
 import { CalendarImportComponent } from './calendar/components/calendar-import/calendar-import.component';
 import { CalendarImportPreviewComponent } from './calendar/components/calendar-import-preview/calendar-import-preview.component';
 import { DateFormatPipe } from './pipes/date.format.pipe';
+import { NotificationListener } from './notification/notification.listener';
+import { PushNotificationService } from './services/push.notification.service';
 
 @NgModule({
   declarations: [
@@ -128,11 +130,10 @@ import { DateFormatPipe } from './pipes/date.format.pipe';
     HotkeyModule.forRoot(),
 
     ngCalendarModule.forRoot(),
-
-
+    
     AgmCoreModule.forRoot({
         apiKey: 'AIzaSyBuPpVTIGkimz2VGPdGP5uSYkH4z43zQXM'
-      }),
+    }),
 
     routing
   ],
@@ -156,7 +157,11 @@ import { DateFormatPipe } from './pipes/date.format.pipe';
     UserService,
     EventService,
     InvitationService,
-    CalendarIcalService
+    CalendarIcalService,
+
+    NotificationListener,
+
+    PushNotificationService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

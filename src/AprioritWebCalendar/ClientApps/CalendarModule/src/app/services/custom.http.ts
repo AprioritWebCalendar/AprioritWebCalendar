@@ -41,6 +41,10 @@ export class CustomHttp extends Http {
         });
     }
 
+    public getTokenString() : string {
+        return this.token;
+    }
+
     public attachToken(options: RequestOptions) {
         options.headers.set("Authorization", `Bearer ${this.token}`);
     }
