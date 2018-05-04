@@ -1,7 +1,6 @@
 import { CustomHttp } from "../services/custom.http";
 import { Injectable } from "@angular/core";
 import { HubConnection, IHubConnectionOptions } from '@aspnet/signalr';
-import { remoteUrl } from "../app.remote";
 
 @Injectable()
 export class NotificationListener {
@@ -14,7 +13,7 @@ export class NotificationListener {
     private _connection: HubConnection;
 
     public Start() : void {
-        this._connection = new HubConnection(`${remoteUrl}/notification-hub?token=${this.customHttp.getTokenString()}`);
+        this._connection = new HubConnection(`/notification-hub?token=${this.customHttp.getTokenString()}`);
         this._connection.start();
         console.log("The NotificationListener is running...");
     }
