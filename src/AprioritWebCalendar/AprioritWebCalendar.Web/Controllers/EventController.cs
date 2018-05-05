@@ -199,17 +199,20 @@ namespace AprioritWebCalendar.Web.Controllers
             if (model.UserId == userId)
                 return this.BadRequestError("You can't invite yourself.");
 
-            if (!await _eventService.IsOwnerAsync(id, userId))
+            var ev = await _eventService.GetEventByIdAsync(id, nameof(Event.Period), nameof(Event.Owner));
+
+            if (userId != ev.Owner.Id)
                 return this.BadRequestError("Only owner can invite users.");
 
-            if (await _eventService.IsPrivateAsync(id))
+            if (ev.IsPrivate)
                 return this.BadRequestError("You can't invite users on private event.");
 
-            await _eventService.InviteUserAsync(id, model.UserId, userId, model.IsReadOnly);
+            if (ev.IsOld(DateTime.UtcNow))
+                return this.BadRequestError("You can't invite users on events from the past.");
 
-            var eventName = (await _eventService.GetEventByIdAsync(id)).Name;
-            await _notificationManager.UserInvitedAsync(model.UserId, eventName, User.Identity.Name);
-
+            await _eventService.InviteUserAsync(ev.Id, model.UserId, userId, model.IsReadOnly);
+            
+            await _notificationManager.UserInvitedAsync(model.UserId, ev.Name, User.Identity.Name);
             return Ok();
         }
 

@@ -16,6 +16,7 @@ namespace AprioritWebCalendar.Web.Jobs
             await _scheduler.Start();
 
             await StartNotificationJob();
+            await StartInvitationsDeletingJob();
         }
 
         private async static Task StartNotificationJob()
@@ -26,6 +27,19 @@ namespace AprioritWebCalendar.Web.Jobs
                 .WithIdentity("NotificationTrigger", "NotificationGroup")
                 .StartNow()
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
+                .Build();
+
+            await _scheduler.ScheduleJob(job, trigger);
+        }
+
+        private async static Task StartInvitationsDeletingJob()
+        {
+            var job = JobBuilder.Create<InvitationsDeletingJob>().Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity("InvitationsDeletingTrigger", "InvitationsDeletingGroup")
+                .StartNow()
+                .WithSimpleSchedule(x => x.WithIntervalInMinutes(5).RepeatForever())
                 .Build();
 
             await _scheduler.ScheduleJob(job, trigger);

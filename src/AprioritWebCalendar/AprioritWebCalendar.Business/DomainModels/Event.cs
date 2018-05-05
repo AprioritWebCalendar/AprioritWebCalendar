@@ -65,5 +65,23 @@ namespace AprioritWebCalendar.Business.DomainModels
                 return Period.PeriodStart.CompareTo(other.StartDate ?? other.Period.PeriodStart);
             }
         }
+
+        public bool IsOld(DateTime dateTime)
+        {
+            DateTime ending;
+
+            if (Period == null)
+            {
+                ending = IsAllDay ? EndDate.Value.AddDays(1)
+                    : EndDate.Value.Add(EndTime.Value);
+            }
+            else
+            {
+                ending = IsAllDay ? Period.PeriodEnd.AddDays(1)
+                    : Period.PeriodEnd.Add(EndTime.Value);
+            }
+
+            return dateTime >= ending;
+        }
     }
 }
