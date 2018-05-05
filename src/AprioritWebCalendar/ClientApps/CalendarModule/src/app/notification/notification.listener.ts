@@ -7,13 +7,12 @@ export class NotificationListener {
     constructor(
         private customHttp: CustomHttp
     ) {
-
+        this._connection = new HubConnection(`/hub/notification?token=${this.customHttp.getTokenString()}`);
     }
 
     private _connection: HubConnection;
 
     public Start() : void {
-        this._connection = new HubConnection(`/notification-hub?token=${this.customHttp.getTokenString()}`);
         this._connection.start();
         console.log("The NotificationListener is running...");
     }
@@ -42,12 +41,6 @@ export class NotificationListener {
         });
     }
 
-    public OnUserInvited(callback: (eventName: string, invitatorName: string) => void) : void {
-        this._connection.on("invited", args => {
-            callback(args.eventName, args.invitatorName);
-        });
-    }
-
     public OnInvitationAccepted(callback: (eventName: string, userName: string) => void) : void {
         this._connection.on("invitationAccepted", args => {
             callback(args.eventName, args.userName);
@@ -57,12 +50,6 @@ export class NotificationListener {
     public OnInvitationRejected(callback: (eventName: string, userName: string) => void) : void {
         this._connection.on("invitationRejected", args => {
             callback(args.eventName, args.userName);
-        });
-    }
-
-    public OnInvitationDeleted(callback: (eventName: string, invitatorName: string) => void) : void {
-        this._connection.on("invitationDeleted", args => {
-            callback(args.eventName, args.invitatorName);
         });
     }
 

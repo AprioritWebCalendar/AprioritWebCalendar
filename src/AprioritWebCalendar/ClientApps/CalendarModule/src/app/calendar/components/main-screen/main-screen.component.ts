@@ -305,8 +305,6 @@ export class MainScreenComponent implements OnInit {
     }
     
     private configureSignalR() : void {
-        this.notificationListener.Start();
-
         this.notificationListener.OnCalendarShared((calName, calOwner) => {
             this.pushNotifService.PushNotification(`Has shared calendar "${calName}" with you.`, calOwner);
         });
@@ -339,20 +337,12 @@ export class MainScreenComponent implements OnInit {
             this.pushNotifService.PushNotification(message, editor);
         });
 
-        this.notificationListener.OnUserInvited((eventName, invitator) => {
-            this.pushNotifService.PushNotification(`Has invited you to event "${eventName}".`, invitator);
-        });
-
         this.notificationListener.OnInvitationAccepted((event, user) => {
             this.pushNotifService.PushNotification(`Has accepted your invitation to event "${event}".`, user);
         });
 
         this.notificationListener.OnInvitationRejected((event, user) => {
             this.pushNotifService.PushNotification(`Has rejected your invitation to event "${event}".`, user);
-        });
-
-        this.notificationListener.OnInvitationDeleted((event, invitator) => {
-            this.pushNotifService.PushNotification(`Has deleted invitation to event "${event}".`, invitator);
         });
 
         this.notificationListener.OnRemovedFromCalendar((name, owner) => {
@@ -380,5 +370,7 @@ export class MainScreenComponent implements OnInit {
 
             this.pushNotifService.PushNotification(message, owner);
         });
+        
+        this.notificationListener.Start();
     }
 }

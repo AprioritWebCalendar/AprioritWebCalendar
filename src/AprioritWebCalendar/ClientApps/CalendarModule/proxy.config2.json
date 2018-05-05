@@ -3,7 +3,7 @@
       "target": "http://localhost:65068",
       "secure": false
    },
-   "/notification-hub": {
+   "/hub": {
       "target": "http://localhost:65068",
       "secure": false,
       "ws": true

@@ -8,8 +8,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
 {
     public class NotificationHubManager
     {
-        // TODO: Get invitations by SignalR.
-
         private readonly IHubContext<NotificationHub> _hub;
 
         public NotificationHubManager(IHubContext<NotificationHub> hub)
@@ -56,15 +54,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             });
         }
 
-        public async Task UserInvitedAsync(int userId, string eventName, string invitatorName)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("invited", new
-            {
-                eventName,
-                invitatorName
-            });
-        }
-
         public async Task InvitationAcceptedAsync(int invitatorId, string eventName, string userName)
         {
             await _hub.Clients.Group(invitatorId.ToString()).SendAsync("invitationAccepted", new
@@ -80,15 +69,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             {
                 eventName,
                 userName
-            });
-        }
-
-        public async Task InvitationDeletedAsync(int userId, string eventName, string invitatorName)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("invitationDeleted", new
-            {
-                eventName,
-                invitatorName
             });
         }
 

@@ -25,14 +25,12 @@ namespace AprioritWebCalendar.Test.Services
                 cfg.AddProfile(new MapperProfile());
             });
 
-            _mapper = config.CreateMapper();
-
             var mockInvitationRepository = new Mock<IRepository<Invitation>>();
 
             mockInvitationRepository.Setup(repo => repo.FindAllIncludingAsync(It.IsAny<Expression<Func<Invitation, object>>[]>()))
                 .Returns(_GetTestInvitations());
 
-            _invitationService = new InvitationService(mockInvitationRepository.Object);
+            _invitationService = new InvitationService(mockInvitationRepository.Object, config.CreateMapper());
         }
 
         [Fact]

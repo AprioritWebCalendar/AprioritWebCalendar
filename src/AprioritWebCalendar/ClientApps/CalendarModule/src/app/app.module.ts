@@ -70,6 +70,7 @@ import { CalendarImportPreviewComponent } from './calendar/components/calendar-i
 import { DateFormatPipe } from './pipes/date.format.pipe';
 import { NotificationListener } from './notification/notification.listener';
 import { PushNotificationService } from './services/push.notification.service';
+import { InvitationListener } from './invitation/services/invitation.listener';
 
 @NgModule({
   declarations: [
@@ -160,6 +161,7 @@ import { PushNotificationService } from './services/push.notification.service';
     CalendarIcalService,
 
     NotificationListener,
+    InvitationListener,
 
     PushNotificationService
   ],

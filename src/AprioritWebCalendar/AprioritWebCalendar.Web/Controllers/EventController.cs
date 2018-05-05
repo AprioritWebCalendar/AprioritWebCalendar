@@ -15,6 +15,7 @@ using AprioritWebCalendar.Web.Filters;
 using AprioritWebCalendar.Web.Extensions;
 using AprioritWebCalendar.Infrastructure.Extensions;
 using AprioritWebCalendar.Web.SignalR.Notifications;
+using AprioritWebCalendar.Web.SignalR.Invitations;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -28,19 +29,25 @@ namespace AprioritWebCalendar.Web.Controllers
     {
         private readonly IEventService _eventService;
         private readonly ICalendarService _calendarService;
+        private readonly IInvitationService _invitationService;
         private readonly NotificationHubManager _notificationManager;
+        private readonly InvitationHubManager _invitationManager;
 
         private readonly IMapper _mapper;
 
         public EventController(
             IEventService eventService,
             ICalendarService calendarService,
+            IInvitationService invitationService,
             NotificationHubManager notificationHubManager,
+            InvitationHubManager invitationHubManager,
             IMapper mapper)
         {
             _eventService = eventService;
             _calendarService = calendarService;
+            _invitationService = invitationService;
             _notificationManager = notificationHubManager;
+            _invitationManager = invitationHubManager;
             _mapper = mapper;
         }
 
@@ -211,8 +218,9 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You can't invite users on events from the past.");
 
             await _eventService.InviteUserAsync(ev.Id, model.UserId, userId, model.IsReadOnly);
-            
-            await _notificationManager.UserInvitedAsync(model.UserId, ev.Name, User.Identity.Name);
+
+            var invitation = await _invitationService.GetInvitationAsync(id, model.UserId);
+            await _invitationManager.UserInvitedAsync(model.UserId, _mapper.Map<InvitationViewModel>(invitation));
             return Ok();
         }
 
@@ -308,7 +316,7 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("Only owner can delete invitation.");
 
             await _eventService.RejectInvitationAsync(id, userId);
-            await _notificationManager.InvitationDeletedAsync(userId, ev.Name, ev.Owner.UserName);
+            await _invitationManager.InvitationDeletedAsync(userId, id, ev.Name, ev.Owner.UserName);
 
             return Ok();
         }

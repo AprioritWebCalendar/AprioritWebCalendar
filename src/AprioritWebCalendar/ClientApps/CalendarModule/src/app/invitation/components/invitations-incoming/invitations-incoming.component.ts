@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Invitation } from '../../models/invitation';
 import { InvitationService } from '../../services/invitation.service';
 import { ToastsManager } from 'ng2-toastr';
+import { InvitationListener } from '../../services/invitation.listener';
+import { PushNotificationService } from '../../../services/push.notification.service';
+import { Event } from '../../../event/models/event';
 
 @Component({
     selector: 'app-invitations-incoming',
@@ -21,22 +24,14 @@ export class InvitationsIncomingComponent implements OnInit {
 
     constructor(
         private invitationService: InvitationService,
-        private toastr: ToastsManager
+        private toastr: ToastsManager,
+        private invitationListener: InvitationListener,
+        private pushNotifService: PushNotificationService
     ) { }
 
     public ngOnInit() : void {
         this.isLoading = true;
-
-        this.invitationService.getIncomingInvitations()
-            .subscribe(i => {
-                if (i != null) {
-                    this.invitations = i;
-                }
-                this.isLoading = false;
-            }, e => {
-                this.isLoading = false;
-                this.isError = true;
-            });
+        this.configureSignalR();
     }
 
     public acceptInvitation(invitation: Invitation): void {
@@ -62,5 +57,34 @@ export class InvitationsIncomingComponent implements OnInit {
 
     private removeFromList(invitation: Invitation) : void {
         this.invitations.splice(this.invitations.indexOf(invitation), 1);
+    }
+
+    private configureSignalR() : void {
+        this.invitationListener.OnIncomingInvitationsReceived((invitations: Invitation[]) => {
+            if (invitations != null && invitations.length > 0) {
+                console.log(invitations);
+
+                this.invitations = invitations;
+                this.isLoading = false;
+            }
+        });
+
+        this.invitationListener.OnUserInvited((i: Invitation) => {
+            console.log(i);
+
+            if (i != null) {
+                this.pushNotifService.PushNotification(`Has invited you to go to event "${i.Event.Name}".`, 
+                    i.Invitator.UserName as string);
+
+                this.invitations.push(i);
+            }
+        });
+
+        this.invitationListener.OnInvitationDeleted((name, id, invitator) => {
+            this.invitations = this.invitations.filter(i => i.Event.Id != id);
+            this.pushNotifService.PushNotification(`Has deleted invitation on event "${name}".`, invitator);
+        });
+        
+        this.invitationListener.Start();
     }
 }
