@@ -38,10 +38,7 @@ export class AuthenticationService {
     login(emailOrUserName : string, password : string) {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
-                this.currentUser = response.json()["User"];
                 var token = response.json()["AccessToken"];
-
-                sessionStorage.setItem("user", JSON.stringify(this.currentUser));
 
                 console.log("The token has been saved");
 
@@ -65,7 +62,6 @@ export class AuthenticationService {
 
     logout() {
         this.customHttp.resetToken();
-        sessionStorage.removeItem("user");
         this.currentUser = null;
         this.router.navigate(['/login']);
     }
