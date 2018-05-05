@@ -57,6 +57,7 @@ namespace AprioritWebCalendar.Bootstrap
             services.AddTransient<ICalendarValidator, CalendarValidator>();
 
             services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IInvitationService, InvitationService>();
 
             services.AddTransient<INotificationService, NotificationService>();
 

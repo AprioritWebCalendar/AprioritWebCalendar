@@ -144,6 +144,8 @@ namespace AprioritWebCalendar.Web
             services.AddSignalR();
 
             services.AddTransient<NotificationJob>();
+            services.AddTransient<InvitationsDeletingJob>();
+
             services.AddTransient<NotificationHubManager>();
         }
 
