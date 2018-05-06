@@ -225,8 +225,8 @@ namespace AprioritWebCalendar.Web.Controllers
             await _calendarService.SetReadOnlyStatusAsync(id, userId, isReadOnly);
 
             var calendarName = (await _calendarService.GetCalendarByIdAsync(id)).Name;
-            await _notificationManager.CalendarReadOnlyChangedAsync(userId, calendarName, User.Identity.Name, isReadOnly);
 
+            await _calendarManager.CalendarReadOnlyChangedAsync(userId, id, calendarName, User.Identity.Name, isReadOnly);
             return Ok();
         }
     }

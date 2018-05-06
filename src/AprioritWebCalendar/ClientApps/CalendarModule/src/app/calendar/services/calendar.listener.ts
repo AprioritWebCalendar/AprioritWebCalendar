@@ -29,4 +29,10 @@ export class CalendarListener {
             callback(args.editedByUser, args.calendar, args.oldCalendarName);
         });
     }
+
+    public OnCalendarReadOnlyChanged(callback: (id, name, owner, isReadOnly) => void) : void {
+        this._connection.on("calendarReadOnlyChanged", args => {
+            callback(args.Calendar.Id, args.Calendar.Name, args.Calendar.Owner, args.IsReadOnly);
+        });
+    }
 }

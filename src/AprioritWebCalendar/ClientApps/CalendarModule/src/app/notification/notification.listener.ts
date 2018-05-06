@@ -47,12 +47,6 @@ export class NotificationListener {
         });
     }
 
-    public OnCalendarReadOnlyChanged(callback: (calendarName: string, calendarOwner: string, isReadOnly: boolean) => void) : void {
-        this._connection.on("calendarReadOnlyChanged", args => {
-            callback(args.calendarName, args.calendarOwner, args.isReadOnly);
-        });
-    }
-
     public OnEventReadOnlyChanged(callback: (eventName: string, eventOwner: string, isReadOnly: boolean) => void) : void {
         this._connection.on("eventReadOnlyChanged", args => {
             callback(args.eventName, args.eventOwner, args.isReadOnly);

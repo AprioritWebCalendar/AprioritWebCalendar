@@ -220,6 +220,19 @@ export class LeftCalendarMenuComponent implements OnInit {
             this.pushNotifService.PushNotification(message, editor);
         });
 
+        this.calendarListener.OnCalendarReadOnlyChanged((id, name, owner, isReadOnly) => {
+            let message = `Has changed your read-only status for calendar "${name}". `;
+
+            if (isReadOnly)
+                message += "You can only read the calendar.";
+            else
+                message += "Now you are able to edit the calendar.";
+
+            this.pushNotifService.PushNotification(message, owner);
+
+            this.model.Calendars.filter(c => c.Id == id)[0].IsReadOnly = isReadOnly;
+        });
+
         this.calendarListener.Start();
     }
 }

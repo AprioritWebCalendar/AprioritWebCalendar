@@ -345,15 +345,6 @@ export class MainScreenComponent implements OnInit {
             this.pushNotifService.PushNotification(`Has removed you from event "${name}".`, owner);
         });
 
-        this.notificationListener.OnCalendarReadOnlyChanged((name, owner, isReadOnly) => {
-            let perm: string = isReadOnly ? "You can only read the calendar."
-                                        : "Now you are able to edit the calendar.";
-
-            let message = `Has changed your permissions for calendar "${name}". ${perm}`;
-
-            this.pushNotifService.PushNotification(message, owner);
-        });
-
         this.notificationListener.OnEventReadOnlyChanged((name, owner, isReadOnly) => {
             let perm: string = isReadOnly ? "You can only read the event."
                                         : "Now you are able to edit the event.";

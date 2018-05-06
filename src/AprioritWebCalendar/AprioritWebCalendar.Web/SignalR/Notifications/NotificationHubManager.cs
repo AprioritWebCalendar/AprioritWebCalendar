@@ -59,16 +59,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             });
         }
 
-        public async Task CalendarReadOnlyChangedAsync(int userId, string calendarName, string calendarOwner, bool isReadOnly)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("calendarReadOnlyChanged", new
-            {
-                calendarName,
-                calendarOwner,
-                isReadOnly
-            });
-        }
-
         public async Task EventReadOnlyChangedAsync(int userId, string eventName, string eventOwner, bool isReadOnly)
         {
             await _hub.Clients.Group(userId.ToString()).SendAsync("eventReadOnlyChanged", new
