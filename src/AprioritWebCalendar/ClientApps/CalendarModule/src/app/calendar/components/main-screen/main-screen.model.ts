@@ -139,6 +139,22 @@ export class MainScreenModel {
         this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != id);
     }
 
+    public removeEventsByCalendar(id: number) : void {
+        this.dataEvents = this.dataEvents.filter(e => e.CalendarId != id);
+        this.calendarEvents = this.calendarEvents.filter(e => e.meta.CalendarId != id);
+    }
+
+    public updateEventsByCalendar(calendar: Calendar) : void {
+        this.calendarEvents = this.calendarEvents.filter(e => e.meta.CalendarId != calendar.Id);
+
+        this.dataEvents.forEach(e => {
+            if (e.CalendarId == calendar.Id) {
+                e.Color = calendar.Color;
+                this.mapEvent(e);
+            }
+        });
+    }
+
     public getDates() : DatesModel {
         var dates = new DatesModel();
         var curMoment = moment(this.viewDate).locale(this.locale);

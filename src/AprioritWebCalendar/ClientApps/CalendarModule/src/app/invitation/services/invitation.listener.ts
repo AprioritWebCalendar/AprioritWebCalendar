@@ -14,7 +14,7 @@ export class InvitationListener {
 
     public Start() : void {
         this._connection.start();
-        console.log("The NotificationListener is running...");
+        console.log("The InvitationListener is running...");
     }
 
     public OnIncomingInvitationsReceived(callback: (invitations: Invitation[]) => void) : void {

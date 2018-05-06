@@ -13,6 +13,8 @@ import { ToastsManager } from 'ng2-toastr';
 import { ICalendarExportParams, CalendarExportComponent } from '../calendar-export/calendar-export.component';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 import { CalendarImportComponent } from '../calendar-import/calendar-import.component';
+import { PushNotificationService } from '../../../services/push.notification.service';
+import { CalendarListener } from '../../services/calendar.listener';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -27,7 +29,9 @@ export class LeftCalendarMenuComponent implements OnInit {
         private authService: AuthenticationService,
         private dialogService: DialogService,
         private toastr: ToastsManager,
-        private hotkeysService: HotkeysService
+        private hotkeysService: HotkeysService,
+        private pushNotifService: PushNotificationService,
+        private calendarListener: CalendarListener
     ) {
      }
 
@@ -38,17 +42,17 @@ export class LeftCalendarMenuComponent implements OnInit {
 
         this.calendarService.getCalendars()
             .subscribe((calendars: Calendar[]) => {
-                this.UserId = this.authService.getCurrentUser().Id;
-
                 if (calendars == null)
                     return;
 
+                this.UserId = this.authService.getCurrentUser().Id;
                 this.model.Calendars = <CalendarCheck[]>calendars;
                 this.model.Calendars.forEach(function(value) {
                     value.IsChecked = true;
                 });
 
                 this.calendarsChanged();
+                this.configureSignalR();
             },
             (response: Response) => {
                 this.model.IsError = true;
@@ -168,6 +172,12 @@ export class LeftCalendarMenuComponent implements OnInit {
     @Output()
     onCalendarsChanged = new EventEmitter<Calendar[]>();
 
+    @Output()
+    onCalendarDeleted = new EventEmitter<number>();
+
+    @Output()
+    onCalendarUpdated = new EventEmitter<Calendar>();
+
     calendarsChanged() {
         this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
     }
@@ -179,5 +189,37 @@ export class LeftCalendarMenuComponent implements OnInit {
 
             return false;
         }));
+    }
+
+    private configureSignalR() : void {
+        this.calendarListener.OnRemovedFromCalendar((id, name, owner) => {
+            this.model.RemoveCalendar(id);
+            this.onCalendarDeleted.emit(id);
+            this.pushNotifService.PushNotification(`Has removed you from calendar "${name}".`, owner);
+        });
+
+        this.calendarListener.OnCalendarShared(calendar => {
+            let calCheck = <CalendarCheck>calendar;
+            this.model.Calendars.push(calCheck);
+
+            this.pushNotifService.PushNotification(`Has shared calendar "${calendar.Name}" with you.`, 
+                calendar.Owner.UserName.toString());
+        });
+
+        this.calendarListener.OnCalendarEdited((editor, calendar, oldName) => {
+            let message;
+
+            if (oldName == calendar.Name) {
+                message = `Has edited your calendar "${calendar.Name}".`;
+            } else {
+                message = `Has renamed your calendar "${oldName}" to "${calendar.Name}".`;
+            }
+
+            this.model.UpdateCalendar(calendar);
+            this.onCalendarUpdated.emit(calendar);
+            this.pushNotifService.PushNotification(message, editor);
+        });
+
+        this.calendarListener.Start();
     }
 }

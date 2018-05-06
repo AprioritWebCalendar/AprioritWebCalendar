@@ -1,5 +1,8 @@
 <div>
-    <app-left-calendar-menu (onCalendarsChanged)="setCalendars($event)"></app-left-calendar-menu>
+    <app-left-calendar-menu 
+        (onCalendarsChanged)="setCalendars($event)"
+        (onCalendarDeleted)="removeEventsByCalendar($event)"
+        (onCalendarUpdated)="updateEventsByCalendar($event)"></app-left-calendar-menu>
 
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1 *ngIf="model.viewMode != 'week'" class="page-header">{{ model.viewDate | calendarDate:(model.viewMode + 'ViewTitle') : model.locale }}</h1>

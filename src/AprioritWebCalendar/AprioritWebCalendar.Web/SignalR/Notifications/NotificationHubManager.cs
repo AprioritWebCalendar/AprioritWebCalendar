@@ -6,32 +6,10 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace AprioritWebCalendar.Web.SignalR.Notifications
 {
-    public class NotificationHubManager
+    public class NotificationHubManager : HubManager<NotificationHub>
     {
-        private readonly IHubContext<NotificationHub> _hub;
-
-        public NotificationHubManager(IHubContext<NotificationHub> hub)
+        public NotificationHubManager(IHubContext<NotificationHub> hub) : base(hub)
         {
-            _hub = hub;
-        }
-
-        public async Task CalendarSharedAsync(int sharedUserId, string calendarName, string calendarOwner)
-        {
-            await _hub.Clients.Group(sharedUserId.ToString()).SendAsync("calendarShared", new
-            {
-                calendarName,
-                calendarOwner
-            });
-        }
-
-        public async Task CalendarEditedAsync(int calendarOwnerId, string editedByUser, string calendarName, string newCalendarName)
-        {
-            await _hub.Clients.Group(calendarOwnerId.ToString()).SendAsync("calendarEdited", new
-            {
-                editedByUser,
-                calendarName,
-                newCalendarName
-            });
         }
 
         public async Task EventInCalendarCreatedAsync(int calendarOwnerId, string createdByUser, string eventName, string calendarName)
@@ -69,15 +47,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             {
                 eventName,
                 userName
-            });
-        }
-
-        public async Task RemovedFromCalendarAsync(int userId, string calendarName, string calendarOwner)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("removedFromCalendar", new
-            {
-                calendarName,
-                calendarOwner
             });
         }
 

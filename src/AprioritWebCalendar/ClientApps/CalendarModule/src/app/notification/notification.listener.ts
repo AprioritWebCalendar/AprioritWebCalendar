@@ -17,18 +17,6 @@ export class NotificationListener {
         console.log("The NotificationListener is running...");
     }
 
-    public OnCalendarShared(callback: (calendarName: string, calendarOwner: string) => void) : void {
-        this._connection.on("calendarShared", args => {
-            callback(args.calendarName, args.calendarOwner);
-        });
-    }
-
-    public OnCalendarEdited(callback: (editedByUser: string, calendarName: string, newCalendarName: string) => void) : void {
-        this._connection.on("calendarEdited", args => {
-            callback(args.editedByUser, args.calendarName, args.newCalendarName);
-        });
-    }
-
     public OnEventInCalendarCreated(callback: (createdByUser: string, eventName: string, calendarName: string) => void) : void {
         this._connection.on("eventInCalendarCreated", args => {
             callback(args.createdByUser, args.eventName, args.calendarName);
@@ -50,12 +38,6 @@ export class NotificationListener {
     public OnInvitationRejected(callback: (eventName: string, userName: string) => void) : void {
         this._connection.on("invitationRejected", args => {
             callback(args.eventName, args.userName);
-        });
-    }
-
-    public OnRemovedFromCalendar(callback: (calendarName: string, calendarOwner: string) => void) : void {
-        this._connection.on("removedFromCalendar", args => {
-            callback(args.calendarName, args.calendarOwner);
         });
     }
  

@@ -71,6 +71,7 @@ import { DateFormatPipe } from './pipes/date.format.pipe';
 import { NotificationListener } from './notification/notification.listener';
 import { PushNotificationService } from './services/push.notification.service';
 import { InvitationListener } from './invitation/services/invitation.listener';
+import { CalendarListener } from './calendar/services/calendar.listener';
 
 @NgModule({
   declarations: [
@@ -162,6 +163,7 @@ import { InvitationListener } from './invitation/services/invitation.listener';
 
     NotificationListener,
     InvitationListener,
+    CalendarListener,
 
     PushNotificationService
   ],

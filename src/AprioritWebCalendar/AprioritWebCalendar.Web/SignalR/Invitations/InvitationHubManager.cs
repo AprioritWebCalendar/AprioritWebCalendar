@@ -7,13 +7,10 @@ using AprioritWebCalendar.ViewModel.Event;
 
 namespace AprioritWebCalendar.Web.SignalR.Invitations
 {
-    public class InvitationHubManager
+    public class InvitationHubManager : HubManager<InvitationHub>
     {
-        private readonly IHubContext<InvitationHub> _hub;
-
-        public InvitationHubManager(IHubContext<InvitationHub> hub)
+        public InvitationHubManager(IHubContext<InvitationHub> hub) : base(hub)
         {
-            _hub = hub;
         }
 
         public async Task UserInvitedAsync(int userId, InvitationViewModel invitation)
