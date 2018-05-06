@@ -72,11 +72,17 @@ import { AuthFormComponent } from './authentication/components/auth-form/auth-fo
 import { Router } from '@angular/router';
 import { InvitationListener } from './invitation/services/invitation.listener';
 import { CalendarListener } from './calendar/services/calendar.listener';
+import { EventDetailsComponent } from './event/components/event-details/event-details.component';
+import { DateTimeLocalPipe } from './pipes/date.time.local.pipe';
+import { TimeLocalPipe } from './pipes/time.local.pipe';
+import { DateLocalPipe } from './pipes/date.local.pipe';
+import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthPanelComponent,
+    AuthFormComponent,
     AlertComponent,
     AlertArrayComponent,
     MainScreenComponent,
@@ -106,10 +112,14 @@ import { CalendarListener } from './calendar/services/calendar.listener';
     CalendarExportComponent,
     CalendarImportComponent,
     CalendarImportPreviewComponent,
+    EventDetailsComponent,
 
     DateFormatPipe,
+    DateLocalPipe,
+    DateTimeLocalPipe,
+    TimeLocalPipe,
+    EventLocationViewComponent
 
-    AuthFormComponent
   ],
   imports: [
     BrowserModule,
@@ -189,7 +199,8 @@ import { CalendarListener } from './calendar/services/calendar.listener';
       EventEditComponent,
       EventDeleteComponent,
       EventMoveComponent,
-      EventShareComponent
+      EventShareComponent,
+      EventDetailsComponent
     ]
 })
 export class CalendarModule { }

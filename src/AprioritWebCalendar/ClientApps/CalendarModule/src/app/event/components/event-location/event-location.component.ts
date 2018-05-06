@@ -4,8 +4,7 @@ import { MouseEvent } from '@agm/core';
 
 @Component({
     selector: 'app-event-location',
-    templateUrl: './event-location.component.html',
-    styleUrls: ['./event-location.component.css']
+    templateUrl: './event-location.component.html'
 })
 export class EventLocationComponent implements OnInit {
     
