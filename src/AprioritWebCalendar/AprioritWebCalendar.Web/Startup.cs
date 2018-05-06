@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,8 +22,8 @@ using AprioritWebCalendar.Bootstrap;
 using AprioritWebCalendar.Infrastructure.Options;
 using AprioritWebCalendar.Web.Jobs;
 using AprioritWebCalendar.Web.SignalR.Notifications;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
+using AprioritWebCalendar.Web.SignalR.Invitations;
+using AprioritWebCalendar.Web.SignalR.Calendar;
 
 namespace AprioritWebCalendar.Web
 {
@@ -88,7 +90,7 @@ namespace AprioritWebCalendar.Web
                     {
                         OnMessageReceived = ctx =>
                         {
-                            if (ctx.HttpContext.Request.Path.Value.StartsWith("/notification-hub") && ctx.Request.Query.ContainsKey("token"))
+                            if (ctx.HttpContext.Request.Path.Value.StartsWith("/hub/") && ctx.Request.Query.ContainsKey("token"))
                             {
                                 ctx.Token = ctx.Request.Query["token"];
                             }
@@ -141,12 +143,27 @@ namespace AprioritWebCalendar.Web
                 opt.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigin"));
             });
 
-            services.AddSignalR();
+            services
+                .AddSignalR()
+                .AddJsonProtocol(conf =>
+                {
+                    conf.PayloadSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+
+                    (conf.PayloadSerializerSettings.ContractResolver as DefaultContractResolver).NamingStrategy = null;
+
+#if DEBUG
+                    // In debug mode formatting is indented.
+                    // In release it's compressed.
+                    conf.PayloadSerializerSettings.Formatting = Formatting.Indented;
+#endif
+                });
 
             services.AddTransient<NotificationJob>();
             services.AddTransient<InvitationsDeletingJob>();
 
             services.AddTransient<NotificationHubManager>();
+            services.AddTransient<InvitationHubManager>();
+            services.AddTransient<CalendarHubManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -180,7 +197,9 @@ namespace AprioritWebCalendar.Web
 
             app.UseSignalR(c =>
             {
-                c.MapHub<NotificationHub>("/notification-hub");
+                c.MapHub<NotificationHub>("/hub/notification");
+                c.MapHub<InvitationHub>("/hub/invitation");
+                c.MapHub<CalendarHub>("/hub/calendar");
             });
 
             JobStarter.RegisterJobs(container);

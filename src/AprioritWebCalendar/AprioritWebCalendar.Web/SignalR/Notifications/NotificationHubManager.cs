@@ -6,34 +6,10 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace AprioritWebCalendar.Web.SignalR.Notifications
 {
-    public class NotificationHubManager
+    public class NotificationHubManager : HubManager<NotificationHub>
     {
-        // TODO: Get invitations by SignalR.
-
-        private readonly IHubContext<NotificationHub> _hub;
-
-        public NotificationHubManager(IHubContext<NotificationHub> hub)
+        public NotificationHubManager(IHubContext<NotificationHub> hub) : base(hub)
         {
-            _hub = hub;
-        }
-
-        public async Task CalendarSharedAsync(int sharedUserId, string calendarName, string calendarOwner)
-        {
-            await _hub.Clients.Group(sharedUserId.ToString()).SendAsync("calendarShared", new
-            {
-                calendarName,
-                calendarOwner
-            });
-        }
-
-        public async Task CalendarEditedAsync(int calendarOwnerId, string editedByUser, string calendarName, string newCalendarName)
-        {
-            await _hub.Clients.Group(calendarOwnerId.ToString()).SendAsync("calendarEdited", new
-            {
-                editedByUser,
-                calendarName,
-                newCalendarName
-            });
         }
 
         public async Task EventInCalendarCreatedAsync(int calendarOwnerId, string createdByUser, string eventName, string calendarName)
@@ -56,15 +32,6 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             });
         }
 
-        public async Task UserInvitedAsync(int userId, string eventName, string invitatorName)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("invited", new
-            {
-                eventName,
-                invitatorName
-            });
-        }
-
         public async Task InvitationAcceptedAsync(int invitatorId, string eventName, string userName)
         {
             await _hub.Clients.Group(invitatorId.ToString()).SendAsync("invitationAccepted", new
@@ -83,40 +50,12 @@ namespace AprioritWebCalendar.Web.SignalR.Notifications
             });
         }
 
-        public async Task InvitationDeletedAsync(int userId, string eventName, string invitatorName)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("invitationDeleted", new
-            {
-                eventName,
-                invitatorName
-            });
-        }
-
-        public async Task RemovedFromCalendarAsync(int userId, string calendarName, string calendarOwner)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("removedFromCalendar", new
-            {
-                calendarName,
-                calendarOwner
-            });
-        }
-
         public async Task RemovedFromEventAsync(int userId, string eventName, string eventOwner)
         {
             await _hub.Clients.Group(userId.ToString()).SendAsync("removedFromEvent", new
             {
                 eventName,
                 eventOwner
-            });
-        }
-
-        public async Task CalendarReadOnlyChangedAsync(int userId, string calendarName, string calendarOwner, bool isReadOnly)
-        {
-            await _hub.Clients.Group(userId.ToString()).SendAsync("calendarReadOnlyChanged", new
-            {
-                calendarName,
-                calendarOwner,
-                isReadOnly
             });
         }
 

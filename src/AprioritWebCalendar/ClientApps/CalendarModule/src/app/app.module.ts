@@ -70,6 +70,8 @@ import { NotificationListener } from './notification/notification.listener';
 import { PushNotificationService } from './services/push.notification.service';
 import { AuthFormComponent } from './authentication/components/auth-form/auth-form.component';
 import { Router } from '@angular/router';
+import { InvitationListener } from './invitation/services/invitation.listener';
+import { CalendarListener } from './calendar/services/calendar.listener';
 
 @NgModule({
   declarations: [
@@ -169,6 +171,8 @@ import { Router } from '@angular/router';
     CalendarIcalService,
 
     NotificationListener,
+    InvitationListener,
+    CalendarListener,
 
     PushNotificationService
   ],

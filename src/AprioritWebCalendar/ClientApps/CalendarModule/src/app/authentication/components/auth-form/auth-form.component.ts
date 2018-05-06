@@ -60,7 +60,7 @@ export class AuthFormComponent {
         this._authService.Register(this.RegisterModel.Email, this.RegisterModel.UserName, this.RegisterModel.Password)
             .subscribe(r => {
                 this._toastr.success("You have been registered successfully. Sign in to continue.");
-                this._router.navigate(['/']);
+                this.IsLoginOpened = true;
             }, r => {
                 var result = r.json();
 

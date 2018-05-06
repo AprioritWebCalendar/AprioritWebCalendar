@@ -2,19 +2,32 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Data.Interfaces;
 using AprioritWebCalendar.Data.Models;
+using DomainInvitation = AprioritWebCalendar.Business.DomainModels.Invitation;
 
 namespace AprioritWebCalendar.Business.Services
 {
     public class InvitationService : IInvitationService
     {
         private readonly IRepository<Invitation> _invitationRepository;
+        private readonly IMapper _mapper;
 
-        public InvitationService(IRepository<Invitation> invitationRepository)
+        public InvitationService(IRepository<Invitation> invitationRepository, IMapper mapper)
         {
             _invitationRepository = invitationRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<DomainInvitation> GetInvitationAsync(int eventId, int userId)
+        {
+            var invitation = (await _invitationRepository.FindAllIncludingAsync(i => i.EventId == eventId && i.UserId == userId,
+                    i => i.Event, i => i.Event.Owner, i => i.Event.Period, i => i.Invitator))
+                .FirstOrDefault();
+
+            return _mapper.Map<DomainInvitation>(invitation);
         }
 
         public async Task<int> RemoveOldInvitationsAsync(DateTime dateTime)

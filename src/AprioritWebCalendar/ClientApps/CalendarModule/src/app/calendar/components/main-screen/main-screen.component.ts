@@ -222,6 +222,9 @@ export class MainScreenComponent implements OnInit {
     }
 
     private addInvitationEvent(invitation: Invitation) {
+        if (this.model.dataEvents.filter(e => e.Id === invitation.Event.Id).length > 0)
+            return;
+
         let event = invitation.Event;
         let defaultCalendar = this.model.getDefaultCalendar();
 
@@ -256,6 +259,15 @@ export class MainScreenComponent implements OnInit {
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
             });
+    }
+
+    private removeEventsByCalendar(id: number) : void {
+        this.model.removeEventsByCalendar(id);
+        this.model.refreshCalendar();
+    }
+
+    private updateEventsByCalendar(calendar: Calendar) : void {
+        this.model.updateEventsByCalendar(calendar);
     }
 
     private configureHotkeys() : void {
@@ -305,24 +317,6 @@ export class MainScreenComponent implements OnInit {
     }
     
     private configureSignalR() : void {
-        this.notificationListener.Start();
-
-        this.notificationListener.OnCalendarShared((calName, calOwner) => {
-            this.pushNotifService.PushNotification(`Has shared calendar "${calName}" with you.`, calOwner);
-        });
-
-        this.notificationListener.OnCalendarEdited((editor, calendarName, newName) => {
-            let message: string;
-
-            if (calendarName === newName) {
-                message = `Has edited your calendar "${calendarName}"`;
-            } else {
-                message = `Has renamed your calendar "${calendarName}" to "${newName}".`;
-            }
-
-            this.pushNotifService.PushNotification(message, editor);
-        });
-
         this.notificationListener.OnEventInCalendarCreated((creator, name, calendarName) => {
             this.pushNotifService.PushNotification(`Has created event "${name}" in your calendar "${calendarName}"`, creator);
         });
@@ -339,10 +333,6 @@ export class MainScreenComponent implements OnInit {
             this.pushNotifService.PushNotification(message, editor);
         });
 
-        this.notificationListener.OnUserInvited((eventName, invitator) => {
-            this.pushNotifService.PushNotification(`Has invited you to event "${eventName}".`, invitator);
-        });
-
         this.notificationListener.OnInvitationAccepted((event, user) => {
             this.pushNotifService.PushNotification(`Has accepted your invitation to event "${event}".`, user);
         });
@@ -351,25 +341,8 @@ export class MainScreenComponent implements OnInit {
             this.pushNotifService.PushNotification(`Has rejected your invitation to event "${event}".`, user);
         });
 
-        this.notificationListener.OnInvitationDeleted((event, invitator) => {
-            this.pushNotifService.PushNotification(`Has deleted invitation to event "${event}".`, invitator);
-        });
-
-        this.notificationListener.OnRemovedFromCalendar((name, owner) => {
-            this.pushNotifService.PushNotification(`Has removed you from calendar "${name}".`, owner);
-        });
-
         this.notificationListener.OnRemovedFromEvent((name, owner) => {
             this.pushNotifService.PushNotification(`Has removed you from event "${name}".`, owner);
-        });
-
-        this.notificationListener.OnCalendarReadOnlyChanged((name, owner, isReadOnly) => {
-            let perm: string = isReadOnly ? "You can only read the calendar."
-                                        : "Now you are able to edit the calendar.";
-
-            let message = `Has changed your permissions for calendar "${name}". ${perm}`;
-
-            this.pushNotifService.PushNotification(message, owner);
         });
 
         this.notificationListener.OnEventReadOnlyChanged((name, owner, isReadOnly) => {
@@ -380,5 +353,7 @@ export class MainScreenComponent implements OnInit {
 
             this.pushNotifService.PushNotification(message, owner);
         });
+        
+        this.notificationListener.Start();
     }
 }

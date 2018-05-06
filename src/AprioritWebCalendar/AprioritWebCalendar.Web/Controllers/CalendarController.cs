@@ -11,6 +11,7 @@ using AprioritWebCalendar.Web.Filters;
 using AprioritWebCalendar.Web.Extensions;
 using AprioritWebCalendar.Business.DomainModels;
 using AprioritWebCalendar.Web.SignalR.Notifications;
+using AprioritWebCalendar.Web.SignalR.Calendar;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -26,17 +27,20 @@ namespace AprioritWebCalendar.Web.Controllers
         private readonly ICalendarValidator _calendarValidator;
 
         private readonly NotificationHubManager _notificationManager;
+        private readonly CalendarHubManager _calendarManager;
 
         public CalendarController(
             IMapper mapper, 
             ICalendarService calendarService,
             ICalendarValidator calendarValidator,
-            NotificationHubManager notificationHubManager)
+            NotificationHubManager notificationHubManager,
+            CalendarHubManager calendarHubManager)
         {
             _mapper = mapper;
             _calendarService = calendarService;
             _calendarValidator = calendarValidator;
             _notificationManager = notificationHubManager;
+            _calendarManager = calendarHubManager;
         }
 
         [HttpGet]
@@ -109,7 +113,7 @@ namespace AprioritWebCalendar.Web.Controllers
             if (!await _calendarService.CanEditAsync(id, userId))
                 throw new ArgumentException();
 
-            var calendar = await _calendarService.GetCalendarByIdAsync(id);
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner));
 
             // Owner can't have any calendars with the same names.
             // If calendar is edited by another user that can permissions, we need to validate it too.
@@ -129,7 +133,9 @@ namespace AprioritWebCalendar.Web.Controllers
             await _calendarService.UpdateCalendarAsync(calendar);
 
             if (userId != calendar.Owner.Id)
-                await _notificationManager.CalendarEditedAsync(calendar.Owner.Id, User.Identity.Name, oldName, calendar.Name);
+            {
+                await _calendarManager.CalendarEditedAsync(calendar.Owner.Id, User.Identity.Name, _mapper.Map<CalendarViewModel>(calendar), oldName);
+            }
 
             return Ok();
         }
@@ -159,9 +165,13 @@ namespace AprioritWebCalendar.Web.Controllers
 
             await _calendarService.ShareCalendarAsync(id, model.UserId.Value, model.IsReadOnly);
 
-            var calendarName = (await _calendarService.GetCalendarByIdAsync(id)).Name;
-            await _notificationManager.CalendarSharedAsync(model.UserId.Value, calendarName, User.Identity.Name);
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner));
 
+            var vmCalendar = _mapper.Map<CalendarViewModel>(calendar);
+            vmCalendar.IsReadOnly = model.IsReadOnly;
+            vmCalendar.IsSubscribed = true;
+
+            await _calendarManager.CalendarSharedAsync(model.UserId.Value, vmCalendar);
             return Ok();
         }
 
@@ -178,8 +188,8 @@ namespace AprioritWebCalendar.Web.Controllers
                 return this.BadRequestError("You don't have any permissions for this action.");
 
             await _calendarService.RemoveSharingAsync(id, userId);
-
-            await _notificationManager.RemovedFromCalendarAsync(userId, calendar.Name, calendar.Owner.UserName);
+            
+            await _calendarManager.RemovedFromCalendarAsync(userId, calendar.Id, calendar.Name, calendar.Owner.UserName);
             return Ok();
         }
 
@@ -215,8 +225,8 @@ namespace AprioritWebCalendar.Web.Controllers
             await _calendarService.SetReadOnlyStatusAsync(id, userId, isReadOnly);
 
             var calendarName = (await _calendarService.GetCalendarByIdAsync(id)).Name;
-            await _notificationManager.CalendarReadOnlyChangedAsync(userId, calendarName, User.Identity.Name, isReadOnly);
 
+            await _calendarManager.CalendarReadOnlyChangedAsync(userId, id, calendarName, User.Identity.Name, isReadOnly);
             return Ok();
         }
     }
