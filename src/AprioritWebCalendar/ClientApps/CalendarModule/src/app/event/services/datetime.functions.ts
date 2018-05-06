@@ -48,7 +48,7 @@ export function getRule(period: Period) : RRule {
     var rrule = new RRule({
         dtstart: getWithoutTime(period.PeriodStart),
         until: getWithoutTime(period.PeriodEnd),
-        freq: this.getFrequency(period.Type),
+        freq: getFrequency(period.Type),
         interval: period.Cycle == null ? 1 : period.Cycle,
     });
 
