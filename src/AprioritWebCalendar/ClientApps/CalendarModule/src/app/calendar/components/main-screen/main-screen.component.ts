@@ -24,6 +24,7 @@ import { MainScreenModel } from './main-screen.model';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 import { NotificationListener } from '../../../notification/notification.listener';
 import { PushNotificationService } from '../../../services/push.notification.service';
+import { EventDetailsComponent } from '../../../event/components/event-details/event-details.component';
 
 @Component({
     selector: 'app-main-screen',
@@ -64,9 +65,15 @@ export class MainScreenComponent implements OnInit {
             }
         },
         {
-            label: '<i class="fas fa-arrow-right"></i>',
+            label: '<i class="fa fa-fw fa-retweet"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
                 this.openMoveEventModal(event);
+            }
+        },
+        {
+            label:'<i class="fa fa-fw fa-share"></i>',
+            onClick: ({ event }: { event: CalendarEvent }): void => {
+                this.openEventShareModal(event)
             }
         }
     ];
@@ -149,6 +156,10 @@ export class MainScreenComponent implements OnInit {
             }, e => {
                 this.toasts.error("Unable to create event. Try again or reload the page.");
             });
+    }
+
+    private openEventDetailsModal(event: CalendarEvent) : void {
+        this.dialogService.addDialog(EventDetailsComponent, {event: event.meta});
     }
 
     private openEditEventModal(event: CalendarEvent) : void {

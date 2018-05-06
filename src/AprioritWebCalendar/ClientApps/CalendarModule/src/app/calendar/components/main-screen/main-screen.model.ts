@@ -102,6 +102,10 @@ export class MainScreenModel {
 
         eventCal.actions.push(this.actions[1]);
         eventCal.actions.push(this.actions[2]);
+
+        if (event.Owner.Id == this.currentUser.Id){
+            eventCal.actions.push(this.actions[3]);
+        }
     }
 
     public refreshCalendar() : void {

@@ -19,8 +19,10 @@ export class CalendarIcalService {
         let data = new FormData();
         data.append("File", model.File, model.File.name);
         data.append("Name", model.Name);
-        data.append("Description", model.Description);
         data.append("Color", model.Color);
+
+        if (model.Description != undefined)
+            data.append("Description", model.Description);
 
         return this.customHttp.post(this._baseUrl, data)
             .map(r => r.json())
