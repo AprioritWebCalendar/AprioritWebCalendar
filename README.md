@@ -4,6 +4,7 @@ Hello, here is instruction how to run the application.
 
 1. Download all repository into your machine.
 2. First of all. There must be a file with secrets for JWT. It's ignored in this repository, so you have to create it individually:
+
   - path: src\AprioritWebCalendar\AprioritWebCalendar.Web\configs\jwtOptions.json
   - <b>Content:</b> here is json. Don't forget to configure "Audience" - url, where it runs.
   <pre>
@@ -15,6 +16,24 @@ Hello, here is instruction how to run the application.
       "Lifetime": 1440
     }
   }
+  </pre>
+  
+  -path: src\AprioritWebCalendar\AprioritWebCalendar.Web\configs\smtpOptions.json - credentials of email account
+  
+  <pre>
+   {
+    "SmtpOptions": {
+      "Server": "smtp.server.com",
+      "Port": 465,
+      "UseSsl": true,
+
+      "Login": "",
+      "Password": "",
+
+      "FromTitle": "WEB Calendar Project"
+    }
+  }
+
   </pre>
   
   3. Client app <b>CalendarModule</b> is in folder "src\AprioritWebCalendar\ClientApps\CalendarModule".

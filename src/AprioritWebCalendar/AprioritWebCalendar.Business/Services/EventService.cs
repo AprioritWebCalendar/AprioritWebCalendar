@@ -12,6 +12,7 @@ using AprioritWebCalendar.Infrastructure.Exceptions;
 using AprioritWebCalendar.Infrastructure.Extensions;
 using DomainEvent = AprioritWebCalendar.Business.DomainModels.Event;
 using DomainUser = AprioritWebCalendar.Business.DomainModels.User;
+using DomainInvitation = AprioritWebCalendar.Business.DomainModels.Invitation;
 using UserInvitation = AprioritWebCalendar.Business.DomainModels.UserInvitation;
 
 namespace AprioritWebCalendar.Business.Services
@@ -52,13 +53,21 @@ namespace AprioritWebCalendar.Business.Services
         {
             // TODO: Needs optimization and refactoring.
             Expression<Func<Event, bool>> filter = e => ((e.Period == null && 
-                    (EFCore.DateDiff(DatePart.day, startDate, e.StartDate) >= 0 || EFCore.DateDiff(DatePart.day, e.StartDate, startDate) >= 0)
-                    && (EFCore.DateDiff(DatePart.day, endDate, e.EndDate) >= 0 || EFCore.DateDiff(DatePart.day, e.EndDate, endDate) >= 0))
-                || (e.Period != null && (EFCore.DateDiff(DatePart.day, startDate, e.Period.PeriodStart)) >= 0 || EFCore.DateDiff(DatePart.day, e.Period.PeriodStart, startDate) >= 0)
-                    && (EFCore.DateDiff(DatePart.day, endDate, e.Period.PeriodEnd)) >= 0 || EFCore.DateDiff(DatePart.day, e.Period.PeriodEnd, endDate) >= 0)
+                    (
+                        (startDate <= e.StartDate && endDate >= e.EndDate) || (startDate >= e.StartDate && endDate <= e.EndDate)
+                        || (startDate >= e.StartDate && endDate >= e.EndDate && startDate <= e.EndDate)
+                        || (startDate <= e.StartDate && endDate <= e.EndDate && endDate >= e.StartDate)
+                    ))
+                || (e.Period != null && 
+                (
+                        (startDate <= e.Period.PeriodStart && endDate >= e.Period.PeriodEnd) || (startDate >= e.Period.PeriodStart && endDate <= e.Period.PeriodEnd)
+                        || (startDate >= e.Period.PeriodStart && endDate >= e.Period.PeriodEnd && startDate <= e.Period.PeriodEnd)
+                        || (startDate <= e.Period.PeriodStart && endDate <= e.Period.PeriodEnd && endDate >= e.Period.PeriodStart)
+                )))
                 && e.Calendars.Select(c => c.CalendarId).Intersect(calendarsIds).Any();
 
             var dataEvents = (await _eventRepository.FindAllIncludingAsync(filter, e => e.Calendars, e => e.Owner, e => e.Period))
+                .AsNoTracking()
                 .ToList();
 
             if (dataEvents?.Any() != true)
@@ -82,15 +91,15 @@ namespace AprioritWebCalendar.Business.Services
             dataUserCalendars.AddRange(userOwnCalendars);
 
             var matchedEvents = (from @event in dataEvents
-                                join evCalendar in dataEventCalendars on @event.Id equals evCalendar.EventId
-                                join usCalendar in dataUserCalendars on evCalendar.CalendarId equals usCalendar.CalendarId
-                                select new
-                                {
-                                    EventId = @event.Id,
-                                    CalendarId = usCalendar.CalendarId,
-                                    Color = usCalendar.Calendar.Color,
-                                    IsReadOnly = usCalendar.IsReadOnly
-                                }).ToList();
+                                 join evCalendar in dataEventCalendars on @event.Id equals evCalendar.EventId
+                                 join usCalendar in dataUserCalendars on evCalendar.CalendarId equals usCalendar.CalendarId
+                                 select new
+                                 {
+                                     EventId = @event.Id,
+                                     CalendarId = usCalendar.CalendarId,
+                                     Color = usCalendar.Calendar.Color,
+                                     IsReadOnly = evCalendar.IsReadOnly
+                                 }).ToList();
 
             dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
 
@@ -106,6 +115,24 @@ namespace AprioritWebCalendar.Business.Services
             }
 
             return domainEvents;
+        }
+
+        public async Task<IEnumerable<DomainEvent>> GetEventsByNameAsync(string name, int userId, int take)
+        {
+            Expression<Func<EventCalendar, bool>> filter = evCal => evCal.Event.Name.IndexOf(name) >= 0
+                && (evCal.Calendar.OwnerId == userId || evCal.Calendar.SharedUsers.Any(u => u.UserId == userId));
+
+            var dataEvents = (await _eventCalendarRepository.FindAllIncludingAsync(filter,
+                    evCal => evCal.Event, evCal => evCal.Event.Period, evCal => evCal.Calendar, evCal => evCal.Calendar.SharedUsers))
+                .Select(evCal => evCal.Event)
+                .OrderByDescending(e => e.Name.StartsWith(name))
+                .ThenByDescending(e => e.StartDate)
+                .ThenByDescending(e => e.Period.PeriodStart)
+                .Take(take)
+                .ToList();
+
+            dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
+            return _mapper.Map<IEnumerable<DomainEvent>>(dataEvents);
         }
 
         public async Task<DomainEvent> GetEventByIdAsync(int eventId)
@@ -141,6 +168,24 @@ namespace AprioritWebCalendar.Business.Services
             domainEvent.Color = eventCalendar.Calendar.Color;
 
             return domainEvent;
+        }
+
+        public async Task<IEnumerable<DomainInvitation>> GetIncomingInvitationsAsync(int userId)
+        {
+            var invitations = await _invitationRepository.FindAllIncludingAsync(i => i.UserId == userId,
+                i => i.Event, i => i.Event.Period, i => i.Invitator);
+
+            return _mapper.Map<IEnumerable<DomainInvitation>>(invitations)
+                .OrderBy(i => i.Event);
+        }
+
+        public async Task<IEnumerable<DomainInvitation>> GetOutcomingInvitationsAsync(int userId)
+        {
+            var invitations = await _invitationRepository.FindAllIncludingAsync(i => i.InvitatorId == userId,
+                i => i.Event, i => i.User);
+
+            return _mapper.Map<IEnumerable<DomainInvitation>>(invitations)
+                .OrderBy(i => i.Event);
         }
 
         public async Task<int> CreateEventAsync(DomainEvent eventDomain, int ownerId)

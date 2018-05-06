@@ -18,16 +18,19 @@ namespace AprioritWebCalendar.Business.Services
     {
         private readonly IRepository<Calendar> _calendarRepository;
         private readonly IRepository<UserCalendar> _userCalendarRepository;
+        private readonly IRepository<EventCalendar> _eventCalendarRepository;
 
         private readonly IMapper _mapper;
 
         public CalendarService(
             IRepository<Calendar> calendarRepository,
             IRepository<UserCalendar> userCalendarRepository,
+            IRepository<EventCalendar> eventCalendarRepository,
             IMapper mapper)
         {
             _calendarRepository = calendarRepository;
             _userCalendarRepository = userCalendarRepository;
+            _eventCalendarRepository = eventCalendarRepository;
             _mapper = mapper;
         }
 
@@ -41,7 +44,7 @@ namespace AprioritWebCalendar.Business.Services
                 predicate = c => c.OwnerId == userId || c.SharedUsers.Any(u => u.UserId == userId);
 
             var calendars = await _calendarRepository.FindAllIncludingAsync(predicate,
-                c => c.SharedUsers, c => c.Owner);
+                    c => c.SharedUsers, c => c.Owner);
 
             return _mapper.Map<IEnumerable<DomainCalendar>>(calendars);
         }
@@ -62,6 +65,20 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<DomainCalendar>(calendar);
         }
 
+        public async Task<DomainCalendar> GetCalendarReadyToExportAsync(int calendarId, int userId)
+        {
+            var calendar = await GetCalendarByIdAsync(calendarId);
+
+            var dataEvents = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.CalendarId == calendarId,
+                    e => e.Event, e => e.Event.Period))
+                .ToList();
+
+            dataEvents.RemoveAll(e => e.Event.IsPrivate && e.Event.OwnerId != userId);
+
+            calendar.Events = _mapper.Map<IEnumerable<DomainModels.EventCalendar>>(dataEvents);
+            return calendar;
+        }
+
         public async Task<int?> GetUserDefaultCalendarIdAsync(int userId)
         {
             return (await _calendarRepository.FindAllAsync(c => c.OwnerId == userId && c.IsDefault))
@@ -73,10 +90,34 @@ namespace AprioritWebCalendar.Business.Services
             var dataCalendar = _mapper.Map<Calendar>(calendar);
             dataCalendar.OwnerId = ownerId;
 
+            if (!await _calendarRepository.AnyAsync(c => c.OwnerId == ownerId && c.IsDefault))
+            {
+                dataCalendar.IsDefault = true;
+            }
+
             dataCalendar = await _calendarRepository.CreateAsync(dataCalendar);
             await _calendarRepository.SaveAsync();
 
             return dataCalendar.Id;
+        }
+
+        public async Task CreateDefaultCalendarAsync(int userId, string userName)
+        {
+            if (await _calendarRepository.AnyAsync(c => c.OwnerId == userId))
+                throw new InvalidOperationException();
+
+            var calendar = new Calendar
+            {
+                OwnerId = userId,
+                Name = userName,
+                IsDefault = true,
+
+                // TODO: Move to config file.
+                Color = "#0000FF"
+            };
+
+            await _calendarRepository.CreateAsync(calendar);
+            await _calendarRepository.SaveAsync();
         }
 
         public async Task UpdateCalendarAsync(DomainCalendar calendar)
@@ -202,6 +243,11 @@ namespace AprioritWebCalendar.Business.Services
                 .ToList();
 
             return calendars.TrueForAll(c => c.OwnerId == userId || c.SharedUsers.Any(u => u.UserId == userId));
+        }
+
+        public async Task<bool> IsDefaultAsync(int calendarId)
+        {
+            return (await _GetByIdAsync(calendarId)).IsDefault;
         }
 
         public async Task<bool> CanEditAsync(int calendarId, int userId)

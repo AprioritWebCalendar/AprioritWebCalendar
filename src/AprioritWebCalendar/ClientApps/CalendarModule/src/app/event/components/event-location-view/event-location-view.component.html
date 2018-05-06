@@ -1,0 +1,11 @@
+<label>Location</label>
+<agm-map
+    [longitude]="location.Longitude"
+    [latitude]="location.Lattitude"
+    [zoom]="8">
+        <agm-marker 
+            [longitude]="location.Longitude"
+            [latitude]="location.Lattitude"></agm-marker>
+</agm-map>
+
+<span *ngIf="location.Description != null">{{location.Description}}</span>

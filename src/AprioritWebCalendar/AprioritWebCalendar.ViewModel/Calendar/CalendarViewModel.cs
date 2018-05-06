@@ -11,6 +11,7 @@ namespace AprioritWebCalendar.ViewModel.Calendar
 
         public UserViewModel Owner { get; set; }
 
+        public bool? IsDefault { get; set; }
         public bool? IsReadOnly { get; set; }
         public bool? IsSubscribed { get; set; }
     }

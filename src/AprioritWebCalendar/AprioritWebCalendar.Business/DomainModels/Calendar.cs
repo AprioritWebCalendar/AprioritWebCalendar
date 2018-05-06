@@ -12,6 +12,8 @@ namespace AprioritWebCalendar.Business.DomainModels
         public string Color { get; set; }
         public User Owner { get; set; }
 
+        public bool? IsDefault { get; set; }
+
         public IEnumerable<UserCalendar> SharedUsers { get; set; } = new List<UserCalendar>();
         public IEnumerable<EventCalendar> Events { get; set; } = new List<EventCalendar>();
     }

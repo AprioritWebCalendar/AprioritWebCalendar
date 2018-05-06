@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AprioritWebCalendar.Bootstrap;
 using AprioritWebCalendar.Infrastructure.Options;
+using AprioritWebCalendar.Web.Jobs;
+using AprioritWebCalendar.Web.SignalR.Notifications;
+using AprioritWebCalendar.Web.SignalR.Invitations;
+using AprioritWebCalendar.Web.SignalR.Calendar;
 
 namespace AprioritWebCalendar.Web
 {
@@ -29,7 +35,8 @@ namespace AprioritWebCalendar.Web
 
             var custConfigBuilder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath + "\\configs\\")
-                .AddJsonFile("jwtOptions.json", true, true);
+                .AddJsonFile("jwtOptions.json", true, true)
+                .AddJsonFile("smtpOptions.json", true, true);
 
             CustomConfiguration = custConfigBuilder.Build();
         }
@@ -44,6 +51,7 @@ namespace AprioritWebCalendar.Web
             services.AddOptions();
 
             services.Configure<JwtOptions>(CustomConfiguration.GetSection("JwtOptions"));
+            services.Configure<SmtpOptions>(CustomConfiguration.GetSection("SmtpOptions"));
 
             services.UseAppDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.UseIdentity();
@@ -52,6 +60,8 @@ namespace AprioritWebCalendar.Web
             services.MapServices();
 
             services.AddAutoMapper();
+
+            services.AddMemoryCache();
 
             #region JWT Configuring.
 
@@ -75,6 +85,19 @@ namespace AprioritWebCalendar.Web
                 {
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = tokenValidationParameters;
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = ctx =>
+                        {
+                            if (ctx.HttpContext.Request.Path.Value.StartsWith("/hub/") && ctx.Request.Query.ContainsKey("token"))
+                            {
+                                ctx.Token = ctx.Request.Query["token"];
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services.AddAuthorization(opts =>
@@ -85,6 +108,17 @@ namespace AprioritWebCalendar.Web
             });
 
             #endregion
+
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("AllowAllOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
+            });
 
             services
                 .AddMvc()
@@ -102,11 +136,38 @@ namespace AprioritWebCalendar.Web
                     // In release it's compressed.
                     opt.SerializerSettings.Formatting = Formatting.Indented;
 #endif
-                }); ;
+                });
+
+            services.Configure<MvcOptions>(opt =>
+            {
+                opt.Filters.Add(new CorsAuthorizationFilterFactory("AllowAllOrigin"));
+            });
+
+            services
+                .AddSignalR()
+                .AddJsonProtocol(conf =>
+                {
+                    conf.PayloadSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+
+                    (conf.PayloadSerializerSettings.ContractResolver as DefaultContractResolver).NamingStrategy = null;
+
+#if DEBUG
+                    // In debug mode formatting is indented.
+                    // In release it's compressed.
+                    conf.PayloadSerializerSettings.Formatting = Formatting.Indented;
+#endif
+                });
+
+            services.AddTransient<NotificationJob>();
+            services.AddTransient<InvitationsDeletingJob>();
+
+            services.AddTransient<NotificationHubManager>();
+            services.AddTransient<InvitationHubManager>();
+            services.AddTransient<CalendarHubManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider container)
         {
             if (env.IsDevelopment())
             {
@@ -131,7 +192,17 @@ namespace AprioritWebCalendar.Web
             app.UseMvcWithDefaultRoute();
             app.UseStaticFiles();
 
+            app.UseCors("AllowAllOrigin");
             app.UseMvc();
+
+            app.UseSignalR(c =>
+            {
+                c.MapHub<NotificationHub>("/hub/notification");
+                c.MapHub<InvitationHub>("/hub/invitation");
+                c.MapHub<CalendarHub>("/hub/calendar");
+            });
+
+            JobStarter.RegisterJobs(container);
         }
     }
 }

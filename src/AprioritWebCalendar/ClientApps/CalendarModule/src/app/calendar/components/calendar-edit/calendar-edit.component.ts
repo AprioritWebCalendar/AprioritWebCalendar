@@ -4,7 +4,6 @@ import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
 import { CalendarCheck } from '../left-calendar-menu/calendar.check.model';
 import { NgForm } from '@angular/forms';
-import { CalendarCreateModel } from '../calendar-create/calendar-create.model';
 
 export interface ICalendarEditModel {
     Id: Number;

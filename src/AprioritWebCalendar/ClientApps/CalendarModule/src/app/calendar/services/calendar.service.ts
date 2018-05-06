@@ -62,7 +62,7 @@ export class CalendarService {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
-        this.customHttp.attachToken(opts);
+        this.customHttp.AttachToken(opts);
 
         return this.customHttp.put(`${this.baseUrl}${id}/RemoveSharing`, userId, opts)
             .map(response => true)
@@ -73,7 +73,7 @@ export class CalendarService {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
-        this.customHttp.attachToken(opts);
+        this.customHttp.AttachToken(opts);
 
         return this.customHttp.put(`${this.baseUrl}${id}/ReadOnly/${userId}`, isReadOnly, opts)
             .map(response => true)

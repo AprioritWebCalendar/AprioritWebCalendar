@@ -7,27 +7,27 @@ import { Observable } from 'rxjs/Observable';
 export class CustomHttp extends Http {
     private token: string;
 
-    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions, private router: Router){
+    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions){
         super(backend, defaultOptions);
     }
 
-    public configureToken(token: string) {
+    public ConfigureToken(token: string) {
         if (token == null)
             return;
 
         this.token = token;
         sessionStorage.setItem("token", token);
-        this.attachToken(this._defaultOptions);
+        this.AttachToken(this._defaultOptions);
         console.log("The CustomHttp has been configured.");
     }
 
-    public resetToken() {
+    public ResetToken() {
         this.token = null;
         sessionStorage.removeItem("token");
         this._defaultOptions.headers.delete("Authorization");
     }
 
-    public getToken() {
+    public InitializeToken() {
         return new Promise((resolve, reject) => {
             var token = sessionStorage.getItem("token");
 
@@ -36,26 +36,20 @@ export class CustomHttp extends Http {
                 return;
             }
     
-            this.configureToken(token);
+            this.ConfigureToken(token);
             console.log("The token has been found"); 
         });
     }
 
-    public attachToken(options: RequestOptions) {
+    public GetTokenString() : string {
+        return this.token;
+    }
+
+    public AttachToken(options: RequestOptions) {
         options.headers.set("Authorization", `Bearer ${this.token}`);
     }
 
-    public tokenExists() : boolean {
+    public TokenExists() : boolean {
         return this.token != null;
-    }
-
-    processError(error: any) : Observable<any> {
-        switch (error.status) {
-            case 401:
-                this.router.navigate(['login']);
-                break;
-        }
-
-        return Observable.throw(error);
     }
 }

@@ -10,6 +10,8 @@ using AprioritWebCalendar.ViewModel.Calendar;
 using AprioritWebCalendar.Web.Filters;
 using AprioritWebCalendar.Web.Extensions;
 using AprioritWebCalendar.Business.DomainModels;
+using AprioritWebCalendar.Web.SignalR.Notifications;
+using AprioritWebCalendar.Web.SignalR.Calendar;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -24,14 +26,21 @@ namespace AprioritWebCalendar.Web.Controllers
         private readonly ICalendarService _calendarService;
         private readonly ICalendarValidator _calendarValidator;
 
+        private readonly NotificationHubManager _notificationManager;
+        private readonly CalendarHubManager _calendarManager;
+
         public CalendarController(
             IMapper mapper, 
             ICalendarService calendarService,
-            ICalendarValidator calendarValidator)
+            ICalendarValidator calendarValidator,
+            NotificationHubManager notificationHubManager,
+            CalendarHubManager calendarHubManager)
         {
             _mapper = mapper;
             _calendarService = calendarService;
             _calendarValidator = calendarValidator;
+            _notificationManager = notificationHubManager;
+            _calendarManager = calendarHubManager;
         }
 
         [HttpGet]
@@ -41,6 +50,13 @@ namespace AprioritWebCalendar.Web.Controllers
 
             var calendars = await _calendarService.GetCalendarsAsync(userId, onlyOwn);
             var viewModels = _mapper.MapToCalendarViewModel(calendars.ToList(), userId);
+
+            // User mustn't know about "IsDefault" state of caledar of another user.
+            foreach (var c in viewModels)
+            {
+                if (c.Owner.Id != userId)
+                    c.IsDefault = null;
+            }
 
             return this.OkOrNoContent(viewModels);
         }
@@ -90,12 +106,14 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPut("{id}"), ValidateApiModelFilter]
         public async Task<IActionResult> Update(int id, [FromBody]CalendarRequestModel model)
         {
+            var userId = this.GetUserId();
+
             // TODO: Replace for custom exception.
 
-            if (!await _calendarService.CanEditAsync(id, this.GetUserId()))
+            if (!await _calendarService.CanEditAsync(id, userId))
                 throw new ArgumentException();
 
-            var calendar = await _calendarService.GetCalendarByIdAsync(id);
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner));
 
             // Owner can't have any calendars with the same names.
             // If calendar is edited by another user that can permissions, we need to validate it too.
@@ -103,13 +121,22 @@ namespace AprioritWebCalendar.Web.Controllers
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.ToStringEnumerable());
+
+            var oldName = calendar.Name.Clone() as string;
             
+            // TODO: Use AutoMapper instead.
             calendar.Id = id;
             calendar.Name = model.Name;
             calendar.Description = model.Description;
             calendar.Color = model.Color;
 
             await _calendarService.UpdateCalendarAsync(calendar);
+
+            if (userId != calendar.Owner.Id)
+            {
+                await _calendarManager.CalendarEditedAsync(calendar.Owner.Id, User.Identity.Name, _mapper.Map<CalendarViewModel>(calendar), oldName);
+            }
+
             return Ok();
         }
 
@@ -121,6 +148,9 @@ namespace AprioritWebCalendar.Web.Controllers
             if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
                 throw new ArgumentException();
 
+            if (await _calendarService.IsDefaultAsync(id))
+                return this.BadRequestError("You can't delete default calendar.");
+
             // TODO: Check for existing events, etc..?
 
             await _calendarService.DeleteCalendarAsync(id);
@@ -130,22 +160,36 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPut("{id}/Share"), ValidateApiModelFilter]
         public async Task<IActionResult> Share(int id, [FromBody]CalendarShareRequest model)
         {
+            if (!await _calendarService.IsOwnerAsync(id, User.GetUserId()))
+                return this.BadRequestError("Only owner can share this calendar.");
+
             await _calendarService.ShareCalendarAsync(id, model.UserId.Value, model.IsReadOnly);
+
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner));
+
+            var vmCalendar = _mapper.Map<CalendarViewModel>(calendar);
+            vmCalendar.IsReadOnly = model.IsReadOnly;
+            vmCalendar.IsSubscribed = true;
+
+            await _calendarManager.CalendarSharedAsync(model.UserId.Value, vmCalendar);
             return Ok();
         }
 
         [HttpPut("{id}/RemoveSharing")]
         public async Task<IActionResult> RemoveSharing(int id, [FromBody]int userId)
         {
-            if (userId == this.GetUserId())
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner));
+            var currentUserId = User.GetUserId();
+
+            if (userId == currentUserId)
                 return this.BadRequestError("You can't remove sharing for your calendar.");
 
-            // TODO: Replace for custom exception.
-            
-            if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
-                throw new ArgumentException();
+            if (calendar.Owner.Id != currentUserId)
+                return this.BadRequestError("You don't have any permissions for this action.");
 
             await _calendarService.RemoveSharingAsync(id, userId);
+            
+            await _calendarManager.RemovedFromCalendarAsync(userId, calendar.Id, calendar.Name, calendar.Owner.UserName);
             return Ok();
         }
 
@@ -170,15 +214,19 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpPut("{id}/ReadOnly/{userId}")]
         public async Task<IActionResult> SetReadOnly(int id, int userId, [FromBody]bool isReadOnly)
         {
-            if (userId == this.GetUserId())
+            var currentUserId = User.GetUserId();
+
+            if (userId == currentUserId)
                 return this.BadRequestError("You can't change this status for yourself.");
 
-            // TODO: Replace for custom exception.
-
-            if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
-                throw new ArgumentException();
+            if (!await _calendarService.IsOwnerAsync(id, currentUserId))
+                return this.BadRequestError("Only owner can change read-only state.");
 
             await _calendarService.SetReadOnlyStatusAsync(id, userId, isReadOnly);
+
+            var calendarName = (await _calendarService.GetCalendarByIdAsync(id)).Name;
+
+            await _calendarManager.CalendarReadOnlyChangedAsync(userId, id, calendarName, User.Identity.Name, isReadOnly);
             return Ok();
         }
     }

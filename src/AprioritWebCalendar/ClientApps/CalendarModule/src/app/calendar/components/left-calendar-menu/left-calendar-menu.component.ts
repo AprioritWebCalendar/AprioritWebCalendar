@@ -10,6 +10,11 @@ import { CalendarEditComponent, ICalendarEditModel } from '../calendar-edit/cale
 import { CalendarDeleteComponent } from '../calendar-delete/calendar-delete.component';
 import { ShareCalendarComponent } from '../share-calendar/share-calendar.component';
 import { ToastsManager } from 'ng2-toastr';
+import { ICalendarExportParams, CalendarExportComponent } from '../calendar-export/calendar-export.component';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+import { CalendarImportComponent } from '../calendar-import/calendar-import.component';
+import { PushNotificationService } from '../../../services/push.notification.service';
+import { CalendarListener } from '../../services/calendar.listener';
 
 @Component({
     selector: 'app-left-calendar-menu',
@@ -23,16 +28,21 @@ export class LeftCalendarMenuComponent implements OnInit {
         private calendarService: CalendarService,
         private authService: AuthenticationService,
         private dialogService: DialogService,
-        private toastr: ToastsManager
+        private toastr: ToastsManager,
+        private hotkeysService: HotkeysService,
+        private pushNotifService: PushNotificationService,
+        private calendarListener: CalendarListener
     ) {
      }
 
     public UserId: Number;
 
     ngOnInit() {
+        this.configureHotkeys();
+
         this.calendarService.getCalendars()
             .subscribe((calendars: Calendar[]) => {
-                this.UserId = this.authService.getCurrentUser().Id;
+                this.UserId = this.authService.GetCurrentUser().Id;
 
                 if (calendars == null)
                     return;
@@ -43,6 +53,7 @@ export class LeftCalendarMenuComponent implements OnInit {
                 });
 
                 this.calendarsChanged();
+                this.configureSignalR();
             },
             (response: Response) => {
                 this.model.IsError = true;
@@ -54,7 +65,7 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.dialogService.addDialog(CalendarCreateComponent)
             .subscribe((calendar: CalendarCheck) => {
                 if (calendar != null) {
-                    calendar.Owner = this.authService.getCurrentUser();
+                    calendar.Owner = this.authService.GetCurrentUser();
                     this.model.Calendars.push(calendar);
 
                     console.log(calendar);
@@ -95,6 +106,7 @@ export class LeftCalendarMenuComponent implements OnInit {
                     return;
 
                 this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
+                this.calendarsChanged();
                 this.toastr.success("The calendar has been deleted successfully.");
             });
     }
@@ -107,6 +119,27 @@ export class LeftCalendarMenuComponent implements OnInit {
         };
 
         this.dialogService.addDialog(ShareCalendarComponent, model);
+    }
+
+    showExportModal(calendar: CalendarCheck) {
+        let params: ICalendarExportParams = {
+            id: calendar.Id as number,
+            fileName: calendar.Name
+        };
+
+        this.dialogService.addDialog(CalendarExportComponent, params);
+    }
+
+    showImportModal() {
+        this.dialogService.addDialog(CalendarImportComponent)
+            .subscribe((calendar: CalendarCheck) => {
+                if (calendar != null) {
+                    calendar.Owner = this.authService.GetCurrentUser();
+                    this.model.Calendars.push(calendar);
+                    this.calendarsChanged();
+                    this.toastr.success("The calendar has been imported successfully.");
+                }
+            });
     }
 
     subscribeCalendar(calendar: CalendarCheck) {
@@ -140,7 +173,67 @@ export class LeftCalendarMenuComponent implements OnInit {
     @Output()
     onCalendarsChanged = new EventEmitter<Calendar[]>();
 
+    @Output()
+    onCalendarDeleted = new EventEmitter<number>();
+
+    @Output()
+    onCalendarUpdated = new EventEmitter<Calendar>();
+
     calendarsChanged() {
         this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
+    }
+
+    private configureHotkeys() : void {
+        this.hotkeysService.add(new Hotkey("alt+c", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.showCreateModal();
+
+            return false;
+        }));
+    }
+
+    private configureSignalR() : void {
+        this.calendarListener.OnRemovedFromCalendar((id, name, owner) => {
+            this.model.RemoveCalendar(id);
+            this.onCalendarDeleted.emit(id);
+            this.pushNotifService.PushNotification(`Has removed you from calendar "${name}".`, owner);
+        });
+
+        this.calendarListener.OnCalendarShared(calendar => {
+            let calCheck = <CalendarCheck>calendar;
+            this.model.Calendars.push(calCheck);
+
+            this.pushNotifService.PushNotification(`Has shared calendar "${calendar.Name}" with you.`, 
+                calendar.Owner.UserName.toString());
+        });
+
+        this.calendarListener.OnCalendarEdited((editor, calendar, oldName) => {
+            let message;
+
+            if (oldName == calendar.Name) {
+                message = `Has edited your calendar "${calendar.Name}".`;
+            } else {
+                message = `Has renamed your calendar "${oldName}" to "${calendar.Name}".`;
+            }
+
+            this.model.UpdateCalendar(calendar);
+            this.onCalendarUpdated.emit(calendar);
+            this.pushNotifService.PushNotification(message, editor);
+        });
+
+        this.calendarListener.OnCalendarReadOnlyChanged((id, name, owner, isReadOnly) => {
+            let message = `Has changed your read-only status for calendar "${name}". `;
+
+            if (isReadOnly)
+                message += "You can only read the calendar.";
+            else
+                message += "Now you are able to edit the calendar.";
+
+            this.pushNotifService.PushNotification(message, owner);
+
+            this.model.Calendars.filter(c => c.Id == id)[0].IsReadOnly = isReadOnly;
+        });
+
+        this.calendarListener.Start();
     }
 }

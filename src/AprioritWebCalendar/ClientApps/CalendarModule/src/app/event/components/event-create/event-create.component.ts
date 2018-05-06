@@ -16,8 +16,7 @@ export interface IEventCreateParams {
 
 @Component({
     selector: 'app-event-create',
-    templateUrl: './event-create.component.html',
-    styleUrls: ['./event-create.component.css']
+    templateUrl: './event-create.component.html'
 })
 export class EventCreateComponent extends DialogComponent<IEventCreateParams, Event>
                                     implements IEventCreateParams {
@@ -25,15 +24,18 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
     model: EventRequestModel = new EventRequestModel();
     calendars: Calendar[];
 
-    startEndDate: string[];
+    startEndDate: Date[];
     startTime?: Date;
     endTime? :Date;
+
+    minDate: Date = new Date();
 
     constructor(
         public dialogService: DialogService,
         private eventService: EventService
     ){
-            super(dialogService);
+        super(dialogService);
+        this.startEndDate = [new Date(), new Date()];
     }
 
     // TODO: Localize timepickers.
@@ -54,7 +56,7 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
         
         console.log(event);
 
-        event.ConvertDateTime(this.startEndDate);
+        event.ConvertDateTime([this.startEndDate[0].toDateString(), this.startEndDate[1].toDateString()]);
 
         console.log(event);
 
