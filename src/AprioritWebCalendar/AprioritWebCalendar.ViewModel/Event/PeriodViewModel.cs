@@ -21,6 +21,8 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var nowUtc = DateTime.UtcNow;
+
             PeriodStart = PeriodStart.Date;
             PeriodEnd = PeriodEnd.Date;
 
@@ -32,6 +34,11 @@ namespace AprioritWebCalendar.ViewModel.Event
             if (PeriodStart >= PeriodEnd)
             {
                 errors.AddError("PeriodStart must not be more than PeriodEnd.", nameof(PeriodStart), nameof(PeriodEnd));
+            }
+
+            if (nowUtc > PeriodStart || nowUtc > PeriodEnd)
+            {
+                errors.AddError("You can't set period in the past.", nameof(PeriodStart), nameof(PeriodEnd));
             }
 
             return errors;

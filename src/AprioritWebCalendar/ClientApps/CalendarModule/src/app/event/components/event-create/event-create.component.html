@@ -80,6 +80,7 @@
         
                             <input type="text" name="Dates" class="form-control" required
                                 [(ngModel)]="startEndDate" #eventStartEndDate="ngModel"
+                                [minDate]="minDate"
                                 bsDaterangepicker />
         
                             <span class="text-danger" *ngIf="!eventStartEndDate.valid && eventStartEndDate.touched">
@@ -153,7 +154,8 @@
                     <div class="col-md-6">
                         <app-event-period
                             *ngIf="model.IsRecurrent"
-                            [period]="model.Period"></app-event-period>
+                            [period]="model.Period"
+                            [minDate]="minDate"></app-event-period>
 
                         <app-event-location 
                             *ngIf="model.IsLocationAttached" 
