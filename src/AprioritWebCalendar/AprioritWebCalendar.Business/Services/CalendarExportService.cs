@@ -4,6 +4,7 @@ using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
+using TimeZoneConverter;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Infrastructure.Enums;
 using DomainCalendar = AprioritWebCalendar.Business.DomainModels.Calendar;
@@ -16,6 +17,9 @@ namespace AprioritWebCalendar.Business.Services
         {
             var iCalendar = new Calendar();
             iCalendar.TimeZones.Add(new VTimeZone(TimeZoneInfo.Utc.Id));
+
+            iCalendar.Properties.Add(new CalendarProperty("X-WR-CALNAME", calendar.Name));
+            iCalendar.Properties.Add(new CalendarProperty("X-WR-TIMEZONE", TZConvert.WindowsToIana(TimeZoneInfo.Utc.Id)));
 
             foreach (var e in calendar.Events)
             {

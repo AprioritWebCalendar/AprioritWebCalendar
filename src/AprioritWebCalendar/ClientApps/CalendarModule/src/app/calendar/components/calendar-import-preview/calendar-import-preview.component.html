@@ -1,4 +1,5 @@
-<app-alert [alertType]="'warning'" [innerText]="'All dates and time are shown in UTC.'"></app-alert>
+<app-alert [alertType]="'warning'" [innerText]="'All dates and time are shown in UTC.'"
+    *ngIf="model.Calendar.Events != null && model.Calendar.Events.length > 0"></app-alert>
 
 <div class="panel panel-info">
     <div class="panel-heading">Calendar "{{model.Calendar.Name}}"</div>
@@ -30,4 +31,9 @@
             </p>
         </div>
     </div>
+
+    <app-alert *ngIf="model.Calendar.Events == null || model.Calendar.Events.length < 1"
+        [alertType]="'danger'"
+        [innerText]="'The calendar is empty.'">
+    </app-alert>
 </div>

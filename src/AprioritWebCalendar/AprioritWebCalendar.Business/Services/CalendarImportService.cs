@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Ical.Net;
 using Ical.Net.DataTypes;
+using TimeZoneConverter;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Infrastructure.Enums;
 using AprioritWebCalendar.Data.Interfaces;
@@ -57,8 +58,19 @@ namespace AprioritWebCalendar.Business.Services
             var domainCalendar = new DomainCalendar();
             var domainEvents = new List<DomainModels.Event>();
 
-            var iCalTimezone = TimeZoneInfo.FindSystemTimeZoneById(iCalendar.TimeZones.FirstOrDefault()?.TzId)
-                ?? TimeZoneInfo.Utc;
+            TimeZoneInfo iCalTimezone = TimeZoneInfo.Utc;
+
+            if (iCalendar.TimeZones?.Any() == true)
+            {
+                iCalTimezone = TimeZoneInfo.FindSystemTimeZoneById(iCalendar.TimeZones.First().TzId);
+            }
+            else if (iCalendar.Properties["X-WR-TIMEZONE"].Value != null)
+            {
+                var ianaTimezone = iCalendar.Properties["X-WR-TIMEZONE"].Value.ToString();
+                var windowsTimezone = TZConvert.IanaToWindows(ianaTimezone);
+
+                iCalTimezone = TimeZoneInfo.FindSystemTimeZoneById(windowsTimezone);
+            }
 
             foreach (var iEvent in iCalendar.Events)
             {
@@ -88,10 +100,8 @@ namespace AprioritWebCalendar.Business.Services
 
                     if (!iEvent.IsAllDay)
                     {
-                        //dEvent.StartTime = TimeZoneInfo.ConvertTimeToUtc(iEvent.DtStart.Value, iCalTimezone).TimeOfDay;
-                        //dEvent.EndTime = TimeZoneInfo.ConvertTimeToUtc(iEvent.DtEnd.Value, iCalTimezone).TimeOfDay;
-                        dEvent.StartTime = iEvent.DtStart.Value.TimeOfDay;
-                        dEvent.EndTime = iEvent.DtEnd.Value.TimeOfDay;
+                        dEvent.StartTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(iEvent.DtStart.Value, DateTimeKind.Unspecified), iCalTimezone).TimeOfDay;
+                        dEvent.EndTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(iEvent.DtEnd.Value, DateTimeKind.Unspecified), iCalTimezone).TimeOfDay;
                     }
                 }
                 else
@@ -100,14 +110,14 @@ namespace AprioritWebCalendar.Business.Services
                     {
                         dEvent.StartDate = iEvent.DtStart.Value;
                         dEvent.EndDate = iEvent.DtEnd.Value;
+
+                        if (iEvent.IsAllDay && iEvent.DtEnd.Minute == 0)
+                            dEvent.EndDate = dEvent.EndDate.Value.AddMinutes(-1);
                     }
                     else
                     {
-                        //var utcStart = TimeZoneInfo.ConvertTimeToUtc(iEvent.DtStart.Value, iCalTimezone);
-                        //var utcEnd = TimeZoneInfo.ConvertTimeToUtc(iEvent.DtEnd.Value, iCalTimezone);
-
-                        var utcStart = iEvent.DtStart.Value;
-                        var utcEnd = iEvent.DtEnd.Value;
+                        var utcStart = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(iEvent.DtStart.Value, DateTimeKind.Unspecified), iCalTimezone);
+                        var utcEnd = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(iEvent.DtEnd.Value, DateTimeKind.Unspecified), iCalTimezone);
 
                         dEvent.StartDate = utcStart.Date;
                         dEvent.EndDate = utcEnd.Date;
