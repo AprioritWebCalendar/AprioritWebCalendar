@@ -81,7 +81,7 @@ export class MainScreenComponent implements OnInit {
 
     private setCalendars(calendars: Calendar[]) : void {
         if (this.model.currentUser == null) {
-            this.model.currentUser = this.authenticationService.getCurrentUser();
+            this.model.currentUser = this.authenticationService.GetCurrentUser();
             this.configureSignalR();
         }
 
@@ -139,7 +139,7 @@ export class MainScreenComponent implements OnInit {
                     return;
 
                 event.IsReadOnly = false;
-                event.Owner = this.authenticationService.getCurrentUser();
+                event.Owner = this.authenticationService.GetCurrentUser();
                 event.Color = this.model.getCalendarColor(event.CalendarId);
                 console.log(event);
 

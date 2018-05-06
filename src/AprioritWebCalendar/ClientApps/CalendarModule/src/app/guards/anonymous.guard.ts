@@ -9,7 +9,7 @@ export class AnonymousGuard implements CanActivate {
     constructor(private router : Router, private authService: AuthenticationService) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
-        if (this.authService.isAuthenticated()) {
+        if (this.authService.IsAuthenticated()) {
             this.router.navigate(['/'])
             return false;
         }

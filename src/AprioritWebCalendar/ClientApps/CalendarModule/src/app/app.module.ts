@@ -28,8 +28,6 @@ import { AnonymousGuard } from './guards/anonymous.guard';
 import { AuthenticationService } from './authentication/services/authentication.service';
 
 import { routing } from './app.routing';
-import { LoginComponent } from './authentication/components/login/login.component';
-import { RegisterComponent } from './authentication/components/register/register.component';
 import { AlertComponent } from './shared/alert/alert.component';
 import { AlertArrayComponent } from './shared/alert-array/alert-array.component';
 
@@ -70,13 +68,13 @@ import { CalendarImportPreviewComponent } from './calendar/components/calendar-i
 import { DateFormatPipe } from './pipes/date.format.pipe';
 import { NotificationListener } from './notification/notification.listener';
 import { PushNotificationService } from './services/push.notification.service';
+import { AuthFormComponent } from './authentication/components/auth-form/auth-form.component';
+import { Router } from '@angular/router';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthPanelComponent,
-    LoginComponent,
-    RegisterComponent,
     AlertComponent,
     AlertArrayComponent,
     MainScreenComponent,
@@ -107,7 +105,9 @@ import { PushNotificationService } from './services/push.notification.service';
     CalendarImportComponent,
     CalendarImportPreviewComponent,
 
-    DateFormatPipe
+    DateFormatPipe,
+
+    AuthFormComponent
   ],
   imports: [
     BrowserModule,
@@ -139,16 +139,25 @@ import { PushNotificationService } from './services/push.notification.service';
   ],
   providers: [
     {
-      provide: CustomHttp,
-      deps: [XHRBackend, RequestOptions, ApplicationModule],
-      useFactory: (backend, options, aplicationService) => {
-        var customHttp = new CustomHttp(backend, options, aplicationService);
-        customHttp.getToken();
-        return customHttp;
-      }
+        provide: CustomHttp,
+        deps: [XHRBackend, RequestOptions, Router],
+        useFactory: (backend, options) => {
+            var customHttp = new CustomHttp(backend, options);
+            customHttp.InitializeToken();
+            return customHttp;
+        }
     },
 
-    AuthenticationService,
+    {
+        provide: AuthenticationService,
+        deps: [Http, CustomHttp, Router],
+        useFactory: (http: Http, customHttp: CustomHttp, router: Router) => {
+            
+            var authService = new AuthenticationService(http, customHttp, router);
+            authService.InitializeUser();
+            return authService;
+        }
+    },
 
     AuthorizeGuard,
     AnonymousGuard,

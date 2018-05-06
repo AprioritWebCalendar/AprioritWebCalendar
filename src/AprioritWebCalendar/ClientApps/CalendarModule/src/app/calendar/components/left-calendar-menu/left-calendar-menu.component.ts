@@ -38,7 +38,7 @@ export class LeftCalendarMenuComponent implements OnInit {
 
         this.calendarService.getCalendars()
             .subscribe((calendars: Calendar[]) => {
-                this.UserId = this.authService.getCurrentUser().Id;
+                this.UserId = this.authService.GetCurrentUser().Id;
 
                 if (calendars == null)
                     return;
@@ -60,7 +60,7 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.dialogService.addDialog(CalendarCreateComponent)
             .subscribe((calendar: CalendarCheck) => {
                 if (calendar != null) {
-                    calendar.Owner = this.authService.getCurrentUser();
+                    calendar.Owner = this.authService.GetCurrentUser();
                     this.model.Calendars.push(calendar);
 
                     console.log(calendar);
@@ -129,7 +129,7 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.dialogService.addDialog(CalendarImportComponent)
             .subscribe((calendar: CalendarCheck) => {
                 if (calendar != null) {
-                    calendar.Owner = this.authService.getCurrentUser();
+                    calendar.Owner = this.authService.GetCurrentUser();
                     this.model.Calendars.push(calendar);
                     this.calendarsChanged();
                     this.toastr.success("The calendar has been imported successfully.");

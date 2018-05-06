@@ -18,55 +18,62 @@ export class AuthenticationService {
         private customHttp : CustomHttp,
         private router: Router
     ) {
-        if (customHttp.tokenExists()) {
+    }
+
+    public InitializeUser() : void {
+        if (this.customHttp.TokenExists()) {
             this.getUser()
                 .subscribe((response: User) => {
                     this.currentUser = response;
                     console.log("The current user has been got");
+                    this.router.navigate(['/']);
                 });
+        } else {
+            console.log("AuthenticationService: unable to get token.");
         }
     }
 
-    isAuthenticated() : boolean {
+    public IsAuthenticated() : boolean {
         return this.currentUser != null;
     }
 
-    getCurrentUser() : User {
+    public GetCurrentUser() : User {
         return this.currentUser;
     }
 
-    login(emailOrUserName : string, password : string) {
+    public Login(emailOrUserName : string, password : string) : Observable<boolean> {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
-                var token = response.json()["AccessToken"];
+                var token = response.json().AccessToken;
 
                 console.log("The token has been saved");
 
-                this.customHttp.configureToken(token);
-                return this.currentUser;
+                this.customHttp.ConfigureToken(token);
+                this.currentUser = response.json().User;
+                return true;
             })
             .catch(e => {
                 return Observable.throw(e);
             });
     }
 
-    register(email : string, userName : string, password : string) {
+    public Register(email : string, userName : string, password : string) : Observable<boolean> {
         return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password})
             .map((response: Response) => {
-                
+                return true;
             })
             .catch(e => {
                 return Observable.throw(e);
             });
     }
 
-    logout() {
-        this.customHttp.resetToken();
+    public Logout() : void {
+        this.customHttp.ResetToken();
         this.currentUser = null;
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/login']);
     }
 
-    getUser() {
+    private getUser() : Observable<User> {
         return this.customHttp.get("/api/Account")
             .map((response:Response) => {
                 return response.json() as User;

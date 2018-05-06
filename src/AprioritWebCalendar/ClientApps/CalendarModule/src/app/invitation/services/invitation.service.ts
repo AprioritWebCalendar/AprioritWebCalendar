@@ -57,7 +57,7 @@ export class InvitationService {
         var opts = new RequestOptions();
         opts.headers = new Headers();
         opts.headers.set("Content-Type", "application/json");
-        this.customHttp.attachToken(opts);
+        this.customHttp.AttachToken(opts);
 
         return this.customHttp.put(`${this.baseUrl}${eventId}/Invitation/ReadOnly/${userId}`, isReadOnly, opts)
             .map(r => true)

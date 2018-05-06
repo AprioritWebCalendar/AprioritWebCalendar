@@ -11,15 +11,15 @@ export class AuthPanelComponent {
     constructor(private authService: AuthenticationService) { }
 
     isAuthenticated(): boolean {
-        return this.authService.isAuthenticated();
+        return this.authService.IsAuthenticated();
     }
 
     getUser(): User {
-        return this.authService.getCurrentUser();
+        return this.authService.GetCurrentUser();
     }
 
     logout() {
         if (confirm("Do you really want to log out the account?"))
-            this.authService.logout();
+            this.authService.Logout();
     }
 }

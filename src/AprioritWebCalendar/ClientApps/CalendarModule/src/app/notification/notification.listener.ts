@@ -13,7 +13,7 @@ export class NotificationListener {
     private _connection: HubConnection;
 
     public Start() : void {
-        this._connection = new HubConnection(`/notification-hub?token=${this.customHttp.getTokenString()}`);
+        this._connection = new HubConnection(`/notification-hub?token=${this.customHttp.GetTokenString()}`);
         this._connection.start();
         console.log("The NotificationListener is running...");
     }
