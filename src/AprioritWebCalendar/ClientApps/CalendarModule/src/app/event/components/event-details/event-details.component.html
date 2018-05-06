@@ -1,0 +1,64 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Event "{{event.Name}}"</h4>
+        </div>
+
+        <div class="modal-body">
+            <dl class="dl-horizontal">
+                <dt>Name:</dt>
+                <dd>{{event.Name}}</dd>
+
+                <span *ngIf="event.Description != null">
+                    <dt>Description:</dt>
+                    <dd>{{event.Description}}</dd>
+                </span>
+
+                <span *ngIf="event.Period == null && event.IsAllDay">
+                    <dt>Duration:</dt>
+                    <dd>{{event.StartDate | dateLocal }} - {{event.EndDate | dateLocal }} (All day(s))</dd>
+                </span>
+
+                <span *ngIf="event.Period == null && !event.IsAllDay">
+                    <dt>Duration:</dt>
+                    <dd>{{event.StartDate | dateTimeLocal:event.StartTime}} - {{event.EndDate | dateTimeLocal:event.EndTime}}</dd>
+                </span>
+
+                <span *ngIf="event.Period != null && event.IsAllDay">
+                    <dt>Duration:</dt>
+                    <dd>{{event.Period.PeriodStart | dateLocal}} - {{event.Period.PeriodEnd | dateLocal}} <i>(Recurring)</i></dd>
+                </span>
+
+                <span *ngIf="event.Period != null && !event.IsAllDay">
+                    <dt>Duration:</dt>
+                    <dd>
+                        <span>{{event.Period.PeriodStart | dateLocal}} - {{event.Period.PeriodEnd | dateLocal}}</span> 
+                        <span>at: </span>
+                        <span>{{event.StartTime | timeLocal}} - {{event.EndTime | timeLocal}} <i>(Recurring)</i></span>
+                    </dd>
+                </span>
+
+                <span *ngIf="event.Period != null">
+                    <dt>Period:</dt>
+                    <dd>
+                        <span>{{GetPeriodType()}}</span>
+                        <span *ngIf="event.Period.Cycle != null"> <i>Interval: </i>({{event.Period.Cycle}})</span>
+                    </dd>
+                </span>
+
+                <dt>Owner:</dt>
+                <dd>{{event.Owner.UserName}}</dd>
+            </dl>
+
+            <app-event-location-view *ngIf="event.Location != null" [location]="event.Location"></app-event-location-view>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+                (click)="close()">Close</button>
+        </div>
+    </div>
+</div>

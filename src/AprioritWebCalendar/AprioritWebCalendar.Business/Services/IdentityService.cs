@@ -18,15 +18,18 @@ namespace AprioritWebCalendar.Business.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IMapper _mapper;
+        private readonly ICalendarService _calendarService;
 
         public IdentityService(
             UserManager<ApplicationUser> userManager, 
             IRepository<ApplicationUser> userRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ICalendarService calendarService)
         {
             _userManager = userManager;
             _userRepository = userRepository;
             _mapper = mapper;
+            _calendarService = calendarService;
         }
 
         public async Task<IdentityResult> CreateUserAsync(RegisterRequestModel registerModel)
@@ -37,7 +40,13 @@ namespace AprioritWebCalendar.Business.Services
                 UserName = registerModel.UserName
             };
 
-            return await _userManager.CreateAsync(user, registerModel.Password);
+            var result = await _userManager.CreateAsync(user, registerModel.Password);
+
+            if (result != IdentityResult.Success)
+                return result;
+
+            await _calendarService.CreateDefaultCalendarAsync(user.Id, user.UserName);
+            return result;
         }
 
         public async Task<User> GetUserAsync(int id)

@@ -1,0 +1,84 @@
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <form #importForm="ngForm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" 
+                    (click)="close()">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Import a calendar</h4>
+
+                <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+            </div>
+
+            <div class="modal-body" *ngIf="isLoading && errors.length == 0">
+                <app-alert [alertType]="'info'" [innerText]="'Loading...'"></app-alert>
+            </div>
+
+            <div class="modal-body" *ngIf="!isSave && !isLoading">
+                <div class="form-group">
+                    <label class="control-label" for="File">File</label>
+
+                    <input type="file" class="form-control" id="File" name="File"
+                        #file (change)="onFileSelected($event.target.files)" />
+
+                    <span class="text-danger" *ngIf="model.File == null && file.touched">
+                        You must choose a file.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="Name">Name</label>
+
+                    <input type="text" class="form-control" id="Name" name="Name" 
+                        required minlength="3" maxlength="32" placeholder="Enter name"
+                        [(ngModel)]="model.Name" #name="ngModel" />
+
+                    <span class="text-danger" *ngIf="!name.valid && name.touched">
+                        The Name must be a string from 3 to 32 symbols.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="Description">Description</label>
+
+                    <textarea class="form-control" id="Description" name="Description" maxlength="256" 
+                        placeholder="Enter description no more than 256 symbols."
+                        [(ngModel)]="model.Description" #description="ngModel"></textarea>
+
+                    <span class="text-danger" *ngIf="!description.valid && description.touched">
+                        The Name must be a string no more than 256 symbols.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="Color">Color</label>
+
+                    <input class="form-control" id="Color" name="Color" required 
+                        [value]="model.Color"
+                        [(colorPicker)]="model.Color" [style.background]="model.Color" />
+
+                    <span class="text-danger" *ngIf="model.Color == undefined">
+                        The Color field is required.
+                    </span>
+                </div>
+            </div>
+
+            <div class="modal-body modal-body-scrollable" *ngIf="isSave && !isLoading && errors.length == 0">
+                <app-calendar-import-preview [model]="calendarPreview"></app-calendar-import-preview>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="import(importForm)"
+                    [disabled]="!importForm.valid || model.File == undefined || model.Color == undefined"
+                    *ngIf="!isSave">Import</button>
+
+                <button type="button" class="btn btn-success" (click)="saveCalendar()"
+                    [disabled]="isLoading"
+                    *ngIf="isSave">Save</button>
+
+                <button type="button" class="btn btn-danger" (click)="close()">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>

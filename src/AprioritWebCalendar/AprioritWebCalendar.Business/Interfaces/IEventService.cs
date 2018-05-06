@@ -18,6 +18,15 @@ namespace AprioritWebCalendar.Business.Interfaces
         Task<IEnumerable<Event>> GetEventsAsync(int userId, DateTime startDate, DateTime endDate, params int[] calendarsIds);
 
         /// <summary>
+        /// Gets events by fragment of name.
+        /// </summary>
+        /// <param name="name">Fragment of name.</param>
+        /// <param name="userId">ID of current user</param>
+        /// <param name="take">Take</param>
+        /// <returns>Enumeration of events.</returns>
+        Task<IEnumerable<Event>> GetEventsByNameAsync(string name, int userId, int take);
+
+        /// <summary>
         /// Gets event by ID without related entities.
         /// </summary>
         /// <param name="eventId">Event ID</param>
@@ -40,6 +49,20 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <param name="userId">UserID</param>
         /// <returns>Event</returns>
         Task<Event> GetEventByIdAsync(int eventId, int userId);
+
+        /// <summary>
+        /// Gets incoming invitations.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Enumeration of invitations.</returns>
+        Task<IEnumerable<Invitation>> GetIncomingInvitationsAsync(int userId);
+
+        /// <summary>
+        /// Gets outcoming invitations.
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Enumeration of invitations.</returns>
+        Task<IEnumerable<Invitation>> GetOutcomingInvitationsAsync(int userId);
 
         /// <summary>
         /// Creates a new event.

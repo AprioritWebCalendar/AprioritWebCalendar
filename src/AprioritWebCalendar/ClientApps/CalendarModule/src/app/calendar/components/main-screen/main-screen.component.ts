@@ -19,6 +19,12 @@ import { User } from '../../../authentication/models/user';
 import { EventDeleteComponent, IEventDeleteParams } from '../../../event/components/event-delete/event-delete.component';
 import { EventMoveComponent, IEventMoveParams } from '../../../event/components/event-move/event-move.component';
 import { IEventShareParams, EventShareComponent } from '../../../event/components/event-share/event-share.component';
+import { Invitation } from '../../../invitation/models/invitation';
+import { MainScreenModel } from './main-screen.model';
+import { HotkeysService, Hotkey } from 'angular2-hotkeys';
+import { NotificationListener } from '../../../notification/notification.listener';
+import { PushNotificationService } from '../../../services/push.notification.service';
+import { EventDetailsComponent } from '../../../event/components/event-details/event-details.component';
 
 @Component({
     selector: 'app-main-screen',
@@ -29,29 +35,21 @@ import { IEventShareParams, EventShareComponent } from '../../../event/component
     }]
 })
 export class MainScreenComponent implements OnInit {
-    dataEvents: Event[] = [];
-    calendarEvents: CalendarEvent<Event>[] = [];
-    calendars: Calendar[] = [];
-    currentUser: User;
+    public model: MainScreenModel = new MainScreenModel();
 
-    activeDayIsOpen: boolean = true;
-
-    refresh: Subject<any> = new Subject();
-
-    public viewDate: Date = new Date();
-    public viewMode: string = "month";
-
-    public localeData: moment.Locale;
-    public locale: string;
-    public weekStartsOn: number;
-    public weekPeriod: string;
+    public isSidebarOpened: boolean;
 
     constructor(
         private eventService: EventService,
         private toasts: ToastsManager,
         private dialogService: DialogService,
-        private authenticationService: AuthenticationService
-    ) { }
+        private authenticationService: AuthenticationService,
+        private hotkeysService: HotkeysService,
+        private notificationListener: NotificationListener,
+        private pushNotifService: PushNotificationService
+    ) {
+        this.model.actions = this.actions;
+     }
 
     private actions: CalendarEventAction[] = [
         {
@@ -67,29 +65,37 @@ export class MainScreenComponent implements OnInit {
             }
         },
         {
-            label: '<i class="fas fa-arrow-right"></i>',
+            label: '<i class="fa fa-fw fa-retweet"></i>',
             onClick: ({ event }: { event: CalendarEvent }): void => {
                 this.openMoveEventModal(event);
+            }
+        },
+        {
+            label:'<i class="fa fa-fw fa-share"></i>',
+            onClick: ({ event }: { event: CalendarEvent }): void => {
+                this.openEventShareModal(event)
             }
         }
     ];
     
     public ngOnInit() : void {
-        this.locale = navigator.language.split("-")[0];
-        this.localeData =  moment.localeData(this.locale);
-        this.weekStartsOn = this.localeData.firstDayOfWeek();
+        this.model.locale = navigator.language.split("-")[0];
+        this.model.localeData =  moment.localeData(this.model.locale);
+        this.model.weekStartsOn = this.model.localeData.firstDayOfWeek();
+
+        this.configureHotkeys();
     }
 
     private setCalendars(calendars: Calendar[]) : void {
-        if (this.currentUser == null) {
-            this.currentUser = this.authenticationService.getCurrentUser();
+        if (this.model.currentUser == null) {
+            this.model.currentUser = this.authenticationService.GetCurrentUser();
+            this.configureSignalR();
         }
 
-        this.calendars = calendars;
+        this.model.calendars = calendars;
 
         if (calendars == null || calendars.length === 0){
-            this.dataEvents = [];
-            this.calendarEvents = [];
+            this.model.clearAllEvents();
             return;
         }
 
@@ -97,21 +103,21 @@ export class MainScreenComponent implements OnInit {
     }
 
     private changeViewMode(viewMode: string) : void {
-        this.viewMode = viewMode;
+        this.model.viewMode = viewMode;
         this.changeWeekPeriod();
         this.loadEvents();
     }
 
     private dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }) : void {
-        if (isSameMonth(date, this.viewDate)) {
+        if (isSameMonth(date, this.model.viewDate)) {
             if (
-                (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
+                (isSameDay(this.model.viewDate, date) && this.model.activeDayIsOpen === true) ||
                 events.length === 0
             ) {
-                this.activeDayIsOpen = false;
+                this.model.activeDayIsOpen = false;
             } else {
-                this.activeDayIsOpen = true;
-                this.viewDate = date;
+                this.model.activeDayIsOpen = true;
+                this.model.viewDate = date;
             }
         }
     }
@@ -132,7 +138,7 @@ export class MainScreenComponent implements OnInit {
     }
 
     private openCreateEventModal() : void {
-        var calendars = this.calendars.filter(c => c.IsReadOnly != true);
+        var calendars = this.model.getEditableCalendars();
 
         this.dialogService.addDialog(EventCreateComponent, { calendars: calendars })
             .subscribe(event => {
@@ -140,17 +146,20 @@ export class MainScreenComponent implements OnInit {
                     return;
 
                 event.IsReadOnly = false;
-                event.Owner = this.authenticationService.getCurrentUser();
-                event.Color = this.getCalendarsColor(event.CalendarId);
+                event.Owner = this.authenticationService.GetCurrentUser();
+                event.Color = this.model.getCalendarColor(event.CalendarId);
                 console.log(event);
 
-                this.dataEvents.push(event);
-                this.mapEvent(event);
+                this.model.pushEvent(event);
                 
                 this.toasts.success("The event has been created successfully");
             }, e => {
                 this.toasts.error("Unable to create event. Try again or reload the page.");
             });
+    }
+
+    private openEventDetailsModal(event: CalendarEvent) : void {
+        this.dialogService.addDialog(EventDetailsComponent, {event: event.meta});
     }
 
     private openEditEventModal(event: CalendarEvent) : void {
@@ -170,13 +179,8 @@ export class MainScreenComponent implements OnInit {
                 ev.Color = event.meta.Color;
                 ev.IsReadOnly = event.meta.IsReadOnly;
 
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
-                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
-
-                this.refresh.next();
-
-                this.dataEvents.push(ev);
-                this.mapEvent(ev);
+                this.model.removeEvent(ev.Id);
+                this.model.pushEvent(ev);
 
                 this.toasts.success("The event has been updated successfully");
             });
@@ -185,7 +189,7 @@ export class MainScreenComponent implements OnInit {
     private openDeleteEventModal(event: CalendarEvent) : void {
         let params: IEventDeleteParams = {
             event: <Event>event.meta,
-            currentUser: this.currentUser
+            currentUser: this.model.currentUser
         };
 
         this.dialogService.addDialog(EventDeleteComponent, params)
@@ -193,9 +197,8 @@ export class MainScreenComponent implements OnInit {
                 if (id == null)
                     return;
 
-                this.dataEvents = this.dataEvents.filter(e => e.Id != id);
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != id);
-                this.refresh.next();
+                this.model.removeEvent(id);
+                this.model.refreshCalendar();
 
                 this.toasts.success("The event has been deleted successfully?");
             }, e => {
@@ -206,155 +209,162 @@ export class MainScreenComponent implements OnInit {
     private openMoveEventModal(event: CalendarEvent) : void {
         let params: IEventMoveParams = {
             event: event.meta,
-            calendars: this.calendars.filter(c => c.Owner.Id == this.currentUser.Id)
+            calendars: this.model.getOwnCalendars()
         };
 
         this.dialogService.addDialog(EventMoveComponent, params)
             .subscribe(ev => {
-                this.dataEvents = this.dataEvents.filter(e => e.Id != ev.Id);
-                this.calendarEvents = this.calendarEvents.filter(e => e.meta.Id != ev.Id);
+                this.model.removeEvent(ev.Id);
+                this.model.pushEvent(ev);
 
-                this.mapEvent(ev);
                 this.toasts.success("The event has been moved successfully");
             }, e => {
                 this.toasts.error("Unable to move the event. Try again or reload the page.");
             });
     }
 
+    private changeSidebarOpened() {
+        this.isSidebarOpened = !this.isSidebarOpened;
+    }
+
+    private closeOpenedSidebar(e: MouseEvent) {
+        if (e.toElement.id != "incoming-invitations-button")
+            this.isSidebarOpened = false;
+    }
+
+    private addInvitationEvent(invitation: Invitation) {
+        if (this.model.dataEvents.filter(e => e.Id === invitation.Event.Id).length > 0)
+            return;
+
+        let event = invitation.Event;
+        let defaultCalendar = this.model.getDefaultCalendar();
+
+        event.IsReadOnly = invitation.IsReadOnly;
+        event.CalendarId = <number>defaultCalendar.Id;
+        event.Color = defaultCalendar.Color;
+
+        this.model.mapEvent(event);
+    }
+
     private changeWeekPeriod() : void {
-        if (this.viewMode == "week") {
-            var start = moment(this.viewDate).locale(this.locale).startOf("week").toDate().toLocaleDateString();
-            var end = moment(this.viewDate).locale(this.locale).endOf("week").toDate().toLocaleDateString();
+        if (this.model.viewMode == "week") {
+            var start = moment(this.model.viewDate).locale(this.model.locale).startOf("week").toDate().toLocaleDateString();
+            var end = moment(this.model.viewDate).locale(this.model.locale).endOf("week").toDate().toLocaleDateString();
             
-            this.weekPeriod = `${start} - ${end}`;
-            console.log("Week period: " + this.weekPeriod);
+            this.model.weekPeriod = `${start} - ${end}`;
+            console.log("Week period: " + this.model.weekPeriod);
         }
     }
 
     private loadEvents() : void {
-        this.dataEvents = [];
-        this.calendarEvents = [];
-        var dates = this.getDates();
+        this.model.dataEvents = [];
+        this.model.calendarEvents = [];
+        var dates = this.model.getDates();
         
-        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.calendars.map(c => c.Id as number))
+        this.eventService.getEvents(dates.StartDate, dates.EndDate, this.model.calendars.map(c => c.Id as number))
             .subscribe(events => {
                 if (events != null) {
-                    console.log(events);
-
-                    this.dataEvents = events;
-
-                    this.mapEventList(this.dataEvents);
-                    this.refresh.next();
+                    this.model.dataEvents = events;
+                    this.model.mapEventList(this.model.dataEvents);
                 }
-
-                console.log(this.calendarEvents);
             }, e => {
                 this.toasts.error("Unable to load events. Try again or reload the page!");
             });
     }
 
-    private mapEventList(events: Event[]) : void {
-        events.forEach(e => {
-            this.mapEvent(e);
-        });
+    private removeEventsByCalendar(id: number) : void {
+        this.model.removeEventsByCalendar(id);
+        this.model.refreshCalendar();
     }
 
-    private mapEvent(event: Event) : void {
-        if (event.Period == null) {
-            this.mapDefaultEvent(event);
-        } else {
-            this.mapRecurringEvent(event);
-        }
-
-        this.refresh.next();
+    private updateEventsByCalendar(calendar: Calendar) : void {
+        this.model.updateEventsByCalendar(calendar);
     }
 
-    private mapDefaultEvent(event: Event) : void {
-        let eventCal;
+    private configureHotkeys() : void {
+        this.hotkeysService.add(new Hotkey("alt+e", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.openCreateEventModal();
+            console.log(e);
 
-        eventCal = {
-            title: event.Name,
-            color: { primary: event.Color },
-            meta: event,
-            actions: []
-        };
+            return false;
+        }));
 
-        eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
+        this.hotkeysService.add(new Hotkey("alt+i", (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+            this.changeSidebarOpened();
+            return false;
+        }));
 
-        if (event.IsAllDay) {
-            eventCal.start = getWithoutTime(new Date(event.StartDate));
-            eventCal.end = setEndOfDay(new Date(event.EndDate));
-        } else {
-            eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));
-            eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
-        }
+        this.hotkeysService.add(new Hotkey(["alt+d", "alt+w", "alt+m"], (e: KeyboardEvent): boolean => {
+            e.preventDefault();
 
-        this.setEventActions(eventCal, event);
-        this.calendarEvents.push(eventCal);
-    }
-
-    private mapRecurringEvent(event: Event) : void {
-        var rule = getRule(event.Period);
-
-        rule.all().forEach(date => {
-            let eventCal;
-
-            eventCal = {
-                title: event.Name,
-                color: { primary: event.Color },
-                meta: event,
-                actions: []
+            let dict = {
+                "d": "day",
+                "w": "week",
+                "m": "month"
             };
 
-            eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
+            let newViewMode = dict[e.key];
 
-            if (event.IsAllDay) {
-                eventCal.start = date;
-                eventCal.end = setEndOfDay(date);
+            if (newViewMode !== this.model.viewMode)
+                this.changeViewMode(dict[e.key]);
+
+            return false;
+        }));
+
+        this.hotkeysService.add(new Hotkey(["alt+p", "alt+t", "alt+n"], (e: KeyboardEvent): boolean => {
+            e.preventDefault();
+
+            let dict = {
+                "p": "calendar-previous-btn",
+                "t": "calendar-today-btn",
+                "n": "calendar-next-btn"
+            };
+
+            document.getElementById(dict[e.key]).click();
+            return false;
+        }));
+    }
+    
+    private configureSignalR() : void {
+        this.notificationListener.OnEventInCalendarCreated((creator, name, calendarName) => {
+            this.pushNotifService.PushNotification(`Has created event "${name}" in your calendar "${calendarName}"`, creator);
+        });
+
+        this.notificationListener.OnEventEdited((editor, name, newName) => {
+            let message: string;
+
+            if (name === newName) {
+                message = `Has edited your event "${name}".`
             } else {
-                eventCal.start = getLocalTime(mergeDateTime(date, event.StartTime));
-                eventCal.end = getLocalTime(mergeDateTime(date, event.EndTime));
+                message = `Has renamed your event "${name}" to "${newName}".`;
             }
 
-            this.setEventActions(eventCal, event);
-            this.calendarEvents.push(eventCal);
+            this.pushNotifService.PushNotification(message, editor);
         });
-    }
 
-    private setEventActions(eventCal: CalendarEvent<Event>, event: Event) : void {
-        if (!event.IsReadOnly) {
-            eventCal.actions.push(this.actions[0]);
-        }
+        this.notificationListener.OnInvitationAccepted((event, user) => {
+            this.pushNotifService.PushNotification(`Has accepted your invitation to event "${event}".`, user);
+        });
 
-        if (event.Owner.Id === this.currentUser.Id) {
-            eventCal.actions.push(this.actions[1]);
-        }
+        this.notificationListener.OnInvitationRejected((event, user) => {
+            this.pushNotifService.PushNotification(`Has rejected your invitation to event "${event}".`, user);
+        });
 
-        eventCal.actions.push(this.actions[2]);
-    }
+        this.notificationListener.OnRemovedFromEvent((name, owner) => {
+            this.pushNotifService.PushNotification(`Has removed you from event "${name}".`, owner);
+        });
 
-    private getDates() : DatesModel {
-        var dates = new DatesModel();
-        var curMoment = moment(this.viewDate).locale(this.locale);
+        this.notificationListener.OnEventReadOnlyChanged((name, owner, isReadOnly) => {
+            let perm: string = isReadOnly ? "You can only read the event."
+                                        : "Now you are able to edit the event.";
 
-        if (this.viewMode == "day") {
-            dates.StartDate = curMoment.startOf("day").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("day").format("YYYY-MM-DD").toString();
-        } else if (this.viewMode == "week") {
-            dates.StartDate = curMoment.startOf("week").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("week").format("YYYY-MM-DD").toString();
-        }
-        else {
-            dates.StartDate = curMoment.startOf("month").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("month").format("YYYY-MM-DD").toString();
-        }
+            let message = `Has changed your permissions for event "${name}". ${perm}`;
 
-        console.log(dates);
-        return dates;
-    }
-
-    private getCalendarsColor(id: number) : string {
-        return this.calendars.filter(c => c.Id == id)
-            .map(c => c.Color)[0];
+            this.pushNotifService.PushNotification(message, owner);
+        });
+        
+        this.notificationListener.Start();
     }
 }

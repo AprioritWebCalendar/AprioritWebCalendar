@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ApplicationModule, APP_INITIALIZER } from '@angular/core';
 
-
 import { AppComponent } from './app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,6 +13,8 @@ import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDatepickerModule } from 'ngx-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
+import { ClickOutsideModule } from 'ng-click-outside';
+import { HotkeyModule } from 'angular2-hotkeys';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -27,8 +28,6 @@ import { AnonymousGuard } from './guards/anonymous.guard';
 import { AuthenticationService } from './authentication/services/authentication.service';
 
 import { routing } from './app.routing';
-import { LoginComponent } from './authentication/components/login/login.component';
-import { RegisterComponent } from './authentication/components/register/register.component';
 import { AlertComponent } from './shared/alert/alert.component';
 import { AlertArrayComponent } from './shared/alert-array/alert-array.component';
 
@@ -57,13 +56,33 @@ import { EventMoveComponent } from './event/components/event-move/event-move.com
 import { EventShareComponent } from './event/components/event-share/event-share.component';
 import { EventShareUsersComponent } from './event/components/event-share-users/event-share-users.component';
 import { EventSelectUserShareComponent } from './event/components/event-select-user-share/event-select-user-share.component';
+import { EventSearchComponent } from './event/components/event-search/event-search.component';
+import { InvitationsIncomingComponent } from './invitation/components/invitations-incoming/invitations-incoming.component';
+import { InvitationsIncomingButtonComponent } from './invitation/components/invitations-incoming-button/invitations-incoming-button.component';
+import { InvitationService } from './invitation/services/invitation.service';
+import { InvitationViewComponent } from './invitation/components/invitation-view/invitation-view.component';
+import { CalendarExportComponent } from './calendar/components/calendar-export/calendar-export.component';
+import { CalendarIcalService } from './calendar/services/calendar.ical.service';
+import { CalendarImportComponent } from './calendar/components/calendar-import/calendar-import.component';
+import { CalendarImportPreviewComponent } from './calendar/components/calendar-import-preview/calendar-import-preview.component';
+import { DateFormatPipe } from './pipes/date.format.pipe';
+import { NotificationListener } from './notification/notification.listener';
+import { PushNotificationService } from './services/push.notification.service';
+import { AuthFormComponent } from './authentication/components/auth-form/auth-form.component';
+import { Router } from '@angular/router';
+import { InvitationListener } from './invitation/services/invitation.listener';
+import { CalendarListener } from './calendar/services/calendar.listener';
+import { EventDetailsComponent } from './event/components/event-details/event-details.component';
+import { DateTimeLocalPipe } from './pipes/date.time.local.pipe';
+import { TimeLocalPipe } from './pipes/time.local.pipe';
+import { DateLocalPipe } from './pipes/date.local.pipe';
+import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthPanelComponent,
-    LoginComponent,
-    RegisterComponent,
+    AuthFormComponent,
     AlertComponent,
     AlertArrayComponent,
     MainScreenComponent,
@@ -85,7 +104,22 @@ import { EventSelectUserShareComponent } from './event/components/event-select-u
     EventMoveComponent,
     EventShareComponent,
     EventShareUsersComponent,
-    EventSelectUserShareComponent
+    EventSelectUserShareComponent,
+    EventSearchComponent,
+    InvitationsIncomingComponent,
+    InvitationsIncomingButtonComponent,
+    InvitationViewComponent,
+    CalendarExportComponent,
+    CalendarImportComponent,
+    CalendarImportPreviewComponent,
+    EventDetailsComponent,
+
+    DateFormatPipe,
+    DateLocalPipe,
+    DateTimeLocalPipe,
+    TimeLocalPipe,
+    EventLocationViewComponent
+
   ],
   imports: [
     BrowserModule,
@@ -104,35 +138,53 @@ import { EventSelectUserShareComponent } from './event/components/event-select-u
 
     BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot(),
+    ClickOutsideModule,
+    HotkeyModule.forRoot(),
 
     ngCalendarModule.forRoot(),
-
-
+    
     AgmCoreModule.forRoot({
         apiKey: 'AIzaSyBuPpVTIGkimz2VGPdGP5uSYkH4z43zQXM'
-      }),
+    }),
 
     routing
   ],
   providers: [
     {
-      provide: CustomHttp,
-      deps: [XHRBackend, RequestOptions, ApplicationModule],
-      useFactory: (backend, options, aplicationService) => {
-        var customHttp = new CustomHttp(backend, options, aplicationService);
-        customHttp.getToken();
-        return customHttp;
-      }
+        provide: CustomHttp,
+        deps: [XHRBackend, RequestOptions, Router],
+        useFactory: (backend, options) => {
+            var customHttp = new CustomHttp(backend, options);
+            customHttp.InitializeToken();
+            return customHttp;
+        }
     },
 
-    AuthenticationService,
+    {
+        provide: AuthenticationService,
+        deps: [Http, CustomHttp, Router],
+        useFactory: (http: Http, customHttp: CustomHttp, router: Router) => {
+            
+            var authService = new AuthenticationService(http, customHttp, router);
+            authService.InitializeUser();
+            return authService;
+        }
+    },
 
     AuthorizeGuard,
     AnonymousGuard,
 
     CalendarService,
     UserService,
-    EventService
+    EventService,
+    InvitationService,
+    CalendarIcalService,
+
+    NotificationListener,
+    InvitationListener,
+    CalendarListener,
+
+    PushNotificationService
   ],
   bootstrap: [AppComponent],
   entryComponents: [
@@ -140,12 +192,15 @@ import { EventSelectUserShareComponent } from './event/components/event-select-u
       CalendarEditComponent,
       CalendarDeleteComponent,
       ShareCalendarComponent,
+      CalendarExportComponent,
+      CalendarImportComponent,
 
       EventCreateComponent,
       EventEditComponent,
       EventDeleteComponent,
       EventMoveComponent,
-      EventShareComponent
+      EventShareComponent,
+      EventDetailsComponent
     ]
 })
 export class CalendarModule { }

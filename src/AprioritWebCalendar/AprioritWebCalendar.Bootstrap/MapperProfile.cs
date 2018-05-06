@@ -47,13 +47,15 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.Invitations, opt => opt.Ignore())
                 .ForMember(dest => dest.Owner, opt => opt.Ignore())
                 .ForMember(dest => dest.OwnerId, opt => opt.Ignore());
-                //.ForMember(dest => dest.Period, opt => opt.Ignore());
 
             CreateMap<Data.Models.Event, Business.DomainModels.Event>()
-                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location{ Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude}));
+                .ForMember(dest => dest.Location, opt => opt.Condition(src => src.Longitude != null && src.Lattitude != null))
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new Location { Description = src.LocationDescription, Lattitude = src.Lattitude, Longitude = src.Longitude }));
 
 
             CreateMap<EventRequestModel, Business.DomainModels.Event>();
+
+            CreateMap<Business.DomainModels.Event, EventSearchResultModel>();
 
             #endregion
 
@@ -95,6 +97,8 @@ namespace AprioritWebCalendar.Bootstrap
                 .ForMember(dest => dest.User, opt => opt.Ignore());
 
             CreateMap<Data.Models.Invitation, Business.DomainModels.Invitation>();
+
+            CreateMap<Business.DomainModels.Invitation, InvitationViewModel>();
 
             #endregion
 

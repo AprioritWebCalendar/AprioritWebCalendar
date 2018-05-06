@@ -18,6 +18,9 @@ export class EventPeriodComponent implements OnInit {
     @Input()
     period: PeriodRequestModel = new PeriodRequestModel();
 
+    @Input()
+    minDate: Date;
+
     @Output()
     onPeriodChanged = new EventEmitter<PeriodRequestModel>();
 
