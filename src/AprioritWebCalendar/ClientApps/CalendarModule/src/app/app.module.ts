@@ -77,6 +77,7 @@ import { DateTimeLocalPipe } from './pipes/date.time.local.pipe';
 import { TimeLocalPipe } from './pipes/time.local.pipe';
 import { DateLocalPipe } from './pipes/date.local.pipe';
 import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
+import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
 
 @NgModule({
   declarations: [
@@ -113,13 +114,13 @@ import { EventLocationViewComponent } from './event/components/event-location-vi
     CalendarImportComponent,
     CalendarImportPreviewComponent,
     EventDetailsComponent,
+    EventLocationViewComponent,
 
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
     TimeLocalPipe,
-    EventLocationViewComponent
-
+    MaxTextLengthPipe
   ],
   imports: [
     BrowserModule,
@@ -150,6 +151,10 @@ import { EventLocationViewComponent } from './event/components/event-location-vi
     routing
   ],
   providers: [
+    NotificationListener,
+    InvitationListener,
+    CalendarListener,
+    
     {
         provide: CustomHttp,
         deps: [XHRBackend, RequestOptions, Router],
@@ -162,10 +167,12 @@ import { EventLocationViewComponent } from './event/components/event-location-vi
 
     {
         provide: AuthenticationService,
-        deps: [Http, CustomHttp, Router],
-        useFactory: (http: Http, customHttp: CustomHttp, router: Router) => {
+        deps: [Http, CustomHttp, Router, CalendarListener, InvitationListener, NotificationListener],
+        useFactory: (http: Http, customHttp: CustomHttp, router: Router, calListener: CalendarListener,
+                invListener: InvitationListener,
+                notifListener: NotificationListener) => {
             
-            var authService = new AuthenticationService(http, customHttp, router);
+            var authService = new AuthenticationService(http, customHttp, router, calListener, invListener, notifListener);
             authService.InitializeUser();
             return authService;
         }
@@ -179,10 +186,6 @@ import { EventLocationViewComponent } from './event/components/event-location-vi
     EventService,
     InvitationService,
     CalendarIcalService,
-
-    NotificationListener,
-    InvitationListener,
-    CalendarListener,
 
     PushNotificationService
   ],

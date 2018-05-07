@@ -36,7 +36,6 @@ namespace AprioritWebCalendar.ViewModel.Event
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var errors = new List<ValidationResult>();
-            var nowUtc = DateTime.UtcNow;
 
             if (Period != null)
             {
@@ -52,11 +51,6 @@ namespace AprioritWebCalendar.ViewModel.Event
                 if (StartDate > EndDate)
                 {
                     errors.AddError("StartDate must not be more than EndDate.", nameof(StartDate), nameof(EndDate));
-                }
-
-                if (nowUtc > StartDate || nowUtc > EndDate)
-                {
-                    errors.AddError("You can't create event in the past.", nameof(StartDate), nameof(EndDate));
                 }
             }
 

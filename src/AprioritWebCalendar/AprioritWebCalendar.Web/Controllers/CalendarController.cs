@@ -143,17 +143,28 @@ namespace AprioritWebCalendar.Web.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // TODO: Replace for custom exception.
+            var currentUserId = User.GetUserId();
+            var calendar = await _calendarService.GetCalendarByIdAsync(id, nameof(Calendar.Owner), nameof(Calendar.SharedUsers));
 
-            if (!await _calendarService.IsOwnerAsync(id, this.GetUserId()))
-                throw new ArgumentException();
+            if (calendar.Owner.Id == currentUserId)
+            {
+                if (await _calendarService.IsDefaultAsync(id))
+                    return this.BadRequestError("You can't delete a default calendar.");
 
-            if (await _calendarService.IsDefaultAsync(id))
-                return this.BadRequestError("You can't delete default calendar.");
+                await _calendarService.DeleteCalendarAsync(id);
 
-            // TODO: Check for existing events, etc..?
+                if (calendar.SharedUsers?.Any() == true)
+                    await _calendarManager.CalendarDeletedAsync(calendar.SharedUsers.Select(u => u.UserId), calendar.Id, calendar.Name, calendar.Owner.UserName);
+            }
+            else if (calendar.SharedUsers.Any(u => u.UserId == currentUserId))
+            {
+                await _calendarService.RemoveSharingAsync(id, currentUserId);
+            }
+            else
+            {
+                return this.BadRequestError("You don't have any permissions to this calendar.");
+            }
 
-            await _calendarService.DeleteCalendarAsync(id);
             return Ok();
         }
 

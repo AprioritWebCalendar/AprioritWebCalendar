@@ -8,18 +8,20 @@ import { User } from '../../models/user';
 })
 export class AuthPanelComponent {
 
-    constructor(private authService: AuthenticationService) { }
+    constructor(
+        private _authService: AuthenticationService,
+    ) { }
 
-    isAuthenticated(): boolean {
-        return this.authService.IsAuthenticated();
+    public IsAuthenticated(): boolean {
+        return this._authService.IsAuthenticated();
     }
 
-    getUser(): User {
-        return this.authService.GetCurrentUser();
+    public GetUser(): User {
+        return this._authService.GetCurrentUser();
     }
 
-    logout() {
+    public Logout() {
         if (confirm("Do you really want to log out the account?"))
-            this.authService.Logout();
+            this._authService.Logout();
     }
 }

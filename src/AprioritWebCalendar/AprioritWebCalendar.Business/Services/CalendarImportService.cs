@@ -40,8 +40,8 @@ namespace AprioritWebCalendar.Business.Services
                 
                 ev.Event.OwnerId = calendar.Owner.Id;
 
-                if (ev.Event.IsAllDay && ev.Event.Period == null)
-                    ev.Event.EndDate = ev.Event.EndDate.Value.AddDays(-1);
+                //if (ev.Event.IsAllDay && ev.Event.Period == null)
+                //    ev.Event.EndDate = ev.Event.EndDate.Value.AddDays(-1);
 
                 dataCalendar.EventCalendars.Add(ev);
             }
@@ -108,11 +108,11 @@ namespace AprioritWebCalendar.Business.Services
                 {
                     if (iEvent.IsAllDay)
                     {
-                        dEvent.StartDate = iEvent.DtStart.Value;
-                        dEvent.EndDate = iEvent.DtEnd.Value;
+                        dEvent.StartDate = iEvent.DtStart.Value.Date;
+                        dEvent.EndDate = iEvent.DtEnd.Value.Date;
 
                         if (iEvent.IsAllDay && iEvent.DtEnd.Minute == 0)
-                            dEvent.EndDate = dEvent.EndDate.Value.AddMinutes(-1);
+                            dEvent.EndDate = dEvent.EndDate.Value.AddDays(-1);
                     }
                     else
                     {

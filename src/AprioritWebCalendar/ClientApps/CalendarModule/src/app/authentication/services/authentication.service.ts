@@ -8,6 +8,9 @@ import 'rxjs/add/observable/throw';
 import { User } from "./../models/user";
 import { CustomHttp } from "../../services/custom.http";
 import { Router } from "@angular/router";
+import { CalendarListener } from "../../calendar/services/calendar.listener";
+import { InvitationListener } from "../../invitation/services/invitation.listener";
+import { NotificationListener } from "../../notification/notification.listener";
 
 @Injectable()
 export class AuthenticationService {
@@ -16,17 +19,24 @@ export class AuthenticationService {
     constructor(
         private http : Http, 
         private customHttp : CustomHttp,
-        private router: Router
+        private router: Router,
+        private calendarListener: CalendarListener,
+        private invitationListener: InvitationListener,
+        private notificationListener: NotificationListener
     ) {
     }
 
     public InitializeUser() : void {
         if (this.customHttp.TokenExists()) {
-            this.getUser()
+            this.GetUser()
                 .subscribe((response: User) => {
                     this.currentUser = response;
                     console.log("The current user has been got");
+                    this.InitializeListeners(this.customHttp.GetTokenString());
+                    
                     this.router.navigate(['/']);
+                }, e => {
+                    this.Logout();
                 });
         } else {
             console.log("AuthenticationService: unable to get token.");
@@ -50,6 +60,7 @@ export class AuthenticationService {
 
                 this.customHttp.ConfigureToken(token);
                 this.currentUser = response.json().User;
+                this.InitializeListeners(token);
                 return true;
             })
             .catch(e => {
@@ -68,12 +79,16 @@ export class AuthenticationService {
     }
 
     public Logout() : void {
+        this.calendarListener.Stop();
+        this.invitationListener.Stop();
+        this.notificationListener.Stop();
+
         this.customHttp.ResetToken();
         this.currentUser = null;
         this.router.navigate(['/auth/login']);
     }
 
-    private getUser() : Observable<User> {
+    private GetUser() : Observable<User> {
         return this.customHttp.get("/api/Account")
             .map((response:Response) => {
                 return response.json() as User;
@@ -81,5 +96,11 @@ export class AuthenticationService {
             .catch(e => {
               return Observable.throw(e);  
             });
+    }
+
+    private InitializeListeners(token: string) : void {
+        this.calendarListener.Initialize(token);
+        this.invitationListener.Initialize(token);
+        this.notificationListener.Initialize(token);
     }
 }

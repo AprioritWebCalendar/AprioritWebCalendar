@@ -7,7 +7,7 @@
                 <a class="dropdown-item" (click)="showEditModal(calendarMenu.get('item'))">Edit</a>
             </li>
 
-            <li *ngIf="calendarMenu.get('item.Owner.Id') == UserId && calendarMenu.get('item.IsDefault') != true">
+            <li *ngIf="calendarMenu.get('item.IsDefault') != true">
                 <a class="dropdown-item" (click)="showDeleteModal(calendarMenu.get('item'))">Delete</a>
             </li>
 

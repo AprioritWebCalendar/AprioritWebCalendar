@@ -1,20 +1,12 @@
 import { CustomHttp } from "../services/custom.http";
 import { Injectable } from "@angular/core";
 import { HubConnection, IHubConnectionOptions } from '@aspnet/signalr';
+import { HubListener } from "../services/hub.listener";
 
 @Injectable()
-export class NotificationListener {
-    constructor(
-        private customHttp: CustomHttp
-    ) {
-        this._connection = new HubConnection(`/hub/notification?token=${this.customHttp.GetTokenString()}`);
-    }
-
-    private _connection: HubConnection;
-
-    public Start() : void {
-        this._connection.start();
-        console.log("The NotificationListener is running...");
+export class NotificationListener extends HubListener {
+    constructor() {
+        super("notification");
     }
 
     public OnEventInCalendarCreated(callback: (createdByUser: string, eventName: string, calendarName: string) => void) : void {

@@ -95,18 +95,18 @@ export class LeftCalendarMenuComponent implements OnInit {
     }
 
     showDeleteModal(calendar: CalendarCheck) {
-        var model = {
-            Id: calendar.Id,
-            Name: calendar.Name
+        var params = {
+            calendar: calendar as Calendar,
+            userId: this.UserId
         };
 
-        this.dialogService.addDialog(CalendarDeleteComponent, model)
+        this.dialogService.addDialog(CalendarDeleteComponent, params)
             .subscribe((isOk: boolean) => {
                 if (!isOk)
                     return;
 
                 this.model.Calendars.splice(this.model.Calendars.indexOf(calendar), 1);
-                this.calendarsChanged();
+                this.onCalendarDeleted.emit(calendar.Id as number);
                 this.toastr.success("The calendar has been deleted successfully.");
             });
     }
@@ -232,6 +232,12 @@ export class LeftCalendarMenuComponent implements OnInit {
             this.pushNotifService.PushNotification(message, owner);
 
             this.model.Calendars.filter(c => c.Id == id)[0].IsReadOnly = isReadOnly;
+        });
+
+        this.calendarListener.OnCalendarDeleted((id, name, owner) => {
+            this.pushNotifService.PushNotification(`Has deleted calendar "${name}".`, owner);
+            this.model.RemoveCalendar(id);
+            this.onCalendarDeleted.emit(id);
         });
 
         this.calendarListener.Start();
