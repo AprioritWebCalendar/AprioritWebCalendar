@@ -299,7 +299,9 @@ namespace AprioritWebCalendar.Web.Controllers
             if (userId == currentUserId || ev.Owner.Id == currentUserId)
             {
                 await _eventService.DeleteIntvitedUserAsync(id, userId);
-                await _notificationManager.RemovedFromEventAsync(userId, ev.Name, ev.Owner.UserName);
+
+                if (ev.Owner.Id != currentUserId)
+                    await _notificationManager.RemovedFromEventAsync(userId, ev.Name, ev.Owner.UserName);
 
                 return Ok();
             }

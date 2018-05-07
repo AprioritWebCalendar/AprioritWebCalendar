@@ -20,7 +20,6 @@ export class InvitationsIncomingComponent implements OnInit {
 
     public invitations: Invitation[] = [];
     public isError: boolean = false;
-    public isLoading: boolean = false;
 
     constructor(
         private invitationService: InvitationService,
@@ -30,7 +29,6 @@ export class InvitationsIncomingComponent implements OnInit {
     ) { }
 
     public ngOnInit() : void {
-        this.isLoading = true;
         this.configureSignalR();
     }
 
@@ -65,7 +63,6 @@ export class InvitationsIncomingComponent implements OnInit {
                 console.log(invitations);
 
                 this.invitations = invitations;
-                this.isLoading = false;
             }
         });
 
