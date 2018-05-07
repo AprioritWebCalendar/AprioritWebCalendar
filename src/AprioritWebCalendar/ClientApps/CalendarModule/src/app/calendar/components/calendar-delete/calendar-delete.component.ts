@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
+import { Calendar } from '../../models/calendar';
 
 export interface ICalendarDeleteModel {
-    Id: Number,
-    Name: string;
+    calendar: Calendar;
+    userId: number
 }
 
 @Component({
@@ -12,9 +13,9 @@ export interface ICalendarDeleteModel {
     templateUrl: './calendar-delete.component.html'
 })
 export class CalendarDeleteComponent extends DialogComponent<ICalendarDeleteModel, boolean> implements ICalendarDeleteModel {
-    Id: Number;
-    Name: string;
-
+    calendar: Calendar;
+    userId: number;
+    
     public errors: string[];
 
     constructor(
@@ -33,7 +34,7 @@ export class CalendarDeleteComponent extends DialogComponent<ICalendarDeleteMode
         if (!confirm("Really?"))
             return;
 
-         this.calendarService.deleteCalendar(this.Id)
+         this.calendarService.deleteCalendar(this.calendar.Id)
             .subscribe((isOk: boolean) => {
                 if (isOk) {
                     this.result = true;

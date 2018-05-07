@@ -18,6 +18,19 @@ namespace AprioritWebCalendar.Web.SignalR.Calendar
             await _hub.Clients.Group(sharedUserId.ToString()).SendAsync("calendarShared", new { calendar });
         }
 
+        public async Task CalendarDeletedAsync(IEnumerable<int> usersId, int calendarId, string calendarName, string ownerName)
+        {
+            await _hub.Clients.Groups(usersId.Select(i => i.ToString()).ToList()).SendAsync("calendarDeleted", new
+            {
+                Calendar = new
+                {
+                    Id = calendarId,
+                    Name = calendarName,
+                    Owner = ownerName
+                }
+            });
+        }
+
         public async Task RemovedFromCalendarAsync(int userId, int calendarId, string calendarName, string ownerName)
         {
             await _hub.Clients.Group(userId.ToString()).SendAsync("removedFromCalendar", new

@@ -29,4 +29,8 @@ export class CalendarListener extends HubListener {
             callback(args.Calendar.Id, args.Calendar.Name, args.Calendar.Owner, args.IsReadOnly);
         });
     }
+
+    public OnCalendarDeleted(callback: (id: number, name: string, owner: string) => void) : void {
+        this._connection.on("calendarDeleted", args => callback(args.Calendar.Id, args.Calendar.Name, args.Calendar.Owner));
+    }
 }

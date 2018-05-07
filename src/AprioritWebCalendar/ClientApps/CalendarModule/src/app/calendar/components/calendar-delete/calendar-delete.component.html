@@ -5,13 +5,22 @@
                 (click)="close()">
                     <span aria-hidden="true">&times;</span>
             </button>
-            <h4 class="modal-title">Delete calendar {{Name}}</h4>
+            <h4 class="modal-title">Delete calendar {{calendar.Name}}</h4>
 
             <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
         </div>
 
-        <div class="modal-body">
-            <p>Do you really want to delete this calendar?</p>
+        <div class="modal-body" *ngIf="calendar.Owner.Id == userId">
+            <p>
+                Do you really want to delete this calendar? You are owner, so the calendar will not be available for anybody.
+            </p>
+        </div>
+
+        <div class="modal-body" *ngIf="calendar.Owner.Id != userId">
+            <p>
+                Do you really want to delete yourself from the calendar?
+                If you delete, the calendar may not be shared with you again.
+            </p>
         </div>
 
         <div class="modal-footer">
