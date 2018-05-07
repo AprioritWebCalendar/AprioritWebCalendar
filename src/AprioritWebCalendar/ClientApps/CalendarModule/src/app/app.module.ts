@@ -77,6 +77,7 @@ import { DateTimeLocalPipe } from './pipes/date.time.local.pipe';
 import { TimeLocalPipe } from './pipes/time.local.pipe';
 import { DateLocalPipe } from './pipes/date.local.pipe';
 import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
+import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
 
 @NgModule({
   declarations: [
@@ -113,13 +114,13 @@ import { EventLocationViewComponent } from './event/components/event-location-vi
     CalendarImportComponent,
     CalendarImportPreviewComponent,
     EventDetailsComponent,
+    EventLocationViewComponent,
 
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
     TimeLocalPipe,
-    EventLocationViewComponent
-
+    MaxTextLengthPipe
   ],
   imports: [
     BrowserModule,
