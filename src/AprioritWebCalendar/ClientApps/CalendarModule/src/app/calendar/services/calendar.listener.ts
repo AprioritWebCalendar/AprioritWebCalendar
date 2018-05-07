@@ -2,18 +2,12 @@ import { Injectable } from "@angular/core";
 import { CustomHttp } from "../../services/custom.http";
 import { HubConnection } from "@aspnet/signalr";
 import { Calendar } from "../models/calendar";
+import { HubListener } from "../../services/hub.listener";
 
 @Injectable()
-export class CalendarListener {
-    constructor(private _customHttp: CustomHttp) {
-        this._connection = new HubConnection(`/hub/calendar?token=${this._customHttp.GetTokenString()}`);
-    }
-
-    private _connection: HubConnection;
-
-    public Start() : void {
-        this._connection.start();
-        console.log("The CalendarListener is running...");
+export class CalendarListener extends HubListener {
+    constructor() {
+        super("calendar");
     }
 
     public OnCalendarShared(callback: (calendar: Calendar) => void) : void {

@@ -3,18 +3,12 @@ import { CustomHttp } from "../../services/custom.http";
 import { HubConnection } from "@aspnet/signalr";
 import { Event } from "../../event/models/event";
 import { Invitation } from "../models/invitation";
+import { HubListener } from "../../services/hub.listener";
 
 @Injectable()
-export class InvitationListener {
-    constructor(private _customHttp: CustomHttp) {
-        this._connection = new HubConnection(`/hub/invitation?token=${this._customHttp.GetTokenString()}`);
-    }
-
-    private _connection: HubConnection;
-
-    public Start() : void {
-        this._connection.start();
-        console.log("The InvitationListener is running...");
+export class InvitationListener extends HubListener {
+    constructor() {
+        super("invitation");
     }
 
     public OnIncomingInvitationsReceived(callback: (invitations: Invitation[]) => void) : void {
