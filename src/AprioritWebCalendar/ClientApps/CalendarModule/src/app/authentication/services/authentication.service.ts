@@ -68,8 +68,8 @@ export class AuthenticationService {
             });
     }
 
-    public Register(email : string, userName : string, password : string) : Observable<boolean> {
-        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password})
+    public Register(email : string, userName : string, password : string, timeZone: string) : Observable<boolean> {
+        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password, TimeZone: timeZone })
             .map((response: Response) => {
                 return true;
             })

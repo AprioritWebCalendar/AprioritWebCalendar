@@ -22,6 +22,11 @@ namespace AprioritWebCalendar.Infrastructure.DataTypes
             return TimeZoneInfo.FindSystemTimeZoneById(TZConvert.IanaToWindows(_name));
         }
 
+        public static bool IsValidTimeZoneName(string name)
+        {
+            return TZConvert.KnownIanaTimeZoneNames.Contains(name);
+        }
+
         #region System.Object methods.
 
         public override string ToString() => _name;

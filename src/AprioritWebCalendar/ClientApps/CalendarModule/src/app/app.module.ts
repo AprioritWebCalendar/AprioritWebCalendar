@@ -15,6 +15,7 @@ import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { HotkeyModule } from 'angular2-hotkeys';
+import { TimezonePickerModule } from 'ng2-timezone-selector';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -141,6 +142,7 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     TimepickerModule.forRoot(),
     ClickOutsideModule,
     HotkeyModule.forRoot(),
+    TimezonePickerModule,
 
     ngCalendarModule.forRoot(),
     
