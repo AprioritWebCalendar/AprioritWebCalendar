@@ -79,6 +79,9 @@ import { TimeLocalPipe } from './pipes/time.local.pipe';
 import { DateLocalPipe } from './pipes/date.local.pipe';
 import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
 import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
+import { SettingsMainComponent } from './settings/components/settings-main/settings-main.component';
+import { SettingsTimezoneComponent } from './settings/components/settings-timezone/settings-timezone.component';
+import { SettingsService } from './settings/services/settings.service';
 
 @NgModule({
   declarations: [
@@ -116,6 +119,9 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     CalendarImportPreviewComponent,
     EventDetailsComponent,
     EventLocationViewComponent,
+
+    SettingsMainComponent,
+    SettingsTimezoneComponent,
 
     DateFormatPipe,
     DateLocalPipe,
@@ -188,6 +194,7 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     EventService,
     InvitationService,
     CalendarIcalService,
+    SettingsService,
 
     PushNotificationService
   ],

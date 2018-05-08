@@ -24,6 +24,7 @@ using AprioritWebCalendar.Web.Jobs;
 using AprioritWebCalendar.Web.SignalR.Notifications;
 using AprioritWebCalendar.Web.SignalR.Invitations;
 using AprioritWebCalendar.Web.SignalR.Calendar;
+using AprioritWebCalendar.Web.Formatters;
 
 namespace AprioritWebCalendar.Web
 {
@@ -121,7 +122,10 @@ namespace AprioritWebCalendar.Web
             });
 
             services
-                .AddMvc()
+                .AddMvc(opt =>
+                {
+                    opt.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
+                })
                 .AddJsonOptions(opt =>
                 {
                     // JSON sertializer options.
