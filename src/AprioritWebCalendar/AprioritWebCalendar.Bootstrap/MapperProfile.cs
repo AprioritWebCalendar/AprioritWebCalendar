@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AprioritWebCalendar.Business.DomainModels;
 using AprioritWebCalendar.Data.Models;
+using AprioritWebCalendar.Infrastructure.DataTypes;
 using AprioritWebCalendar.ViewModel.Account;
 using AprioritWebCalendar.ViewModel.Calendar;
 using AprioritWebCalendar.ViewModel.Event;
@@ -14,9 +15,14 @@ namespace AprioritWebCalendar.Bootstrap
             #region User.
 
             CreateMap<ApplicationUser, User>()
-                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed));
+                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed))
+                .ForMember(dest => dest.TimeZone, opt => opt.MapFrom(src => new TimeZoneInfoIana(src.TimeZone)));
 
-            CreateMap<User, UserViewModel>();
+            CreateMap<User, ApplicationUser>()
+                .ForMember(dest => dest.TimeZone, opt => opt.MapFrom(src => src.TimeZone.ToString()));
+
+            CreateMap<User, UserViewModel>()
+                .ForMember(dest => dest.TimeZone, opt => opt.MapFrom(src => src.TimeZone.ToString()));
 
             #endregion
 
