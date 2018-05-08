@@ -42,7 +42,7 @@ namespace AprioritWebCalendar.Business.Services
                 .Where(filter)
                 .ToList();
 
-            var count = invitations.Count;
+            var count = invitations?.Count;
 
             if (count > 0)
             {
@@ -50,7 +50,7 @@ namespace AprioritWebCalendar.Business.Services
                 await _invitationRepository.SaveAsync();
             }
 
-            return count;
+            return count ?? 0;
         }
     }
 }

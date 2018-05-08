@@ -21,7 +21,7 @@ namespace AprioritWebCalendar.Business.Services
         {
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress(_smtpOptions.Login));
+            emailMessage.From.Add(new MailboxAddress(_smtpOptions.FromTitle, _smtpOptions.Login));
             emailMessage.To.Add(new MailboxAddress(email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(TextFormat.Html) { Text = message };
