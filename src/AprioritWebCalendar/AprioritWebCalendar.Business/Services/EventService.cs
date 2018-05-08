@@ -434,11 +434,14 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<bool> CanEditAsync(int eventId, int userId)
         {
+            if (await IsOwnerAsync(eventId, userId))
+                return true;
+
             var eventCalendars = (await _eventCalendarRepository
                 .FindAllIncludingAsync(e => e.EventId == eventId, e => e.Calendar, e => e.Event))
                 .AsEnumerable();
 
-            return eventCalendars.Any(e => e.Calendar.OwnerId == userId && !e.IsReadOnly && (!e.Event.IsPrivate || e.Event.OwnerId == userId));
+            return eventCalendars.Any(ec => ec.Calendar.OwnerId == userId && !ec.IsReadOnly && !ec.Event.IsPrivate);
         }
 
         #region Private methods.
