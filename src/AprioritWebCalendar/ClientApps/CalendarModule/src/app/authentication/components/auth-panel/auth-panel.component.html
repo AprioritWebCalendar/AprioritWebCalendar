@@ -17,7 +17,7 @@
         <h4 class="title">{{GetUser().UserName}}</h4>
         <address>{{GetUser().Email}}</address>
 
-        <button type="button" class="btn btn-primary">Settings</button>
+        <a [routerLink]="['settings']" type="button" class="btn btn-primary">Settings</a>
     </ng-template>
 </ul>
 

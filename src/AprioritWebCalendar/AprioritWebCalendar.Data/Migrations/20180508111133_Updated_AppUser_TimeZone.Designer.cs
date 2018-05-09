@@ -13,9 +13,10 @@ using System;
 namespace AprioritWebCalendar.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180508111133_Updated_AppUser_TimeZone")]
+    partial class Updated_AppUser_TimeZone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

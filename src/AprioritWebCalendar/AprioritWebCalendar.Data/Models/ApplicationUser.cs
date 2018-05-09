@@ -19,10 +19,7 @@ namespace AprioritWebCalendar.Data.Models
             OutcomingInvitations = new HashSet<Invitation>();
         }
 
-        /// <summary>
-        /// Time offset from UTC in minutes.
-        /// </summary>
-        public int TimeOffset { get; set; }
+        public string TimeZone { get; set; }
         
         public ICollection<IdentityUserRole<int>> UserRoles { get; set; }
 

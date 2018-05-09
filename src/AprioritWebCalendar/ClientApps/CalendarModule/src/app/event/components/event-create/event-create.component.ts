@@ -36,6 +36,7 @@ export class EventCreateComponent extends DialogComponent<IEventCreateParams, Ev
     ){
         super(dialogService);
         this.startEndDate = [new Date(), new Date()];
+        this.model.RemindBefore = 15;
     }
 
     // TODO: Localize timepickers.

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AprioritWebCalendar.Infrastructure.Validation;
 
 namespace AprioritWebCalendar.ViewModel.Account
 {
@@ -12,5 +13,8 @@ namespace AprioritWebCalendar.ViewModel.Account
 
         [Required, StringLength(64, MinimumLength = 6)]
         public string Password { get; set; }
+
+        [Required, IanaTimeZone]
+        public string TimeZone { get; set; }
     }
 }

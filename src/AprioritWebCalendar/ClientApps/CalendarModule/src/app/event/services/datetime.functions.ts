@@ -30,7 +30,7 @@ export function getTimeAsDate(time: string) : Date {
 }
 
 export function getTimeAsString(date: Date) : string {
-    return moment(date).utc().format("HH:mm");
+    return moment(date).format("HH:mm");
 }
 
 export function getWithoutTime(date: Date) : Date {
