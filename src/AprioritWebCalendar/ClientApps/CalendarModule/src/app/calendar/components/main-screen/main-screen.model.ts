@@ -56,8 +56,8 @@ export class MainScreenModel {
         eventCal.color.secondary = this.viewMode == "month" ? '#FDF1BA' : event.Color;
 
         if (event.IsAllDay) {
-            eventCal.start = getWithoutTime(new Date(event.StartDate));
-            eventCal.end = setEndOfDay(new Date(event.EndDate));
+            eventCal.start = getWithoutTime(event.StartDate);
+            eventCal.end = setEndOfDay(event.EndDate);
         } else {
             eventCal.start = getLocalTime(mergeDateTime(event.StartDate, event.StartTime));
             eventCal.end = getLocalTime(mergeDateTime(event.EndDate, event.EndTime));
