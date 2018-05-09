@@ -33,7 +33,7 @@ namespace AprioritWebCalendar.Business.Services
             Expression<Func<EventCalendar, bool>> filter = e => e.Event.RemindBefore != null &&
                 ((e.Event.Period != null && dateDate >= e.Event.Period.PeriodStart && dateDate <= e.Event.Period.PeriodEnd)
                 || (e.Event.Period == null && !e.Event.IsAllDay && EFFunctions.DateDiffMinute(e.Event.StartDate.Value.AddMinutes(e.Event.StartTime.Value.TotalMinutes).AddMinutes(-e.Event.RemindBefore.Value), dateTime) == 0)
-                || (e.Event.Period == null && e.Event.IsAllDay && EFFunctions.DateDiffMinute(e.Event.StartDate.Value.AddMinutes(-e.Event.RemindBefore.Value), dateTime) == 0));
+                || (e.Event.Period == null && e.Event.IsAllDay && EFFunctions.DateDiffHour(dateTime, e.Event.StartDate.Value.AddMinutes(-e.Event.RemindBefore.Value)) <= 24));
 
             var eventCalendars = (await _eventCalendarRepository.FindAllIncludingAsync(e => e.Calendar, e => e.Calendar.Owner, e => e.Calendar.SharedUsers,
                         e => e.Event, e => e.Event.Period))
@@ -47,7 +47,8 @@ namespace AprioritWebCalendar.Business.Services
             var domainEventCalendars = _mapper.Map<List<DomainEventCalendar>>(eventCalendars);
 
             domainEventCalendars = CalculateRecurrences(domainEventCalendars)
-                .Where(e => EFFunctions.DateDiffMinute(dateTime, e.Event.StartDate.Value.AddMinutes(e.Event.StartTime?.TotalMinutes ?? 0).AddMinutes(-e.Event.RemindBefore.Value)) == 0)
+                .Where(e => (!e.Event.IsAllDay && EFFunctions.DateDiffMinute(dateTime, e.Event.StartDate.Value.Add(e.Event.StartTime.Value).AddMinutes(-e.Event.RemindBefore.Value)) == 0)
+                             || (e.Event.IsAllDay && EFFunctions.DateDiffMinute(e.Calendar.Owner.TimeZone.ConvertFromUtc(dateTime), e.Event.StartDate.Value.AddMinutes(-e.Event.RemindBefore.Value)) == 0))
                 .ToList();
 
             if (!domainEventCalendars.Any())

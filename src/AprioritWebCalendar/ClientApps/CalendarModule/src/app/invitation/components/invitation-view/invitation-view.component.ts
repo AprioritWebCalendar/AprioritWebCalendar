@@ -1,15 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Invitation } from '../../models/invitation';
-import { InvitationShortEventModel } from './invitation.short.event.model';
 
 @Component({
     selector: 'app-invitation-view',
     templateUrl: './invitation-view.component.html',
     styleUrls: ['./invitation-view.component.css']
 })
-export class InvitationViewComponent implements OnInit {
-    public eventInfo: InvitationShortEventModel = new InvitationShortEventModel();
-
+export class InvitationViewComponent {
     @Input()
     public invitation: Invitation;
 
@@ -18,10 +15,6 @@ export class InvitationViewComponent implements OnInit {
 
     @Output()
     public onRejected = new EventEmitter<Invitation>();
-
-    public ngOnInit(): void {
-        this.eventInfo = InvitationShortEventModel.FromEvent(this.invitation.Event);
-    }
 
     public accept() : void {
         if (!confirm(`Do you really want to accept invitation on event "${this.invitation.Event.Name}"?`))

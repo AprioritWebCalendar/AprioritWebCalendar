@@ -20,7 +20,7 @@ export class EventRequestModel {
 
     public IsAllDay: boolean;
     public IsPrivate: boolean = false;
-    public RemindBefore?: number = 15;
+    public RemindBefore?: number;
 
     public Location: Location = new Location();
     public Period: PeriodRequestModel = new PeriodRequestModel();

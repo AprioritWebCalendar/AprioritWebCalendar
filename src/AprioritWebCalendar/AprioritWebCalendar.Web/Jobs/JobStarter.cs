@@ -25,7 +25,7 @@ namespace AprioritWebCalendar.Web.Jobs
 
             var trigger = TriggerBuilder.Create()
                 .WithIdentity("NotificationTrigger", "NotificationGroup")
-                .StartNow()
+                .StartAt(DateTimeOffset.Now.AddMinutes(1))
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
                 .Build();
 
@@ -38,7 +38,7 @@ namespace AprioritWebCalendar.Web.Jobs
 
             var trigger = TriggerBuilder.Create()
                 .WithIdentity("InvitationsDeletingTrigger", "InvitationsDeletingGroup")
-                .StartNow()
+                .StartAt(DateTimeOffset.Now.AddMinutes(1))
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(5).RepeatForever())
                 .Build();
 

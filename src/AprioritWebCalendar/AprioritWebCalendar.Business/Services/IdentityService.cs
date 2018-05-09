@@ -37,7 +37,8 @@ namespace AprioritWebCalendar.Business.Services
             var user = new ApplicationUser
             {
                 Email = registerModel.Email,
-                UserName = registerModel.UserName
+                UserName = registerModel.UserName,
+                TimeZone = registerModel.TimeZone
             };
 
             var result = await _userManager.CreateAsync(user, registerModel.Password);

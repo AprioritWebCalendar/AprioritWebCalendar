@@ -49,7 +49,14 @@ namespace AprioritWebCalendar.Web.Jobs
 
             foreach (var e in eventUsers)
             {
-                var message = $"Don't forget about the event <b>{e.Event.Name}.</b> {e.Event.RemindBefore} minutes left.";
+                var userLocalTime = e.Event.StartDate.Value.ToShortDateString();
+
+                if (!e.Event.IsAllDay)
+                {
+                    userLocalTime = e.User.TimeZone.ConvertFromUtc(e.Event.StartDate.Value.Add(e.Event.StartTime.Value)).ToString("F");
+                }
+
+                var message = $"Don't forget about the event <b>{e.Event.Name}.</b> It will start at <b>{userLocalTime}</b>.";
 
                 try
                 {

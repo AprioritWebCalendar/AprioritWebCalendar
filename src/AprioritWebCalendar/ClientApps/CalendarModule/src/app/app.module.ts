@@ -15,6 +15,7 @@ import { ToastModule } from 'ng2-toastr/ng2-toastr';
 import { PopoverModule } from 'ngx-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { HotkeyModule } from 'angular2-hotkeys';
+import { TimezonePickerModule } from 'ng2-timezone-selector';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -78,6 +79,9 @@ import { TimeLocalPipe } from './pipes/time.local.pipe';
 import { DateLocalPipe } from './pipes/date.local.pipe';
 import { EventLocationViewComponent } from './event/components/event-location-view/event-location-view.component';
 import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
+import { SettingsMainComponent } from './settings/components/settings-main/settings-main.component';
+import { SettingsTimezoneComponent } from './settings/components/settings-timezone/settings-timezone.component';
+import { SettingsService } from './settings/services/settings.service';
 
 @NgModule({
   declarations: [
@@ -116,6 +120,9 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     EventDetailsComponent,
     EventLocationViewComponent,
 
+    SettingsMainComponent,
+    SettingsTimezoneComponent,
+
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
@@ -141,6 +148,7 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     TimepickerModule.forRoot(),
     ClickOutsideModule,
     HotkeyModule.forRoot(),
+    TimezonePickerModule,
 
     ngCalendarModule.forRoot(),
     
@@ -186,6 +194,7 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
     EventService,
     InvitationService,
     CalendarIcalService,
+    SettingsService,
 
     PushNotificationService
   ],

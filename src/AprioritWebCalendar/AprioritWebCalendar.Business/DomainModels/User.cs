@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using AprioritWebCalendar.Infrastructure.DataTypes;
 
 namespace AprioritWebCalendar.Business.DomainModels
 {
@@ -9,6 +11,6 @@ namespace AprioritWebCalendar.Business.DomainModels
         public string Email { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public IEnumerable<string> Roles { get; set; } = new List<string>();
-        public int TimeOffset { get; set; }
+        public TimeZoneInfoIana TimeZone { get; set; }
     }
 }

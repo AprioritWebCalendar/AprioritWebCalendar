@@ -51,6 +51,10 @@ export class AuthenticationService {
         return this.currentUser;
     }
 
+    public SetUserTimeZone(timeZone: string) : void {
+        this.currentUser.TimeZone = timeZone;
+    }
+
     public Login(emailOrUserName : string, password : string) : Observable<boolean> {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
@@ -68,8 +72,8 @@ export class AuthenticationService {
             });
     }
 
-    public Register(email : string, userName : string, password : string) : Observable<boolean> {
-        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password})
+    public Register(email : string, userName : string, password : string, timeZone: string) : Observable<boolean> {
+        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password, TimeZone: timeZone })
             .map((response: Response) => {
                 return true;
             })

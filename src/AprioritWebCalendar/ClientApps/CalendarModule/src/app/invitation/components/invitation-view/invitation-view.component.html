@@ -1,21 +1,32 @@
 <div class="panel panel-info">
-    <div class="panel-heading">{{eventInfo.Name}} ({{invitation.Invitator.UserName}})</div>
+    <div class="panel-heading">{{invitation.Event.Name}} ({{invitation.Invitator.UserName}})</div>
 
     <div class="panel-body">
-        <p *ngIf="eventInfo.Description != null">{{eventInfo.Description}}</p>
+        <p *ngIf="invitation.Event.Description != null">{{invitation.Event.Description}}</p>
 
-        <dt>Start: </dt>
-        <dd>{{eventInfo.Start}}</dd>
-        
-        <dt>End: </dt>
-        <dd>{{eventInfo.End}}</dd>
-        
-        <i *ngIf="eventInfo.IsRecurring">
-            Recurring
-            <span *ngIf="!eventInfo.IsAllDay"> 
-                ({{eventInfo.PeriodStart}} - {{eventInfo.PeriodEnd}})
-            </span>
-        </i>
+        <span *ngIf="invitation.Event.Period == null && invitation.Event.IsAllDay">
+            <dt>Duration:</dt>
+            <dd>{{invitation.Event.StartDate | dateLocal }} - {{invitation.Event.EndDate | dateLocal }} (All day(s))</dd>
+        </span>
+
+        <span *ngIf="invitation.Event.Period == null && !invitation.Event.IsAllDay">
+            <dt>Duration:</dt>
+            <dd>{{invitation.Event.StartDate | dateTimeLocal:invitation.Event.StartTime}} - {{invitation.Event.EndDate | dateTimeLocal:invitation.Event.EndTime}}</dd>
+        </span>
+
+        <span *ngIf="invitation.Event.Period != null && invitation.Event.IsAllDay">
+            <dt>Duration:</dt>
+            <dd>{{invitation.Event.Period.PeriodStart | dateLocal}} - {{invitation.Event.Period.PeriodEnd | dateLocal}} <i>(Recurring)</i></dd>
+        </span>
+
+        <span *ngIf="invitation.Event.Period != null && !invitation.Event.IsAllDay">
+            <dt>Duration:</dt>
+            <dd>
+                <span>{{invitation.Event.Period.PeriodStart | dateLocal}} - {{invitation.Event.Period.PeriodEnd | dateLocal}}</span> 
+                <span>at: </span>
+                <span>{{invitation.Event.StartTime | timeLocal}} - {{invitation.Event.EndTime | timeLocal}} <i>(Recurring)</i></span>
+            </dd>
+        </span>
     </div>
 
     <div class="panel-footer">

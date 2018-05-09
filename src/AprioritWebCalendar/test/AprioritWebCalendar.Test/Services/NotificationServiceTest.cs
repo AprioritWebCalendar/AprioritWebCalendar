@@ -298,7 +298,10 @@ namespace AprioritWebCalendar.Test.Services
                             StartDate = new DateTime(2018, 6, 30),
                             IsAllDay = true
                         },
-                        Calendar = new Calendar { }
+                        Calendar = new Calendar
+                        {
+                            Owner = new ApplicationUser { TimeZone = "Etc/UTC" }
+                        }
                     }
                 };
 

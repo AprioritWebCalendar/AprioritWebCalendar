@@ -4,4 +4,5 @@ export class User {
     public Email : String;
     public IsEmailConfirmed : Boolean;
     public Roles : Array<String>;
+    public TimeZone: string;
 }

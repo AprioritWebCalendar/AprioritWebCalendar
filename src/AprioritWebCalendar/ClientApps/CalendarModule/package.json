@@ -37,6 +37,7 @@
     "ng-click-outside": "^3.3.0",
     "ng2-bootstrap-modal": "https://github.com/Sky4CE/ng2-bootstrap-modal/tarball/v.1.0.2",
     "ng2-contextmenu": "^1.4.0",
+    "ng2-timezone-selector": "^0.2.4",
     "ng2-toastr": "^4.1.2",
     "ngx-bootstrap": "^2.0.3",
     "ngx-color-picker": "^5.3.8",

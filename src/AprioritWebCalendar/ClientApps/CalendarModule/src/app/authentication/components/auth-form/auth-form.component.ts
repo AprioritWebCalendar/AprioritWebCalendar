@@ -57,7 +57,7 @@ export class AuthFormComponent {
         if (!form.valid)
             return;
 
-        this._authService.Register(this.RegisterModel.Email, this.RegisterModel.UserName, this.RegisterModel.Password)
+        this._authService.Register(this.RegisterModel.Email, this.RegisterModel.UserName, this.RegisterModel.Password, this.RegisterModel.TimeZone)
             .subscribe(r => {
                 this._toastr.success("You have been registered successfully. Sign in to continue.");
                 this.IsLoginOpened = true;
