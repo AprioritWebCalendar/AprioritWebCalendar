@@ -22,9 +22,13 @@ namespace AprioritWebCalendar.Data
         public DbSet<Period> EventPeriods { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
 
+        public DbSet<TelegramCode> TelegramCodes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<TelegramCode>().HasIndex(t => t.Code).IsUnique();
 
             builder.Entity<ApplicationUser>().Property(p => p.Id).UseSqlServerIdentityColumn();
             builder.Entity<ApplicationUser>().HasMany(u => u.UserRoles).WithOne().HasForeignKey(u => u.UserId).IsRequired();
