@@ -40,7 +40,8 @@ namespace AprioritWebCalendar.Bootstrap
 
                 opts.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<AppDbContext>()
-               .AddDefaultTokenProviders();
+               .AddDefaultTokenProviders()
+               .AddUserManager<CustomUserManager>();
         }
 
         public static void UseRepository(this IServiceCollection services)
