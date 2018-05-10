@@ -12,5 +12,8 @@ namespace AprioritWebCalendar.Business.DomainModels
         public bool IsEmailConfirmed { get; set; }
         public IEnumerable<string> Roles { get; set; } = new List<string>();
         public TimeZoneInfoIana TimeZone { get; set; }
+
+        public int? TelegramId { get; set; }
+        public bool? IsTelegramNotificationEnabled { get; set; }
     }
 }

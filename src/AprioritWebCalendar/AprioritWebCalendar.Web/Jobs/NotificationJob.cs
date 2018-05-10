@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Quartz;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.DomainModels;
+using AprioritWebCalendar.Business.Telegram;
 
 namespace AprioritWebCalendar.Web.Jobs
 {
@@ -13,13 +14,16 @@ namespace AprioritWebCalendar.Web.Jobs
     {
         private readonly INotificationService _notificationService;
         private readonly IEmailService _emailService;
+        private readonly ITelegramService _telegramService;
 
         private readonly ILogger _logger;
 
-        public NotificationJob(INotificationService notificationService, IEmailService emailService, ILoggerFactory loggerFactory)
+        public NotificationJob(INotificationService notificationService, IEmailService emailService, ITelegramService telegramService, ILoggerFactory loggerFactory)
         {
             _notificationService = notificationService;
             _emailService = emailService;
+            _telegramService = telegramService;
+
             _logger = loggerFactory.CreateLogger("NotificationJobLogger");
         }
 
@@ -66,6 +70,19 @@ namespace AprioritWebCalendar.Web.Jobs
                 catch (Exception ex)
                 {
                     _logger.LogError($"Unable to send Email ({e.User.Email}), ex: {ex.Message}");
+                }
+
+                if (e.User.IsTelegramNotificationEnabled == true)
+                {
+                    try
+                    {
+                        await _telegramService.SendMessageAsync(e.User.TelegramId.Value, message);
+                        _logger.LogInformation($"Telegram message to {e.User.TelegramId} has been sent.");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Unable to send Telegram message ({e.User.TelegramId}), ex: {ex.Message}");
+                    }
                 }
             }
         }
