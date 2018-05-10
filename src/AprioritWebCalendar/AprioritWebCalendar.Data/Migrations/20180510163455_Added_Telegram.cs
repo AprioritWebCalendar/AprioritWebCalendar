@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AprioritWebCalendar.Data.Migrations
 {
@@ -11,7 +13,7 @@ namespace AprioritWebCalendar.Data.Migrations
                 table: "AspNetUsers",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AddColumn<int>(
                 name: "TelegramId",
                 table: "AspNetUsers",
                 nullable: true);
@@ -20,8 +22,10 @@ namespace AprioritWebCalendar.Data.Migrations
                 name: "TelegramCodes",
                 columns: table => new
                 {
-                    TelegramId = table.Column<string>(nullable: false),
-                    Code = table.Column<string>(nullable: true)
+                    TelegramId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Code = table.Column<string>(nullable: true),
+                    CreatedDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {

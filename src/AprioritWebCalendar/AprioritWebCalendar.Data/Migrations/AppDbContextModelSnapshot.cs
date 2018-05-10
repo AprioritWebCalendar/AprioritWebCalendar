@@ -82,7 +82,7 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<string>("TelegramId");
+                    b.Property<int?>("TelegramId");
 
                     b.Property<string>("TimeZone");
 
@@ -226,10 +226,12 @@ namespace AprioritWebCalendar.Data.Migrations
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.TelegramCode", b =>
                 {
-                    b.Property<string>("TelegramId")
+                    b.Property<int>("TelegramId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Code");
+
+                    b.Property<DateTime>("CreatedDate");
 
                     b.HasKey("TelegramId");
 

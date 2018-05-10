@@ -13,7 +13,7 @@ using System;
 namespace AprioritWebCalendar.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20180510084605_Added_Telegram")]
+    [Migration("20180510163455_Added_Telegram")]
     partial class Added_Telegram
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,7 +83,7 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<string>("TelegramId");
+                    b.Property<int?>("TelegramId");
 
                     b.Property<string>("TimeZone");
 
@@ -227,10 +227,12 @@ namespace AprioritWebCalendar.Data.Migrations
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.TelegramCode", b =>
                 {
-                    b.Property<string>("TelegramId")
+                    b.Property<int>("TelegramId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Code");
+
+                    b.Property<DateTime>("CreatedDate");
 
                     b.HasKey("TelegramId");
 

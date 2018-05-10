@@ -41,13 +41,13 @@ namespace AprioritWebCalendar.Business.Identity
             return user;
         }
 
-        public async Task<ApplicationUser> FindByTelegramIdAsync(string telegramId)
+        public async Task<ApplicationUser> FindByTelegramIdAsync(int telegramId)
         {
             return (await _userRepository.FindAllAsync(u => u.TelegramId.Equals(telegramId)))
                 .FirstOrDefault();
         }
 
-        public async Task AssignTelegramIdAsync(ApplicationUser user, string telegramId)
+        public async Task AssignTelegramIdAsync(ApplicationUser user, int telegramId)
         {
             user.TelegramId = telegramId;
             user.IsTelegramNotificationEnabled = true;

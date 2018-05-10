@@ -66,11 +66,11 @@ namespace AprioritWebCalendar.Business.Services
             return _mapper.Map<IEnumerable<User>>(users);
         }
 
-        public async Task AssignTelegramIdAsync(int userId, string telegramId)
+        public async Task AssignTelegramIdAsync(int userId, int telegramId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (!string.IsNullOrEmpty(user.TelegramId))
+            if (user.TelegramId != null)
                 throw new InvalidOperationException();
 
             await _userManager.AssignTelegramIdAsync(user, telegramId);
@@ -80,7 +80,7 @@ namespace AprioritWebCalendar.Business.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (string.IsNullOrEmpty(user.TelegramId))
+            if (user.TelegramId == null)
                 throw new InvalidOperationException();
 
             await _userManager.ResetTelegramIdAsync(user);

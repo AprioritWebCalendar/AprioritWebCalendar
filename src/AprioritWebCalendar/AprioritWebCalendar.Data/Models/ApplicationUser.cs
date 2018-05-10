@@ -21,7 +21,7 @@ namespace AprioritWebCalendar.Data.Models
 
         public string TimeZone { get; set; }
 
-        public string TelegramId { get; set; }
+        public int? TelegramId { get; set; }
         public bool? IsTelegramNotificationEnabled { get; set; }
         
         public ICollection<IdentityUserRole<int>> UserRoles { get; set; }
