@@ -6,6 +6,7 @@ using System.Net.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using AprioritWebCalendar.Infrastructure.Options;
+using System.Dynamic;
 
 namespace AprioritWebCalendar.Business.Telegram
 {
@@ -43,7 +44,8 @@ namespace AprioritWebCalendar.Business.Telegram
             var message = new
             {
                 chat_id = telegramId,
-                text
+                text,
+                parse_mode = "html"
             };
 
             return await PerformTelegramRequest<TelegramMessage>("sendMessage", message);
