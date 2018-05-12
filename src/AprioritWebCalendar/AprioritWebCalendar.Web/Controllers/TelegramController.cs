@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Mvc;
+using AprioritWebCalendar.Business.Interfaces;
+using AprioritWebCalendar.Business.Telegram;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -11,10 +12,121 @@ namespace AprioritWebCalendar.Web.Controllers
     [Route("api/Telegram")]
     public class TelegramController : Controller
     {
-        [HttpPost]
-        public async Task<IActionResult> WebHook()
+        private readonly ITelegramService _telegramService;
+        private readonly ITelegramVerificationService _telegramVerificationService;
+        private readonly IIdentityService _identityService;
+
+        private TelegramMessageUpdate _update;
+        private int _telegramId;
+
+        private readonly Dictionary<string, Func<Task<IActionResult>>> _responses = new Dictionary<string, Func<Task<IActionResult>>>();
+
+        public TelegramController(ITelegramService telegramService, ITelegramVerificationService telegramVerificationService, IIdentityService identityService)
         {
+            _telegramService = telegramService;
+            _telegramVerificationService = telegramVerificationService;
+            _identityService = identityService;
+
+            _responses.Add("start", _Start);
+            _responses.Add("connect", _Connect);
+            _responses.Add("reset", _Reset);
+            _responses.Add("pause", _Pause);
+            _responses.Add("resume", _Resume);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> WebHook([FromBody]TelegramMessageUpdate update)
+        {
+            _update = update;
+            _telegramId = update.Message.From.Id;
+
+            return await _responses[update.Message.GetCommandWithoutSlash()]();
+        }
+
+        private async Task<IActionResult> _Connect()
+        {
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user != null)
+            {
+                return await _SendMessageResponse($"Your Telegram account is already connected with user <b>{user.UserName}</b>.");
+            }
+            else
+            {
+                var code = await _telegramVerificationService.GetVerificationCodeAsync(_telegramId);
+
+                var message = @"Use this token to connect with account on the site.<br>Open **Settings** > **Telegram** and put the code in the field and press **Connect**
+                                If everything is OK, the account will be connected. Do not show the message with code to anybody. 
+                                If you change one's mind and do not want to connect account, I advice you to delete the message with the code.";
+
+                await _SendMessage(message);
+                return await _SendMessageResponse(code);
+            }
+        }
+
+        private async Task<IActionResult> _Pause()
+        {
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user == null)
+                return await _SendMessageResponse("Your Telegram account is not connected with any profile.");
+
+            if (user.IsTelegramNotificationEnabled == false)
+                return await _SendMessageResponse("Notifications are already disabled.");
+
+            await _identityService.DisableTelegramNotificationsAsync(user.Id);
+            return await _SendMessageResponse("Notifications have been disabled successfully.");
+        }
+
+        private async Task<IActionResult> _Resume()
+        {
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user == null)
+                return await _SendMessageResponse("Your Telegram account is not connected with any profile.");
+
+            if (user.IsTelegramNotificationEnabled == true)
+                return await _SendMessageResponse("Notifications are already enabled.");
+
+            await _identityService.DisableTelegramNotificationsAsync(user.Id);
+            return await _SendMessageResponse("Notifications have been enabled successfully.");
+        }
+
+        private async Task<IActionResult> _Reset()
+        {
+            string message = null;
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user == null)
+            {
+                message = "Your Telegram account is not connected with any profile.";
+            }
+            else
+            {
+                await _identityService.ResetTelegramIdAsync(user.Id);
+                message = $"Your Telegram account has been disconnected with a profile <b>{user.UserName}</b>.";
+            }
+
+            return await _SendMessageResponse(message);
+        }
+
+        private async Task<IActionResult> _Start()
+        {
+            var message = @"Hello, I'm <b>Web Calendar Bot</b>. I can send notifications about nearest events in your calenadr.<br>But... 
+                            You have to connect your Telegram account with account from the site.<br>
+                            Run <i>/connect</i> command and follow the promts.";
+            return await _SendMessageResponse(message);
+        }
+
+        private async Task<IActionResult> _SendMessageResponse(string message)
+        {
+            await _SendMessage(message);
             return Ok();
+        }
+
+        private async Task _SendMessage(string message)
+        {
+            await _telegramService.SendMessageAsync(_telegramId, message);
         }
     }
 }

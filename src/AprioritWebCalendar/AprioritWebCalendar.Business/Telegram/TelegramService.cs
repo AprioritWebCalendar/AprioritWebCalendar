@@ -6,7 +6,6 @@ using System.Net.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using AprioritWebCalendar.Infrastructure.Options;
-using System.Dynamic;
 
 namespace AprioritWebCalendar.Business.Telegram
 {
@@ -23,6 +22,8 @@ namespace AprioritWebCalendar.Business.Telegram
             {
                 BaseAddress = new Uri($"https://api.telegram.org/bot{_telegramOptions.BotToken}/")
             };
+
+            SetWebHookAsync();
         }
 
         public async Task SetWebHookAsync()

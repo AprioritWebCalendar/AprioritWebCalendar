@@ -7,6 +7,7 @@ using AprioritWebCalendar.Business.Identity;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Data.Interfaces;
 using AprioritWebCalendar.Data.Models;
+using AprioritWebCalendar.Infrastructure.Exceptions;
 
 namespace AprioritWebCalendar.Business.Services
 {
@@ -23,20 +24,20 @@ namespace AprioritWebCalendar.Business.Services
             _userManager = userManager;
         }
 
-        public async Task<bool> TryVerifyAsync(int userId, string code)
+        public async Task<int> TryVerifyAsync(int userId, string code)
         {
             var telegramIdCode = (await _codesRepository.FindAllAsync(c => c.Code.Equals(code)))
                 .FirstOrDefault();
 
             if (telegramIdCode == null)
-                return false;
+                throw new NotFoundException();
 
             await _codesRepository.RemoveAsync(telegramIdCode);
 
             var user = await _userManager.FindByIdAsync(userId);
             await _userManager.AssignTelegramIdAsync(user, telegramIdCode.TelegramId);
 
-            return true;
+            return telegramIdCode.TelegramId;
         }
 
         public async Task<string> GetVerificationCodeAsync(int telegramId)

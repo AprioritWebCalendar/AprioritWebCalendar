@@ -23,6 +23,7 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <returns></returns>
         Task<IEnumerable<User>> FindUsersAsync(string emailOrUserName, int currentUserId);
 
+        Task<User> GetByTelegramIdAsync(int telegramId);
         Task AssignTelegramIdAsync(int userId, int telegramId);
         Task ResetTelegramIdAsync(int userId);
         Task EnableTelegramNotificationsAsync(int userId);

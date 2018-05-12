@@ -10,5 +10,8 @@ namespace AprioritWebCalendar.ViewModel.Account
         public bool IsEmailConfirmed { get; set; }
         public IEnumerable<string> Roles { get; set; } = new List<string>();
         public string TimeZone { get; set; }
+
+        public int? TelegramId { get; set; }
+        public bool? IsTelegramNotificationEnabled { get; set; }
     }
 }

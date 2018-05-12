@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Infrastructure.DataTypes;
 using AprioritWebCalendar.Web.Extensions;
+using AprioritWebCalendar.Business.Telegram;
+using AprioritWebCalendar.Infrastructure.Exceptions;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -16,10 +18,20 @@ namespace AprioritWebCalendar.Web.Controllers
     public class SettingsController : Controller
     {
         private readonly ISettingsService _settingsService;
+        private readonly ITelegramService _telegramService;
+        private readonly ITelegramVerificationService _telegramVerificationService;
+        private readonly IIdentityService _identityService;
 
-        public SettingsController(ISettingsService settingsService)
+        public SettingsController(
+            ISettingsService settingsService,
+            ITelegramService telegramService,
+            ITelegramVerificationService telegramVerificationService, 
+            IIdentityService identityService)
         {
             _settingsService = settingsService;
+            _telegramService = telegramService;
+            _telegramVerificationService = telegramVerificationService;
+            _identityService = identityService;
         }
 
         [HttpGet("TimeZone")]
@@ -37,6 +49,21 @@ namespace AprioritWebCalendar.Web.Controllers
 
             await _settingsService.SetTimeZoneAsync(User.GetUserId(), new TimeZoneInfoIana(timeZone));
             return Ok();
+        }
+
+        [HttpPost("Telegram")]
+        public async Task<IActionResult> ConnectAccount([FromBody]string code)
+        {
+            try
+            {
+                var telegramId = await _telegramVerificationService.TryVerifyAsync(User.GetUserId(), code);
+                await _telegramService.SendMessageAsync(telegramId, $"Your Telegram account has been connected to **{User.Identity.Name}** profile successfully.");
+                return Ok(new { TelegramId = telegramId });
+            }
+            catch (NotFoundException)
+            {
+                return this.BadRequestError("The verification code is invalid.");
+            }
         }
     }
 }
