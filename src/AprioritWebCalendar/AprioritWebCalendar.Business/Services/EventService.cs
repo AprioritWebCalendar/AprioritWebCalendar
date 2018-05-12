@@ -51,16 +51,21 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<IEnumerable<DomainEvent>> GetEventsAsync(int userId, DateTime startDate, DateTime endDate, params int[] calendarsIds)
         {
+            startDate = startDate.Date;
+            endDate = endDate.Date;
+
             // TODO: Needs optimization and refactoring.
             Expression<Func<Event, bool>> filter = e => ((e.Period == null && 
                     (
-                        (startDate <= e.StartDate && endDate >= e.EndDate) || (startDate >= e.StartDate && endDate <= e.EndDate)
+                        (startDate <= e.StartDate && endDate >= e.EndDate)
+                        || (startDate >= e.StartDate && endDate <= e.EndDate)
                         || (startDate >= e.StartDate && endDate >= e.EndDate && startDate <= e.EndDate)
                         || (startDate <= e.StartDate && endDate <= e.EndDate && endDate >= e.StartDate)
                     ))
                 || (e.Period != null && 
                 (
-                        (startDate <= e.Period.PeriodStart && endDate >= e.Period.PeriodEnd) || (startDate >= e.Period.PeriodStart && endDate <= e.Period.PeriodEnd)
+                        (startDate <= e.Period.PeriodStart && endDate >= e.Period.PeriodEnd) 
+                        || (startDate >= e.Period.PeriodStart && endDate <= e.Period.PeriodEnd)
                         || (startDate >= e.Period.PeriodStart && endDate >= e.Period.PeriodEnd && startDate <= e.Period.PeriodEnd)
                         || (startDate <= e.Period.PeriodStart && endDate <= e.Period.PeriodEnd && endDate >= e.Period.PeriodStart)
                 )))

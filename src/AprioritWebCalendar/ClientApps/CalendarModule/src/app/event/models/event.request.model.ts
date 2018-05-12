@@ -73,11 +73,24 @@ export class EventRequestModel {
             let start = mergeDateTime(getWithoutTime(new Date(startEndDate[0])), this.StartTime);
             let end = mergeDateTime(getWithoutTime(new Date(startEndDate[1])), this.EndTime);
 
-            this.StartDate = moment(getWithoutTime(start)).format();
-            this.EndDate = moment(getWithoutTime(end)).format();
+            let utcStart = moment(start).utc();
+            let utcEnd = moment(end).utc();
 
-            this.StartTime = getTimeAsString(start);
-            this.EndTime = getTimeAsString(end);
+            console.log([utcStart, utcEnd]);
+
+            this.StartDate = utcStart.format("MM-DD-YYYY");
+            this.EndDate = utcEnd.format("MM-DD-YYYY");
+
+            this.StartTime = utcStart.format("HH:mm:ss");
+            this.EndTime = utcEnd.format("HH:mm:ss");
+
+            // console.log([start, end]);
+
+            // this.StartDate = moment(getWithoutTime(start)).format();
+            // this.EndDate = moment(getWithoutTime(end)).format();
+
+            // this.StartTime = getTimeAsString(start);
+            // this.EndTime = getTimeAsString(end);
         } else if (this.IsAllDay && !this.IsRecurrent) {
             this.StartDate = moment(getWithoutTime(new Date(startEndDate[0]))).format();
             this.EndDate = moment(getWithoutTime(new Date(startEndDate[1]))).format();
