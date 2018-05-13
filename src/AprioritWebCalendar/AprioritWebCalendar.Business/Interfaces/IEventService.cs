@@ -26,6 +26,8 @@ namespace AprioritWebCalendar.Business.Interfaces
         /// <returns>Enumeration of events.</returns>
         Task<IEnumerable<Event>> GetEventsByNameAsync(string name, int userId, int take);
 
+        Task<IEnumerable<Event>> GetEventsByDateAsync(int userId, DateTime date);
+
         /// <summary>
         /// Gets event by ID without related entities.
         /// </summary>

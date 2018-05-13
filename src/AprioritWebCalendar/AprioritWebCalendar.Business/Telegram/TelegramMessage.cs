@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -19,7 +20,7 @@ namespace AprioritWebCalendar.Business.Telegram
         public string Text { get; set; }
 
         [JsonProperty("date")]
-        public int Date { get; set; }
+        public int DateUnix { get; set; }
 
         [JsonProperty("entities")]
         public IEnumerable<TelegramMessageEntity> Entities { get; set; }
@@ -35,6 +36,11 @@ namespace AprioritWebCalendar.Business.Telegram
                 var commandsCount = Entities?.Count(e => e.IsBotCommand);
                 return commandsCount == 1;
             }
+        }
+
+        public DateTime DateTime
+        {
+            get => new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(DateUnix);
         }
 
         public string GetCommandWithoutSlash()
