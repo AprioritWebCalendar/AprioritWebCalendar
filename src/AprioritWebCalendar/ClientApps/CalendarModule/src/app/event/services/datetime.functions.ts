@@ -33,6 +33,10 @@ export function getTimeAsString(date: Date) : string {
     return moment(date).utc().format("HH:mm");
 }
 
+export function getTimeAsLocalString(date: Date) : string {
+    return moment(date).format("HH:mm");
+}
+
 export function getWithoutTime(date: Date) : Date {
     return moment(date).startOf('day').toDate();
 }
