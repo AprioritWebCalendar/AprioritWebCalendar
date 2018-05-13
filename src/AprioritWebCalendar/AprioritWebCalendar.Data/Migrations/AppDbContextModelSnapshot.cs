@@ -226,18 +226,13 @@ namespace AprioritWebCalendar.Data.Migrations
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.TelegramCode", b =>
                 {
-                    b.Property<int>("TelegramId")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("TelegramId");
 
                     b.Property<string>("Code");
 
                     b.Property<DateTime>("CreatedDate");
 
-                    b.HasKey("TelegramId");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL");
+                    b.HasKey("TelegramId", "Code");
 
                     b.ToTable("TelegramCodes");
                 });

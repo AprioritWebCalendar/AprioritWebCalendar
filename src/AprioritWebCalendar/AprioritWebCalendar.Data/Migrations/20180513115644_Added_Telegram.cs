@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AprioritWebCalendar.Data.Migrations
@@ -22,22 +21,14 @@ namespace AprioritWebCalendar.Data.Migrations
                 name: "TelegramCodes",
                 columns: table => new
                 {
-                    TelegramId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Code = table.Column<string>(nullable: true),
+                    TelegramId = table.Column<int>(nullable: false),
+                    Code = table.Column<string>(nullable: false),
                     CreatedDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TelegramCodes", x => x.TelegramId);
+                    table.PrimaryKey("PK_TelegramCodes", x => new { x.TelegramId, x.Code });
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TelegramCodes_Code",
-                table: "TelegramCodes",
-                column: "Code",
-                unique: true,
-                filter: "[Code] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

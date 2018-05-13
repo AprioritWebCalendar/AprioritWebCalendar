@@ -28,8 +28,6 @@ namespace AprioritWebCalendar.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<TelegramCode>().HasIndex(t => t.Code).IsUnique();
-
             builder.Entity<ApplicationUser>().Property(p => p.Id).UseSqlServerIdentityColumn();
             builder.Entity<ApplicationUser>().HasMany(u => u.UserRoles).WithOne().HasForeignKey(u => u.UserId).IsRequired();
             builder.Entity<ApplicationRole>().HasMany(r => r.UserRoles).WithOne().HasForeignKey(r => r.RoleId).IsRequired();
@@ -37,6 +35,8 @@ namespace AprioritWebCalendar.Data
             builder.Entity<UserCalendar>().HasKey(k => new { k.UserId, k.CalendarId });
             builder.Entity<EventCalendar>().HasKey(k => new { k.EventId, k.CalendarId });
             builder.Entity<Invitation>().HasKey(k => new { k.EventId, k.UserId, k.InvitatorId });
+            builder.Entity<TelegramCode>().HasKey(k => new { k.TelegramId, k.Code });
+
             EFCore.UseDateDiff(builder);
         }
     }

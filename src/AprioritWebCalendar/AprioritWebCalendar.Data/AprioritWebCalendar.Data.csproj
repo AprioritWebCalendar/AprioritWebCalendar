@@ -7,6 +7,9 @@
   <ItemGroup>
     <Compile Remove="Migrations\20180510084605_Added_Telegram.cs" />
     <Compile Remove="Migrations\20180510161423_Updated_TelegramId_int.cs" />
+    <Compile Remove="Migrations\20180510163455_Added_Telegram.cs" />
+    <Compile Remove="Migrations\20180513113728_TelegramCode_TelegramId_NeverDefault.cs" />
+    <Compile Remove="Migrations\20180513114923_TelegramCode_KeysUpdate.cs" />
   </ItemGroup>
 
   <ItemGroup>
