@@ -11,6 +11,7 @@ import { Router } from "@angular/router";
 import { CalendarListener } from "../../calendar/services/calendar.listener";
 import { InvitationListener } from "../../invitation/services/invitation.listener";
 import { NotificationListener } from "../../notification/notification.listener";
+import { TelegramListener } from "../../settings/services/telegram.listener";
 
 @Injectable()
 export class AuthenticationService {
@@ -22,7 +23,8 @@ export class AuthenticationService {
         private router: Router,
         private calendarListener: CalendarListener,
         private invitationListener: InvitationListener,
-        private notificationListener: NotificationListener
+        private notificationListener: NotificationListener,
+        private telegramListener: TelegramListener
     ) {
     }
 
@@ -100,6 +102,7 @@ export class AuthenticationService {
         this.calendarListener.Stop();
         this.invitationListener.Stop();
         this.notificationListener.Stop();
+        this.telegramListener.Stop();
 
         this.customHttp.ResetToken();
         this.currentUser = null;
@@ -120,5 +123,11 @@ export class AuthenticationService {
         this.calendarListener.Initialize(token);
         this.invitationListener.Initialize(token);
         this.notificationListener.Initialize(token);
+        this.telegramListener.Initialize(token);
+
+        this.calendarListener.Start();
+        this.invitationListener.Start();
+        this.notificationListener.Start();
+        this.telegramListener.Start();
     }
 }

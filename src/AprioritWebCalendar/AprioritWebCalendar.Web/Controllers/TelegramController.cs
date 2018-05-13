@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Telegram;
+using AprioritWebCalendar.Web.SignalR.Telegram;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -15,23 +16,29 @@ namespace AprioritWebCalendar.Web.Controllers
         private readonly ITelegramService _telegramService;
         private readonly ITelegramVerificationService _telegramVerificationService;
         private readonly IIdentityService _identityService;
+        private readonly TelegramHubManager _telegramHubManager;
 
         private TelegramMessageUpdate _update;
         private int _telegramId;
 
         private readonly Dictionary<string, Func<Task<IActionResult>>> _responses = new Dictionary<string, Func<Task<IActionResult>>>();
 
-        public TelegramController(ITelegramService telegramService, ITelegramVerificationService telegramVerificationService, IIdentityService identityService)
+        public TelegramController(
+            ITelegramService telegramService,
+            ITelegramVerificationService telegramVerificationService,
+            IIdentityService identityService,
+            TelegramHubManager telegramHubManager)
         {
             _telegramService = telegramService;
             _telegramVerificationService = telegramVerificationService;
             _identityService = identityService;
+            _telegramHubManager = telegramHubManager;
 
             _responses.Add("start", _Start);
             _responses.Add("connect", _Connect);
             _responses.Add("reset", _Reset);
             _responses.Add("pause", _Pause);
-            _responses.Add("resume", _Resume);
+            _responses.Add("restore", _Restore);
         }
 
         [HttpPost]
@@ -78,10 +85,11 @@ namespace AprioritWebCalendar.Web.Controllers
                 return await _SendMessageResponse("Notifications are already disabled.");
 
             await _identityService.DisableTelegramNotificationsAsync(user.Id);
+            await _telegramHubManager.TelegramNotificationsDisabledAsync(user.Id);
             return await _SendMessageResponse("Notifications have been disabled successfully.");
         }
 
-        private async Task<IActionResult> _Resume()
+        private async Task<IActionResult> _Restore()
         {
             var user = await _identityService.GetByTelegramIdAsync(_telegramId);
 
@@ -91,7 +99,8 @@ namespace AprioritWebCalendar.Web.Controllers
             if (user.IsTelegramNotificationEnabled == true)
                 return await _SendMessageResponse("Notifications are already enabled.");
 
-            await _identityService.DisableTelegramNotificationsAsync(user.Id);
+            await _identityService.EnableTelegramNotificationsAsync(user.Id);
+            await _telegramHubManager.TelegramNotificationsEnabledAsync(user.Id);
             return await _SendMessageResponse("Notifications have been enabled successfully.");
         }
 
@@ -107,6 +116,7 @@ namespace AprioritWebCalendar.Web.Controllers
             else
             {
                 await _identityService.ResetTelegramIdAsync(user.Id);
+                await _telegramHubManager.TelegramResetedAsync(user.Id);
                 message = $"Your Telegram account has been disconnected from profile <b>{user.UserName}</b>.";
             }
 

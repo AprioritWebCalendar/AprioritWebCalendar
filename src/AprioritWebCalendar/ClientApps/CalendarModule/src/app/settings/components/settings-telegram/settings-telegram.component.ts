@@ -3,6 +3,7 @@ import { AuthenticationService } from '../../../authentication/services/authenti
 import { ToastsManager } from 'ng2-toastr';
 import { NgForm } from '@angular/forms';
 import { TelegramService } from '../../services/telegram.service';
+import { TelegramListener } from '../../services/telegram.listener';
 
 @Component({
     selector: 'app-settings-telegram',
@@ -12,7 +13,8 @@ export class SettingsTelegramComponent implements OnInit {
     constructor(
         private _telegramService: TelegramService,
         private _authService: AuthenticationService,
-        private _toastr: ToastsManager) { }
+        private _toastr: ToastsManager,
+        private _telegramListener: TelegramListener) { }
 
     public verificationCode: string;
 
@@ -28,6 +30,8 @@ export class SettingsTelegramComponent implements OnInit {
             this.telegramId = user.TelegramId;
             this.enabledState = user.IsTelegramNotificationEnabled;
         }
+
+        this.configureSignalR();
     }
     
     public verifyCode() : void {
@@ -53,37 +57,24 @@ export class SettingsTelegramComponent implements OnInit {
         this.errors = [];
 
         this._telegramService.resetTelegram()
-            .subscribe(r => {
-                this._authService.ResetTelegram();
-                this.telegramId = null;
-                this.enabledState = null;
-
-                this._toastr.success("Telegram account has been disconnected successfully.");
-            }, e => this.processErrors(e));
+            .subscribe(r =>  this.onTelegramReseted(), 
+                        e => this.processErrors(e));
     }
 
     public disableNotifications() : void {
         this.errors = [];
 
         this._telegramService.setNotificationsEnabled(false)
-            .subscribe(r => {
-                this.enabledState = false;
-                this._authService.SetTelegramNotificationsEnabled(false);
-
-                this._toastr.success("Notifications have been disabled succesfully.");
-            }, e => this.processErrors(e));
+            .subscribe(r => this.onTelegramNotificationStateChanged(false), 
+                        e => this.processErrors(e));
     }
 
     public enableNotifications() : void {
         this.errors = [];
 
         this._telegramService.setNotificationsEnabled(true)
-            .subscribe(r => {
-                this.enabledState = true;
-                this._authService.SetTelegramNotificationsEnabled(true);
-
-                this._toastr.success("Notifications have been enabled succesfully.");
-            }, e => this.processErrors(e));
+            .subscribe(r => this.onTelegramNotificationStateChanged(true),
+                        e => this.processErrors(e));
     }
 
     private processErrors(resp: Response) : void {
@@ -94,5 +85,29 @@ export class SettingsTelegramComponent implements OnInit {
         } else {
             this.errors.push("It seems we have some problems. Try again or reload the page.");
         }
+    }
+
+    private onTelegramReseted() : void {
+        this._authService.ResetTelegram();
+        this.telegramId = null;
+        this.enabledState = null;
+
+        this._toastr.success("Telegram account has been disconnected successfully.");
+    }
+
+    private onTelegramNotificationStateChanged(enabled: boolean) : void {
+        this.enabledState = enabled;
+        this._authService.SetTelegramNotificationsEnabled(enabled);
+
+        let message = enabled ? "Notifications have been enabled succesfully." : "Notifications have been disabled succesfully.";
+        this._toastr.success(message);
+    }
+
+    private configureSignalR() : void {
+        this._telegramListener.OnTelegramReseted(() => this.onTelegramReseted());
+
+        this._telegramListener.OnNotificationsDisabled(() => this.onTelegramNotificationStateChanged(false));
+
+        this._telegramListener.OnNotificationsEnabled(() => this.onTelegramNotificationStateChanged(true));
     }
 }

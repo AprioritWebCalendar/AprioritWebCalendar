@@ -239,7 +239,5 @@ export class LeftCalendarMenuComponent implements OnInit {
             this.model.RemoveCalendar(id);
             this.onCalendarDeleted.emit(id);
         });
-
-        this.calendarListener.Start();
     }
 }
