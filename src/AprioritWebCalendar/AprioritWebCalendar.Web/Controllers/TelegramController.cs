@@ -45,6 +45,9 @@ namespace AprioritWebCalendar.Web.Controllers
 
         private async Task<IActionResult> _Connect()
         {
+            if (await _telegramVerificationService.CodeExistsAsync(_telegramId))
+                await _telegramVerificationService.RemoveCodesAsync(_telegramId);
+
             var user = await _identityService.GetByTelegramIdAsync(_telegramId);
 
             if (user != null)
@@ -55,12 +58,12 @@ namespace AprioritWebCalendar.Web.Controllers
             {
                 var code = await _telegramVerificationService.GetVerificationCodeAsync(_telegramId);
 
-                var message = @"Use this token to connect with account on the site.<br>Open **Settings** > **Telegram** and put the code in the field and press **Connect**
-                                If everything is OK, the account will be connected. Do not show the message with code to anybody. 
-                                If you change one's mind and do not want to connect account, I advice you to delete the message with the code.";
+                var message = "Use this token to connect with account on the site.\nOpen <b>Settings</b> > <b>Telegram</b> and put the code in the field and press <b>Connect</b> "
+                                + "If everything is OK, the account will be connected. Do not show the message with code to anybody. "
+                                + "If you change one's mind and do not want to connect account, I advice you to delete the message with the code.";
 
                 await _SendMessage(message);
-                return await _SendMessageResponse(code);
+                return await _SendMessageResponse($"<code>{code}</code>");
             }
         }
 
@@ -104,7 +107,7 @@ namespace AprioritWebCalendar.Web.Controllers
             else
             {
                 await _identityService.ResetTelegramIdAsync(user.Id);
-                message = $"Your Telegram account has been disconnected with a profile <b>{user.UserName}</b>.";
+                message = $"Your Telegram account has been disconnected from profile <b>{user.UserName}</b>.";
             }
 
             return await _SendMessageResponse(message);
@@ -112,9 +115,9 @@ namespace AprioritWebCalendar.Web.Controllers
 
         private async Task<IActionResult> _Start()
         {
-            var message = @"Hello, I'm <b>Web Calendar Bot</b>. I can send notifications about nearest events in your calenadr.<br>But... 
-                            You have to connect your Telegram account with account from the site.<br>
-                            Run <i>/connect</i> command and follow the promts.";
+            var message = "Hello, I'm <b>Web Calendar Bot</b>. I can send notifications about nearest events in your calenadr.\nBut... "
+                            + "You have to connect your Telegram account with account from the site.\n"
+                            + "Run <a>/connect</a> command and follow the promts.";
             return await _SendMessageResponse(message);
         }
 

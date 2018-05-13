@@ -46,7 +46,7 @@ namespace AprioritWebCalendar.Business.Services
 
             do
             {
-                code = _randomDataProvider.GetRandomBase64String(32);
+                code = _randomDataProvider.GetRandomBase64String(64);
             }
             while (await _codesRepository.AnyAsync(c => c.Code.Equals(code)));
 
@@ -58,6 +58,17 @@ namespace AprioritWebCalendar.Business.Services
             await _codesRepository.SaveAsync();
 
             return code;
+        }
+
+        public async Task<bool> CodeExistsAsync(int telegramId)
+        {
+            return await _codesRepository.AnyAsync(c => c.TelegramId == telegramId);
+        }
+
+        public async Task RemoveCodesAsync(int telegramId)
+        {
+            await _codesRepository.RemoveRangeAsync(c => c.TelegramId == telegramId);
+            await _codesRepository.SaveAsync();
         }
     }
 }

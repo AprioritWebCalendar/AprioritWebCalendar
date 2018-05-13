@@ -6,5 +6,7 @@ namespace AprioritWebCalendar.Business.Interfaces
     {
         Task<int> TryVerifyAsync(int userId, string code);
         Task<string> GetVerificationCodeAsync(int telegramId);
+        Task<bool> CodeExistsAsync(int telegramId);
+        Task RemoveCodesAsync(int telegramId);
     }
 }

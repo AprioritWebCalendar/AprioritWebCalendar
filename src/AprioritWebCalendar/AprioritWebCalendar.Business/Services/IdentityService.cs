@@ -75,24 +75,40 @@ namespace AprioritWebCalendar.Business.Services
         public async Task AssignTelegramIdAsync(int userId, int telegramId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.TelegramId != null)
+                throw new InvalidOperationException();
+
             await _userManager.AssignTelegramIdAsync(user, telegramId);
         }
 
         public async Task ResetTelegramIdAsync(int userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.TelegramId == null)
+                throw new InvalidOperationException();
+
             await _userManager.ResetTelegramIdAsync(user);
         }
 
         public async Task EnableTelegramNotificationsAsync(int userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.IsTelegramNotificationEnabled == true)
+                throw new InvalidOperationException();
+
             await _userManager.SetTelegramNotificationsEnableAsync(user, true);
         }
 
         public async Task DisableTelegramNotificationsAsync(int userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.IsTelegramNotificationEnabled == false)
+                throw new InvalidOperationException();
+
             await _userManager.SetTelegramNotificationsEnableAsync(user, true);
         }
     }
