@@ -14,6 +14,7 @@ using DomainEvent = AprioritWebCalendar.Business.DomainModels.Event;
 using DomainUser = AprioritWebCalendar.Business.DomainModels.User;
 using DomainInvitation = AprioritWebCalendar.Business.DomainModels.Invitation;
 using UserInvitation = AprioritWebCalendar.Business.DomainModels.UserInvitation;
+using AprioritWebCalendar.Business.Recurrences;
 
 namespace AprioritWebCalendar.Business.Services
 {
@@ -138,6 +139,34 @@ namespace AprioritWebCalendar.Business.Services
 
             dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
             return _mapper.Map<IEnumerable<DomainEvent>>(dataEvents);
+        }
+
+        public async Task<IEnumerable<DomainEvent>> GetEventsByDateAsync(int userId, DateTime date)
+        {
+            Expression<Func<Event, bool>> filter = e => e.Calendars.Any(c => c.Calendar.OwnerId == userId)
+                && ((e.Period == null && date >= e.StartDate.Value && date <= e.EndDate.Value)
+                    || (e.Period != null && date >= e.Period.PeriodStart && date <= e.Period.PeriodEnd));
+
+
+            var dataEvents = (await _eventRepository.FindAllIncludingAsync(e => e.Period, e => e.Calendars))
+                .Where(filter)
+                .ToList();
+
+            dataEvents.RemoveAll(e => e.IsPrivate && e.OwnerId != userId);
+
+            var domainEvents = _mapper.Map<List<DomainEvent>>(dataEvents);
+            var filteredEvents = domainEvents.Where(e => e.Period == null).ToList();
+
+            foreach (var e in domainEvents.Where(e => e.Period != null))
+            {
+                var calc = new RecurrenceCalculator(e);
+                var rec = calc.GetRecurrences();
+                filteredEvents.AddRange(rec);
+            }
+
+            filteredEvents = filteredEvents.Where(e => EFFunctions.DateDiffDay(date, e.StartDate.Value) >= 0 && EFFunctions.DateDiffDay(date, e.EndDate.Value) <= 0).ToList();
+
+            return filteredEvents.OrderBy(e => e.StartDate.Value.AddMinutes(e.StartTime?.TotalMinutes ?? 0));
         }
 
         public async Task<DomainEvent> GetEventByIdAsync(int eventId)

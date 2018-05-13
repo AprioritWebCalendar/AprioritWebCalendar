@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Telegram;
 using AprioritWebCalendar.Web.SignalR.Telegram;
+using AprioritWebCalendar.Business.DomainModels;
+using System.Text;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -16,6 +18,7 @@ namespace AprioritWebCalendar.Web.Controllers
         private readonly ITelegramService _telegramService;
         private readonly ITelegramVerificationService _telegramVerificationService;
         private readonly IIdentityService _identityService;
+        private readonly IEventService _eventService;
         private readonly TelegramHubManager _telegramHubManager;
 
         private TelegramMessageUpdate _update;
@@ -27,11 +30,13 @@ namespace AprioritWebCalendar.Web.Controllers
             ITelegramService telegramService,
             ITelegramVerificationService telegramVerificationService,
             IIdentityService identityService,
+            IEventService eventService,
             TelegramHubManager telegramHubManager)
         {
             _telegramService = telegramService;
             _telegramVerificationService = telegramVerificationService;
             _identityService = identityService;
+            _eventService = eventService;
             _telegramHubManager = telegramHubManager;
 
             _responses.Add("start", _Start);
@@ -39,16 +44,88 @@ namespace AprioritWebCalendar.Web.Controllers
             _responses.Add("reset", _Reset);
             _responses.Add("pause", _Pause);
             _responses.Add("restore", _Restore);
+
+            _responses.Add("today", _Today);
+            _responses.Add("tomorrow", _Tomorrow);
         }
 
         [HttpPost]
         public async Task<IActionResult> WebHook([FromBody]TelegramMessageUpdate update)
         {
+            if ((DateTime.UtcNow - update.Message.DateTime).TotalMinutes >= 1 || !update.Message.IsBotCommand || !update.Message.IsFromRealUser)
+                return BadRequest();
+
             _update = update;
             _telegramId = update.Message.From.Id;
 
             return await _responses[update.Message.GetCommandWithoutSlash()]();
         }
+
+        private async Task<IActionResult> _Today()
+        {
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user == null)
+            {
+
+            }
+
+            var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, user.TimeZone.ToWindowsTimeZoneInfo());
+            var events = await _eventService.GetEventsByDateAsync(user.Id, date.Date);
+
+            return await _ReturnEventsByDate(events, user.TimeZone.ToWindowsTimeZoneInfo());
+        }
+
+        private async Task<IActionResult> _Tomorrow()
+        {
+            var user = await _identityService.GetByTelegramIdAsync(_telegramId);
+
+            if (user == null)
+            {
+
+            }
+
+            var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, user.TimeZone.ToWindowsTimeZoneInfo());
+            date = date.AddDays(1);
+            var events = await _eventService.GetEventsByDateAsync(user.Id, date.Date);
+
+            return await _ReturnEventsByDate(events, user.TimeZone.ToWindowsTimeZoneInfo());
+        }
+
+        private async Task<IActionResult> _ReturnEventsByDate(IEnumerable<Event> events, TimeZoneInfo timeZone)
+        {
+            if (!events.Any())
+                return await _SendMessageResponse("No events");
+
+            var eventsString = new StringBuilder();
+
+            foreach (var e in events)
+            {
+                eventsString.AppendLine($"<b>{e.Name}</b>");
+
+                if (e.IsAllDay)
+                {
+                    eventsString.AppendLine($"Start: {e.StartDate.Value.ToString("d")}");
+                    eventsString.AppendLine($"End: {e.EndDate.Value.ToString("d")}");
+                }
+                else
+                {
+                    eventsString.AppendLine($"Start: {e.StartDate.Value.AddMinutes(e.StartTime?.TotalMinutes ?? 0).ToString("g")}");
+                    eventsString.AppendLine($"End: {e.EndDate.Value.AddMinutes(e.EndTime?.TotalMinutes ?? 0).ToString("g")}");
+                }
+
+                if (!string.IsNullOrEmpty(e.Location?.Description))
+                {
+                    eventsString.AppendLine($"Location: {e.Location.Description}");
+                }
+
+                eventsString.AppendLine();
+            }
+
+            return await _SendMessageResponse(eventsString.ToString());
+        }
+
+        #region Simple commands.
 
         private async Task<IActionResult> _Connect()
         {
@@ -130,6 +207,8 @@ namespace AprioritWebCalendar.Web.Controllers
                             + "Run <a>/connect</a> command and follow the promts.";
             return await _SendMessageResponse(message);
         }
+
+        #endregion
 
         private async Task<IActionResult> _SendMessageResponse(string message)
         {
