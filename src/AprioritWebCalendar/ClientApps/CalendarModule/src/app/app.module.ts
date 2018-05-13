@@ -82,6 +82,9 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
 import { SettingsMainComponent } from './settings/components/settings-main/settings-main.component';
 import { SettingsTimezoneComponent } from './settings/components/settings-timezone/settings-timezone.component';
 import { SettingsService } from './settings/services/settings.service';
+import { SettingsTelegramComponent } from './settings/components/settings-telegram/settings-telegram.component';
+import { TelegramService } from './settings/services/telegram.service';
+import { TelegramListener } from './settings/services/telegram.listener';
 
 @NgModule({
   declarations: [
@@ -122,12 +125,13 @@ import { SettingsService } from './settings/services/settings.service';
 
     SettingsMainComponent,
     SettingsTimezoneComponent,
+    SettingsTelegramComponent,
 
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
     TimeLocalPipe,
-    MaxTextLengthPipe
+    MaxTextLengthPipe,
   ],
   imports: [
     BrowserModule,
@@ -162,6 +166,7 @@ import { SettingsService } from './settings/services/settings.service';
     NotificationListener,
     InvitationListener,
     CalendarListener,
+    TelegramListener,
     
     {
         provide: CustomHttp,
@@ -175,12 +180,13 @@ import { SettingsService } from './settings/services/settings.service';
 
     {
         provide: AuthenticationService,
-        deps: [Http, CustomHttp, Router, CalendarListener, InvitationListener, NotificationListener],
+        deps: [Http, CustomHttp, Router, CalendarListener, InvitationListener, NotificationListener, TelegramListener],
         useFactory: (http: Http, customHttp: CustomHttp, router: Router, calListener: CalendarListener,
                 invListener: InvitationListener,
-                notifListener: NotificationListener) => {
+                notifListener: NotificationListener,
+                telegramListener: TelegramListener) => {
             
-            var authService = new AuthenticationService(http, customHttp, router, calListener, invListener, notifListener);
+            var authService = new AuthenticationService(http, customHttp, router, calListener, invListener, notifListener, telegramListener);
             authService.InitializeUser();
             return authService;
         }
@@ -195,6 +201,7 @@ import { SettingsService } from './settings/services/settings.service';
     InvitationService,
     CalendarIcalService,
     SettingsService,
+    TelegramService,
 
     PushNotificationService
   ],

@@ -30,6 +30,10 @@ export function getTimeAsDate(time: string) : Date {
 }
 
 export function getTimeAsString(date: Date) : string {
+    return moment(date).utc().format("HH:mm");
+}
+
+export function getTimeAsLocalString(date: Date) : string {
     return moment(date).format("HH:mm");
 }
 

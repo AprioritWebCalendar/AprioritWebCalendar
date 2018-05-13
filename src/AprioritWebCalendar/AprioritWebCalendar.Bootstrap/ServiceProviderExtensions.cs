@@ -11,6 +11,7 @@ using AprioritWebCalendar.Business.Identity;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Services;
 using AprioritWebCalendar.Business.Validation;
+using AprioritWebCalendar.Business.Telegram;
 
 namespace AprioritWebCalendar.Bootstrap
 {
@@ -40,7 +41,8 @@ namespace AprioritWebCalendar.Bootstrap
 
                 opts.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<AppDbContext>()
-               .AddDefaultTokenProviders();
+               .AddDefaultTokenProviders()
+               .AddUserManager<CustomUserManager>();
         }
 
         public static void UseRepository(this IServiceCollection services)
@@ -53,6 +55,7 @@ namespace AprioritWebCalendar.Bootstrap
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IUserAuthenticationService, UserAuthenticationService>();
             services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<ITelegramVerificationService, TelegramVerificationService>();
 
             services.AddTransient<ICalendarService, CalendarService>();
             services.AddTransient<ICalendarValidator, CalendarValidator>();
@@ -67,6 +70,8 @@ namespace AprioritWebCalendar.Bootstrap
 
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<ICacheService, MemoryCacheService>();
+            services.AddSingleton<IRandomDataProvider, RandomDataProvider>();
+            services.AddSingleton<ITelegramService, TelegramService>();
         }
     }
 }

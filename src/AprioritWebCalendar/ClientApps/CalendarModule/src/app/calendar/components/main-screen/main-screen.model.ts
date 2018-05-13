@@ -160,20 +160,29 @@ export class MainScreenModel {
     }
 
     public getDates() : DatesModel {
-        var dates = new DatesModel();
         var curMoment = moment(this.viewDate).locale(this.locale);
 
+        let start, end;
+
         if (this.viewMode == "day") {
-            dates.StartDate = curMoment.startOf("day").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("day").format("YYYY-MM-DD").toString();
+            start = curMoment.startOf("day").toDate();
+            end = curMoment.endOf("day").toDate();
         } else if (this.viewMode == "week") {
-            dates.StartDate = curMoment.startOf("week").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("week").format("YYYY-MM-DD").toString();
+            start = curMoment.startOf("week").toDate();
+            end = curMoment.endOf("week").toDate();
         }
         else {
-            dates.StartDate = curMoment.startOf("month").format("YYYY-MM-DD").toString();
-            dates.EndDate = curMoment.endOf("month").format("YYYY-MM-DD").toString();
+            start = curMoment.startOf("month").toDate();
+            end = curMoment.endOf("month").toDate();
         }
+
+        console.log([start, end]);
+
+        var dates = new DatesModel();
+        dates.StartDate = moment(start).utc().format();
+        dates.EndDate = moment(end).utc().format();
+
+        console.log(dates);
 
         return dates;
     }

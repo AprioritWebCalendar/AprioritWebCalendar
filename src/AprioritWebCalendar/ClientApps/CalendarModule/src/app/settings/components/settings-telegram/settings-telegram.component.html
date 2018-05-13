@@ -1,0 +1,48 @@
+<div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
+    <h4>Telegram</h4>
+    <hr />
+
+    <app-alert-array [alertType]="'danger'" [errors]="errors"></app-alert-array>
+
+    <form *ngIf="telegramId == null">
+        <div class="form-group">
+            <label for="Code" class="control-label">Verification Code</label>
+            <input type="text" id="Code" name="Code" class="form-control"
+                [(ngModel)]="verificationCode" #core="ngModel" />
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-primary"
+                [disabled]="verificationCode == null"
+                (click)="verifyCode()">Connect</button>
+        </div>
+    </form>
+
+    <div *ngIf="telegramId != null">
+        <dl class="form-horizontal">
+            <dt>Telegram ID:</dt>
+            <dd>{{telegramId}}</dd>
+
+            <dt>Notifications:</dt>
+            <dd *ngIf="enabledState == true">Enabled</dd>
+            <dd *ngIf="enabledState == false">Disabled</dd>
+        </dl>
+
+        <div class="row col-md-offset-1">
+            <button type="button" class="btn btn-default" 
+                *ngIf="enabledState == false"
+                (click)="enableNotifications()">
+                    Enable notifications
+            </button>
+            
+            <button type="button" class="btn btn-default" 
+                *ngIf="enabledState == true"
+                (click)="disableNotifications()">
+                    Disable notifications
+            </button>
+
+            <button type="button" class="btn btn-danger"
+                (click)="resetTelegram()">Reset Telegram</button>
+        </div>
+    </div>
+</div>

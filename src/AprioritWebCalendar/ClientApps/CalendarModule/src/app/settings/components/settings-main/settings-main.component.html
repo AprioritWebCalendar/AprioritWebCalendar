@@ -1,6 +1,10 @@
 <h2>Profile Settings</h2>
 <hr />
 
-<app-settings-timezone
-    (onSuccess)="successToast($event)"
-    (onError)="errorToast($event)"></app-settings-timezone>
+<div class="col-md-offset-4">
+    <app-settings-timezone class="row" 
+        (onSuccess)="successToast($event)" 
+        (onError)="errorToast($event)"></app-settings-timezone>
+
+    <app-settings-telegram class="row"></app-settings-telegram>
+</div>

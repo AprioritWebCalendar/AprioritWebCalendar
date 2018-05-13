@@ -10,18 +10,19 @@ using AprioritWebCalendar.Data.Models;
 using AprioritWebCalendar.ViewModel.Account;
 using AprioritWebCalendar.Business.DomainModels;
 using AprioritWebCalendar.Data.Interfaces;
+using AprioritWebCalendar.Business.Identity;
 
 namespace AprioritWebCalendar.Business.Services
 {
     public class IdentityService : IIdentityService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly CustomUserManager _userManager;
         private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IMapper _mapper;
         private readonly ICalendarService _calendarService;
 
         public IdentityService(
-            UserManager<ApplicationUser> userManager, 
+            CustomUserManager userManager, 
             IRepository<ApplicationUser> userRepository,
             IMapper mapper,
             ICalendarService calendarService)
@@ -52,7 +53,7 @@ namespace AprioritWebCalendar.Business.Services
 
         public async Task<User> GetUserAsync(int id)
         {
-            var user = await _userRepository.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             return _mapper.Map<User>(user);
         }
 
@@ -63,6 +64,52 @@ namespace AprioritWebCalendar.Business.Services
 
             var users = await _userRepository.FindAllAsync(filter);
             return _mapper.Map<IEnumerable<User>>(users);
+        }
+
+        public async Task<User> GetByTelegramIdAsync(int telegramId)
+        {
+            var user = await _userManager.FindByTelegramIdAsync(telegramId);
+            return _mapper.Map<User>(user);
+        }
+
+        public async Task AssignTelegramIdAsync(int userId, int telegramId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.TelegramId != null)
+                throw new InvalidOperationException();
+
+            await _userManager.AssignTelegramIdAsync(user, telegramId);
+        }
+
+        public async Task ResetTelegramIdAsync(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.TelegramId == null)
+                throw new InvalidOperationException();
+
+            await _userManager.ResetTelegramIdAsync(user);
+        }
+
+        public async Task EnableTelegramNotificationsAsync(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.IsTelegramNotificationEnabled == true)
+                throw new InvalidOperationException();
+
+            await _userManager.SetTelegramNotificationsEnableAsync(user, true);
+        }
+
+        public async Task DisableTelegramNotificationsAsync(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.IsTelegramNotificationEnabled == false)
+                throw new InvalidOperationException();
+
+            await _userManager.SetTelegramNotificationsEnableAsync(user, false);
         }
     }
 }
