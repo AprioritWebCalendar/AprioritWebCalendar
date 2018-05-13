@@ -5,4 +5,7 @@ export class User {
     public IsEmailConfirmed : Boolean;
     public Roles : Array<String>;
     public TimeZone: string;
+
+    public TelegramId?: number;
+    public IsTelegramNotificationEnabled?: boolean;
 }

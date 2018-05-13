@@ -82,6 +82,8 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
 import { SettingsMainComponent } from './settings/components/settings-main/settings-main.component';
 import { SettingsTimezoneComponent } from './settings/components/settings-timezone/settings-timezone.component';
 import { SettingsService } from './settings/services/settings.service';
+import { SettingsTelegramComponent } from './settings/components/settings-telegram/settings-telegram.component';
+import { TelegramService } from './settings/services/telegram.service';
 
 @NgModule({
   declarations: [
@@ -122,12 +124,13 @@ import { SettingsService } from './settings/services/settings.service';
 
     SettingsMainComponent,
     SettingsTimezoneComponent,
+    SettingsTelegramComponent,
 
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
     TimeLocalPipe,
-    MaxTextLengthPipe
+    MaxTextLengthPipe,
   ],
   imports: [
     BrowserModule,
@@ -195,6 +198,7 @@ import { SettingsService } from './settings/services/settings.service';
     InvitationService,
     CalendarIcalService,
     SettingsService,
+    TelegramService,
 
     PushNotificationService
   ],

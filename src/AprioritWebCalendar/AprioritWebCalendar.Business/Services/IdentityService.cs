@@ -109,7 +109,7 @@ namespace AprioritWebCalendar.Business.Services
             if (user.IsTelegramNotificationEnabled == false)
                 throw new InvalidOperationException();
 
-            await _userManager.SetTelegramNotificationsEnableAsync(user, true);
+            await _userManager.SetTelegramNotificationsEnableAsync(user, false);
         }
     }
 }

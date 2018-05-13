@@ -55,6 +55,20 @@ export class AuthenticationService {
         this.currentUser.TimeZone = timeZone;
     }
 
+    public SetTelegramId(telegramId: number) : void {
+        this.currentUser.TelegramId = telegramId;
+        this.currentUser.IsTelegramNotificationEnabled = true;
+    }
+
+    public ResetTelegram() : void {
+        this.currentUser.TelegramId = null;
+        this.currentUser.IsTelegramNotificationEnabled = null;
+    }
+
+    public SetTelegramNotificationsEnabled(isEnabled: boolean) : void {
+        this.currentUser.IsTelegramNotificationEnabled = isEnabled;
+    }
+
     public Login(emailOrUserName : string, password : string) : Observable<boolean> {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
