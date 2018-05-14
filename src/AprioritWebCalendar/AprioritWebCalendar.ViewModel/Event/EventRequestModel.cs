@@ -81,12 +81,9 @@ namespace AprioritWebCalendar.ViewModel.Event
             }
             else
             {
-                if (StartTime > EndTime)
+                if (StartTime > EndTime && Period == null && EndDate.Value.Date == StartDate.Value.Date)
                 {
-                    if (Period != null || (Period == null && EndDate.Value.Date == StartDate.Value.Date))
-                    {
-                        errors.AddError("StartTime must not be more than EndTime.", nameof(StartTime), nameof(EndTime));
-                    }
+                    errors.AddError("StartTime must not be more than EndTime.", nameof(StartTime), nameof(EndTime));
                 }
             }
 

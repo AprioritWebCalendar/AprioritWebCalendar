@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Event } from '../../models/event';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { EventService } from '../../services/event.service';
 import { UserInvited } from '../../models/user.invited';
 import { ToastsManager } from 'ng2-toastr';
 import { InviteRequestModel } from '../../models/invite.request.model';
 import { InvitationService } from '../../../invitation/services/invitation.service';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventShareParams {
     event: Event;
@@ -15,7 +16,7 @@ export interface IEventShareParams {
     selector: 'app-event-share',
     templateUrl: './event-share.component.html'
 })
-export class EventShareComponent extends DialogComponent<IEventShareParams, boolean> 
+export class EventShareComponent extends CustomDialogComponent<IEventShareParams, boolean> 
                                  implements OnInit, IEventShareParams {
 
     constructor(

@@ -28,8 +28,7 @@
         "../node_modules/bootstrap-sidebar/dist/css/sidebar.css",
         "../node_modules/select2/dist/css/select2.min.css",
         "styles/checkbox.css",
-        "styles/material.switch.css",
-        "styles/modal.scrollable.css"
+        "styles/material.switch.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",

@@ -283,6 +283,10 @@ export class MainScreenComponent implements OnInit {
         this.model.updateEventsByCalendar(calendar);
     }
 
+    private addCalendar(calendar: Calendar) : void {
+        this.model.calendars.push(calendar);
+    }
+
     private configureHotkeys() : void {
         this.hotkeysService.add(new Hotkey("alt+e", (e: KeyboardEvent): boolean => {
             e.preventDefault();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using AprioritWebCalendar.Business.DomainModels;
@@ -20,7 +19,8 @@ namespace AprioritWebCalendar.Test
                     PeriodStart = new DateTime(2006, 4, 30),
                     PeriodEnd = new DateTime(2011, 11, 26),
                     Type = PeriodType.Yearly
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 6;
@@ -41,7 +41,8 @@ namespace AprioritWebCalendar.Test
                     PeriodStart = new DateTime(2009, 4, 19),
                     PeriodEnd = new DateTime(2013, 11, 1),
                     Type = PeriodType.Yearly
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 5;
@@ -62,7 +63,8 @@ namespace AprioritWebCalendar.Test
                     PeriodStart = new DateTime(2016, 2, 11),
                     PeriodEnd = new DateTime(2017, 5, 11),
                     Type = PeriodType.Monthly
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 16;
@@ -83,7 +85,8 @@ namespace AprioritWebCalendar.Test
                     PeriodStart = new DateTime(2017, 9, 20),
                     PeriodEnd = new DateTime(2018, 4, 20),
                     Type = PeriodType.Monthly
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 8;
@@ -104,7 +107,8 @@ namespace AprioritWebCalendar.Test
                     PeriodStart = new DateTime(2018, 2, 12),
                     PeriodEnd = new DateTime(2018, 4, 29),
                     Type = PeriodType.Weekly
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 11;
@@ -126,7 +130,8 @@ namespace AprioritWebCalendar.Test
                     PeriodEnd = new DateTime(2016, 2, 8),
                     Type = PeriodType.Custom,
                     Cycle = 1
-                }
+                },
+                IsAllDay = true
             };
 
             var expected = 53;

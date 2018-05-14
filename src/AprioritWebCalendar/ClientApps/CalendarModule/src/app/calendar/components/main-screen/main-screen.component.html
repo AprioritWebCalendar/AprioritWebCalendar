@@ -1,5 +1,6 @@
 <div>
     <app-left-calendar-menu 
+        (onNewCalendar)="addCalendar($event)"
         (onCalendarsChanged)="setCalendars($event)"
         (onCalendarDeleted)="removeEventsByCalendar($event)"
         (onCalendarUpdated)="updateEventsByCalendar($event)"></app-left-calendar-menu>

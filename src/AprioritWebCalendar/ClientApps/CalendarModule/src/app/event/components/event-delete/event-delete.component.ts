@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../../../authentication/models/user';
 import { Event } from '../../models/event';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { EventService } from '../../services/event.service';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventDeleteParams {
     event: Event;
@@ -13,7 +14,7 @@ export interface IEventDeleteParams {
     selector: 'app-event-delete',
     templateUrl: './event-delete.component.html'
 })
-export class EventDeleteComponent extends DialogComponent<IEventDeleteParams, number>
+export class EventDeleteComponent extends CustomDialogComponent<IEventDeleteParams, number>
                                     implements OnInit, IEventDeleteParams {
     event: Event;
     currentUser: User;

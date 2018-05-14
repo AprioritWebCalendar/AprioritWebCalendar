@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
-import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule, DialogService, DialogComponent } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDatepickerModule } from 'ngx-bootstrap';
@@ -85,6 +85,9 @@ import { SettingsService } from './settings/services/settings.service';
 import { SettingsTelegramComponent } from './settings/components/settings-telegram/settings-telegram.component';
 import { TelegramService } from './settings/services/telegram.service';
 import { TelegramListener } from './settings/services/telegram.listener';
+import { PeriodTypePipe } from './pipes/period.type.pipe';
+import { CustomDialogService } from './services/custom.dialog.service';
+import { CustomDialogComponent } from './services/custom.dialog.component';
 
 @NgModule({
   declarations: [
@@ -132,6 +135,7 @@ import { TelegramListener } from './settings/services/telegram.listener';
     DateTimeLocalPipe,
     TimeLocalPipe,
     MaxTextLengthPipe,
+    PeriodTypePipe
   ],
   imports: [
     BrowserModule,
@@ -203,7 +207,12 @@ import { TelegramListener } from './settings/services/telegram.listener';
     SettingsService,
     TelegramService,
 
-    PushNotificationService
+    PushNotificationService,
+
+    {
+        provide: DialogService,
+        useClass: CustomDialogService
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [

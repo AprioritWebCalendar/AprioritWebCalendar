@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarIcalService } from '../../services/calendar.ical.service';
 import { NgForm } from '@angular/forms';
 import { saveAs } from 'file-saver/FileSaver';
 import { ToastsManager } from 'ng2-toastr';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface ICalendarExportParams {
     id: number;
@@ -14,7 +15,7 @@ export interface ICalendarExportParams {
     selector: 'app-calendar-export',
     templateUrl: './calendar-export.component.html'
 })
-export class CalendarExportComponent extends DialogComponent<ICalendarExportParams, boolean>
+export class CalendarExportComponent extends CustomDialogComponent<ICalendarExportParams, boolean>
                                         implements ICalendarExportParams {
 
     public id: number;

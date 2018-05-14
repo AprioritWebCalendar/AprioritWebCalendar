@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
 import { Calendar } from '../../models/calendar';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface ICalendarDeleteModel {
     calendar: Calendar;
@@ -12,7 +13,7 @@ export interface ICalendarDeleteModel {
     selector: 'app-calendar-delete',
     templateUrl: './calendar-delete.component.html'
 })
-export class CalendarDeleteComponent extends DialogComponent<ICalendarDeleteModel, boolean> implements ICalendarDeleteModel {
+export class CalendarDeleteComponent extends CustomDialogComponent<ICalendarDeleteModel, boolean> implements ICalendarDeleteModel {
     calendar: Calendar;
     userId: number;
     

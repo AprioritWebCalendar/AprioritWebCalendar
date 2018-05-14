@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Calendar } from '../../models/calendar';
-import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
 import { CalendarCheck } from '../left-calendar-menu/calendar.check.model';
 import { NgForm } from '@angular/forms';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface ICalendarEditModel {
     Id: Number;
@@ -16,7 +17,7 @@ export interface ICalendarEditModel {
     selector: 'app-calendar-edit',
     templateUrl: './calendar-edit.component.html'
 })
-export class CalendarEditComponent extends DialogComponent<ICalendarEditModel, ICalendarEditModel> implements ICalendarEditModel {
+export class CalendarEditComponent extends CustomDialogComponent<ICalendarEditModel, ICalendarEditModel> implements ICalendarEditModel {
     Id: Number;
     Name: string;
     Description: string;
