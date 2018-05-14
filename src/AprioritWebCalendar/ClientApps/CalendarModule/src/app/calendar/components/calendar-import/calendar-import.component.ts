@@ -41,6 +41,8 @@ export class CalendarImportComponent extends CustomDialogComponent<CalendarImpor
                 this.calendarPreview = preview;
                 this.isLoading = false;
                 this.isSave = true;
+
+                setTimeout(() => this.close(), 300000);
             }, resp => {
                 var errors = resp.json();
                 this.isLoading = false;

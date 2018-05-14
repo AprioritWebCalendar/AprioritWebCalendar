@@ -1,3 +1,5 @@
-<div class="alert alert-{{alertType}}" role="alert" *ngIf="innerText">
-  {{innerText}}
+<div class="alert alert-{{alertType}}" role="alert">
+    <span *ngIf="innerText">{{innerText}}</span>
+    <br />
+    <ng-content></ng-content>
 </div>

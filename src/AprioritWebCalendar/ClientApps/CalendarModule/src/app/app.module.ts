@@ -88,6 +88,7 @@ import { TelegramListener } from './settings/services/telegram.listener';
 import { PeriodTypePipe } from './pipes/period.type.pipe';
 import { CustomDialogService } from './services/custom.dialog.service';
 import { CustomDialogComponent } from './services/custom.dialog.component';
+import { CountdownComponent } from './shared/countdown/countdown.component';
 
 @NgModule({
   declarations: [
@@ -135,7 +136,8 @@ import { CustomDialogComponent } from './services/custom.dialog.component';
     DateTimeLocalPipe,
     TimeLocalPipe,
     MaxTextLengthPipe,
-    PeriodTypePipe
+    PeriodTypePipe,
+    CountdownComponent
   ],
   imports: [
     BrowserModule,

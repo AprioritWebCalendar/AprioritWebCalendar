@@ -50,6 +50,7 @@ export class SelectUserShareComponent {
                 this.onCalendarShared.emit(userCalendar);
                 this.toastr.success("The calendar has been shared successfully.");
                 this.selectedUser = new User();
+                this.emailOrUserName = null;
             },
             (e: Response) => {
                 this.toastr.error("Unable to share the calendar.");

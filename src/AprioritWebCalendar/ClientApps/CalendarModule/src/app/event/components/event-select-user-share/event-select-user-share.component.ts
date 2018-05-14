@@ -47,6 +47,7 @@ export class EventSelectUserShareComponent implements OnInit {
 
         this.onUserInvited.emit(invitationRequest);
         this.selectedUser = new User();
+        this.emailOrUserName = null;
     }
 
     private cancelInvite() {
