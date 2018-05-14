@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -22,15 +21,13 @@ namespace AprioritWebCalendar.Business.Telegram
             {
                 BaseAddress = new Uri($"https://api.telegram.org/bot{_telegramOptions.BotToken}/")
             };
-
-            SetWebHookAsync();
         }
 
         public async Task SetWebHookAsync()
         {
             var data = new
             {
-                url = _telegramOptions.WebHookUrl,
+                url = _telegramOptions.WebHookUrl + _telegramOptions.BotToken,
                 allowed_updates = _telegramOptions.AllowedUpdates
             };
 

@@ -26,6 +26,8 @@ using AprioritWebCalendar.Web.SignalR.Invitations;
 using AprioritWebCalendar.Web.SignalR.Calendar;
 using AprioritWebCalendar.Web.Formatters;
 using AprioritWebCalendar.Web.SignalR.Telegram;
+using AprioritWebCalendar.Business.Telegram;
+using AprioritWebCalendar.Web.Filters;
 
 namespace AprioritWebCalendar.Web
 {
@@ -172,10 +174,12 @@ namespace AprioritWebCalendar.Web
             services.AddTransient<InvitationHubManager>();
             services.AddTransient<CalendarHubManager>();
             services.AddTransient<TelegramHubManager>();
+
+            services.AddTransient<ValidateTelegramTokenAttribute>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider container)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider container, ITelegramService telegramService, IOptions<TelegramOptions> telegramOptions)
         {
             if (env.IsDevelopment())
             {
@@ -212,6 +216,9 @@ namespace AprioritWebCalendar.Web
             });
 
             JobStarter.RegisterJobs(container);
+
+            if (!string.IsNullOrEmpty(telegramOptions.Value.BotToken) && !string.IsNullOrEmpty(telegramOptions.Value.WebHookUrl))
+                await telegramService.SetWebHookAsync();
         }
     }
 }

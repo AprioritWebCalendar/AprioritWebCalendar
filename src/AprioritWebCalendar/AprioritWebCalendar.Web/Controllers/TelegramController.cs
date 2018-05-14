@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Telegram;
 using AprioritWebCalendar.Web.SignalR.Telegram;
 using AprioritWebCalendar.Business.DomainModels;
-using System.Text;
+using AprioritWebCalendar.ViewModel.Event;
+using AprioritWebCalendar.Web.Filters;
+using AprioritWebCalendar.Infrastructure.DataTypes;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
@@ -21,6 +24,8 @@ namespace AprioritWebCalendar.Web.Controllers
         private readonly IEventService _eventService;
         private readonly TelegramHubManager _telegramHubManager;
 
+        private readonly IMapper _mapper;
+
         private TelegramMessageUpdate _update;
         private int _telegramId;
 
@@ -31,13 +36,15 @@ namespace AprioritWebCalendar.Web.Controllers
             ITelegramVerificationService telegramVerificationService,
             IIdentityService identityService,
             IEventService eventService,
-            TelegramHubManager telegramHubManager)
+            TelegramHubManager telegramHubManager,
+            IMapper mapper)
         {
             _telegramService = telegramService;
             _telegramVerificationService = telegramVerificationService;
             _identityService = identityService;
             _eventService = eventService;
             _telegramHubManager = telegramHubManager;
+            _mapper = mapper;
 
             _responses.Add("start", _Start);
             _responses.Add("connect", _Connect);
@@ -49,12 +56,11 @@ namespace AprioritWebCalendar.Web.Controllers
             _responses.Add("tomorrow", _Tomorrow);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> WebHook([FromBody]TelegramMessageUpdate update)
+        [HttpPost("{token}")]
+        [ServiceFilter(typeof(ValidateTelegramTokenAttribute))]
+        [ValidateTelegramUpdate]
+        public async Task<IActionResult> WebHook(string token, [FromBody]TelegramMessageUpdate update)
         {
-            if ((DateTime.UtcNow - update.Message.DateTime).TotalMinutes >= 1 || !update.Message.IsBotCommand || !update.Message.IsFromRealUser)
-                return BadRequest();
-
             _update = update;
             _telegramId = update.Message.From.Id;
 
@@ -66,14 +72,12 @@ namespace AprioritWebCalendar.Web.Controllers
             var user = await _identityService.GetByTelegramIdAsync(_telegramId);
 
             if (user == null)
-            {
-
-            }
+                return Ok();
 
             var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, user.TimeZone.ToWindowsTimeZoneInfo());
             var events = await _eventService.GetEventsByDateAsync(user.Id, date.Date);
 
-            return await _ReturnEventsByDate(events, user.TimeZone.ToWindowsTimeZoneInfo());
+            return await _ReturnEventsByDate(events, user.TimeZone);
         }
 
         private async Task<IActionResult> _Tomorrow()
@@ -81,48 +85,23 @@ namespace AprioritWebCalendar.Web.Controllers
             var user = await _identityService.GetByTelegramIdAsync(_telegramId);
 
             if (user == null)
-            {
-
-            }
+                return Ok();
 
             var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, user.TimeZone.ToWindowsTimeZoneInfo());
             date = date.AddDays(1);
             var events = await _eventService.GetEventsByDateAsync(user.Id, date.Date);
 
-            return await _ReturnEventsByDate(events, user.TimeZone.ToWindowsTimeZoneInfo());
+            return await _ReturnEventsByDate(events, user.TimeZone);
         }
 
-        private async Task<IActionResult> _ReturnEventsByDate(IEnumerable<Event> events, TimeZoneInfo timeZone)
+        private async Task<IActionResult> _ReturnEventsByDate(IEnumerable<Event> events, TimeZoneInfoIana timeZone)
         {
             if (!events.Any())
                 return await _SendMessageResponse("No events");
 
-            var eventsString = new StringBuilder();
-
-            foreach (var e in events)
-            {
-                eventsString.AppendLine($"<b>{e.Name}</b>");
-
-                if (e.IsAllDay)
-                {
-                    eventsString.AppendLine($"Start: {e.StartDate.Value.ToString("d")}");
-                    eventsString.AppendLine($"End: {e.EndDate.Value.ToString("d")}");
-                }
-                else
-                {
-                    eventsString.AppendLine($"Start: {e.StartDate.Value.AddMinutes(e.StartTime?.TotalMinutes ?? 0).ToString("g")}");
-                    eventsString.AppendLine($"End: {e.EndDate.Value.AddMinutes(e.EndTime?.TotalMinutes ?? 0).ToString("g")}");
-                }
-
-                if (!string.IsNullOrEmpty(e.Location?.Description))
-                {
-                    eventsString.AppendLine($"Location: {e.Location.Description}");
-                }
-
-                eventsString.AppendLine();
-            }
-
-            return await _SendMessageResponse(eventsString.ToString());
+            var viewModels = _mapper.Map<IEnumerable<EventViewModel>>(events);
+            var message = string.Join(string.Empty, viewModels.Select(e => e.ToMessageString(timeZone)));
+            return await _SendMessageResponse(message);
         }
 
         #region Simple commands.
@@ -142,8 +121,8 @@ namespace AprioritWebCalendar.Web.Controllers
             {
                 var code = await _telegramVerificationService.GetVerificationCodeAsync(_telegramId);
 
-                var message = "Use this token to connect with account on the site.\nOpen <b>Settings</b> > <b>Telegram</b> and put the code in the field and press <b>Connect</b> "
-                                + "If everything is OK, the account will be connected. Do not show the message with code to anybody. "
+                var message = "Use this token to connect with account on the site.\nOpen <b>Settings</b> > <b>Telegram</b> and put the code in the field and press <b>Connect</b>\n\n"
+                                +"If everything is OK, the account will be connected. Do not show the message with code to anybody.\n\n"
                                 + "If you change one's mind and do not want to connect account, I advice you to delete the message with the code.";
 
                 await _SendMessage(message);
