@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
 import { LoginModel } from './login.model';
 import { RegisterModel } from './register.model';
@@ -46,9 +46,6 @@ export class AuthFormComponent {
         if (!form.valid)
             return;
 
-        this.RegisterModel.RecaptchaToken = this.getRecaptcha();
-        console.log(this.RegisterModel);
-
         this._authService.Register(this.RegisterModel)
             .subscribe(r => {
                 // this._toastr.success("You have been registered successfully. Sign in to continue.");
@@ -81,17 +78,8 @@ export class AuthFormComponent {
         }
     }
 
-    private getRecaptcha() : string {
-        if (typeof window["grecaptcha"] != null) {
-            var response = window["grecaptcha"].getResponse();
-    
-            if (!response || response.length === 0) {
-                return null;
-            }
-    
-            console.log("recaptcha response has been got.");
-            return response;
-        }
+    public SetRecaptcha(response: string) : void {
+        this.RegisterModel.RecaptchaToken = response;
     }
 
     private loginRequest(emailOrUserName: string, password: string) : void {

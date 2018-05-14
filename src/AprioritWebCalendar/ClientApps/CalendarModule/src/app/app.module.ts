@@ -16,6 +16,7 @@ import { PopoverModule } from 'ngx-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { TimezonePickerModule } from 'ng2-timezone-selector';
+import { ReCaptchaModule } from 'angular5-recaptcha';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -46,7 +47,6 @@ import { UserService } from './services/user.service';
 import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
 import { CalendarViewSwitcherComponent } from './calendar/components/calendar-view-switcher/calendar-view-switcher.component';
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
-import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 import { EventService } from './event/services/event.service';
 import { EventCreateComponent } from './event/components/event-create/event-create.component';
 import { EventPeriodComponent } from './event/components/event-period/event-period.component';
@@ -89,7 +89,6 @@ import { PeriodTypePipe } from './pipes/period.type.pipe';
 import { CustomDialogService } from './services/custom.dialog.service';
 import { CustomDialogComponent } from './services/custom.dialog.component';
 import { CountdownComponent } from './shared/countdown/countdown.component';
-import { RecaptchaComponent } from './shared/recaptcha/recaptcha.component';
 
 @NgModule({
   declarations: [
@@ -108,7 +107,6 @@ import { RecaptchaComponent } from './shared/recaptcha/recaptcha.component';
     SelectUserShareComponent,
     CalendarViewSwitcherComponent,
     AddEventButtonComponent,
-    NotificationsPopoverComponent,
     EventCreateComponent,
     EventPeriodComponent,
     EventLocationComponent,
@@ -138,8 +136,7 @@ import { RecaptchaComponent } from './shared/recaptcha/recaptcha.component';
     TimeLocalPipe,
     MaxTextLengthPipe,
     PeriodTypePipe,
-    CountdownComponent,
-    RecaptchaComponent
+    CountdownComponent
   ],
   imports: [
     BrowserModule,
@@ -161,6 +158,7 @@ import { RecaptchaComponent } from './shared/recaptcha/recaptcha.component';
     ClickOutsideModule,
     HotkeyModule.forRoot(),
     TimezonePickerModule,
+    ReCaptchaModule,
 
     ngCalendarModule.forRoot(),
     
