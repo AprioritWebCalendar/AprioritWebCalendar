@@ -89,6 +89,7 @@ import { PeriodTypePipe } from './pipes/period.type.pipe';
 import { CustomDialogService } from './services/custom.dialog.service';
 import { CustomDialogComponent } from './services/custom.dialog.component';
 import { CountdownComponent } from './shared/countdown/countdown.component';
+import { RecaptchaComponent } from './shared/recaptcha/recaptcha.component';
 
 @NgModule({
   declarations: [
@@ -137,7 +138,8 @@ import { CountdownComponent } from './shared/countdown/countdown.component';
     TimeLocalPipe,
     MaxTextLengthPipe,
     PeriodTypePipe,
-    CountdownComponent
+    CountdownComponent,
+    RecaptchaComponent
   ],
   imports: [
     BrowserModule,

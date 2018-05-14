@@ -12,6 +12,7 @@ import { CalendarListener } from "../../calendar/services/calendar.listener";
 import { InvitationListener } from "../../invitation/services/invitation.listener";
 import { NotificationListener } from "../../notification/notification.listener";
 import { TelegramListener } from "../../settings/services/telegram.listener";
+import { RegisterModel } from "../components/auth-form/register.model";
 
 @Injectable()
 export class AuthenticationService {
@@ -88,8 +89,8 @@ export class AuthenticationService {
             });
     }
 
-    public Register(email : string, userName : string, password : string, timeZone: string) : Observable<boolean> {
-        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password, TimeZone: timeZone })
+    public Register(registerModel: RegisterModel) : Observable<boolean> {
+        return this.http.post("/api/Account/Register", registerModel)
             .map((response: Response) => {
                 return true;
             })
