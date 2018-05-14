@@ -18,6 +18,7 @@ namespace AprioritWebCalendar.Web.Controllers
 {
     [Produces("application/json")]
     [Route("api/Account")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class AccountController : Controller
     {
         private readonly IIdentityService _identityService;
@@ -41,7 +42,6 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> Get()
         {
             var user = await _identityService.GetUserAsync(this.GetUserId());
@@ -49,10 +49,13 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPost("Login")]
-        [OnlyAnonymous]
+        [AllowAnonymous]
         [ValidateApiModelFilter]
         public async Task<IActionResult> Login([FromBody]LoginRequestModel model)
         {
+            if (User.Identity.IsAuthenticated)
+                return Forbid();
+
             try
             {
                 var user = await _userAuthenticationService.FindUserByCredentialsAsync(model);
@@ -72,10 +75,13 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPost("Register")]
-        [OnlyAnonymous]
+        [AllowAnonymous]
         [ValidateApiModelFilter]
         public async Task<IActionResult> Register([FromBody]RegisterRequestModel model)
         {
+            if (User.Identity.IsAuthenticated)
+                return Forbid();
+
             if (!await _captchaService.TryVerifyCaptchaAsync(model.RecaptchaToken))
                 return this.BadRequestError("Invalid captcha.");
 

@@ -9,12 +9,14 @@ using AprioritWebCalendar.Infrastructure.DataTypes;
 using AprioritWebCalendar.Web.Extensions;
 using AprioritWebCalendar.Business.Telegram;
 using AprioritWebCalendar.Infrastructure.Exceptions;
+using AprioritWebCalendar.Web.Filters;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
     [Produces("application/json")]
     [Route("api/Settings")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    [ExceptionHandler]
     public class SettingsController : Controller
     {
         private readonly ISettingsService _settingsService;

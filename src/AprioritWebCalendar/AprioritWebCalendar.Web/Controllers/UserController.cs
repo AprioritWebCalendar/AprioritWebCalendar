@@ -8,12 +8,14 @@ using AutoMapper;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.ViewModel.Account;
 using AprioritWebCalendar.Web.Extensions;
+using AprioritWebCalendar.Web.Filters;
 
 namespace AprioritWebCalendar.Web.Controllers
 {
     [Produces("application/json")]
     [Route("api/User")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    [ExceptionHandler]
     public class UserController : Controller
     {
         private readonly IMapper _mapper;

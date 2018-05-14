@@ -25,6 +25,7 @@ namespace AprioritWebCalendar.Web.Controllers
     [Produces("application/json")]
     [Route("api/Event")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    [ExceptionHandler]
     public class EventController : Controller
     {
         private readonly IEventService _eventService;
