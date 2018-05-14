@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using AprioritWebCalendar.Data;
@@ -12,6 +9,7 @@ using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.Services;
 using AprioritWebCalendar.Business.Validation;
 using AprioritWebCalendar.Business.Telegram;
+using AprioritWebCalendar.Business.Recaptcha;
 
 namespace AprioritWebCalendar.Bootstrap
 {
@@ -72,6 +70,7 @@ namespace AprioritWebCalendar.Bootstrap
             services.AddSingleton<ICacheService, MemoryCacheService>();
             services.AddSingleton<IRandomDataProvider, RandomDataProvider>();
             services.AddSingleton<ITelegramService, TelegramService>();
+            services.AddSingleton<ICaptchaService, RecaptchaService>();
         }
     }
 }

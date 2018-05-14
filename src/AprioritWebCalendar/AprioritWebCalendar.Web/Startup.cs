@@ -28,6 +28,7 @@ using AprioritWebCalendar.Web.Formatters;
 using AprioritWebCalendar.Web.SignalR.Telegram;
 using AprioritWebCalendar.Business.Telegram;
 using AprioritWebCalendar.Web.Filters;
+using AprioritWebCalendar.Business.Recaptcha;
 
 namespace AprioritWebCalendar.Web
 {
@@ -41,7 +42,8 @@ namespace AprioritWebCalendar.Web
                 .SetBasePath(env.ContentRootPath + "\\configs\\")
                 .AddJsonFile("jwtOptions.json", true, true)
                 .AddJsonFile("smtpOptions.json", true, true)
-                .AddJsonFile("telegramOptions.json", true, true);
+                .AddJsonFile("telegramOptions.json", true, true)
+                .AddJsonFile("recaptchaKeys.json", true, true);
 
             CustomConfiguration = custConfigBuilder.Build();
         }
@@ -58,6 +60,7 @@ namespace AprioritWebCalendar.Web
             services.Configure<JwtOptions>(CustomConfiguration.GetSection("JwtOptions"));
             services.Configure<SmtpOptions>(CustomConfiguration.GetSection("SmtpOptions"));
             services.Configure<TelegramOptions>(CustomConfiguration.GetSection("TelegramOptions"));
+            services.Configure<RecaptchaKeys>(CustomConfiguration.GetSection("RecaptchaKeys"));
 
             services.UseAppDbContext(Configuration.GetConnectionString("DefaultConnection"));
             services.UseIdentity();

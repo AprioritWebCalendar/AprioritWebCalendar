@@ -16,5 +16,8 @@ namespace AprioritWebCalendar.ViewModel.Account
 
         [Required, IanaTimeZone]
         public string TimeZone { get; set; }
+
+        [Required]
+        public string RecaptchaToken { get; set; }
     }
 }

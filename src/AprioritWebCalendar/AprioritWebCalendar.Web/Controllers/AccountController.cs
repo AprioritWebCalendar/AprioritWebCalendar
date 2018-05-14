@@ -22,17 +22,20 @@ namespace AprioritWebCalendar.Web.Controllers
     {
         private readonly IIdentityService _identityService;
         private readonly IUserAuthenticationService _userAuthenticationService;
+        private readonly ICaptchaService _captchaService;
         private readonly IMapper _mapper;
         private readonly JwtOptions _jwtOptions;
 
         public AccountController(
             IIdentityService identityService, 
             IUserAuthenticationService userAuthenticationService, 
+            ICaptchaService captchaService,
             IMapper mapper,
             IOptions<JwtOptions> jwtOptions)
         {
             _identityService = identityService;
             _userAuthenticationService = userAuthenticationService;
+            _captchaService = captchaService;
             _mapper = mapper;
             _jwtOptions = jwtOptions.Value;
         }
@@ -73,6 +76,9 @@ namespace AprioritWebCalendar.Web.Controllers
         [ValidateApiModelFilter]
         public async Task<IActionResult> Register([FromBody]RegisterRequestModel model)
         {
+            if (!await _captchaService.TryVerifyCaptchaAsync(model.RecaptchaToken))
+                return this.BadRequestError("Invalid captcha.");
+
             var registerResult = await _identityService.CreateUserAsync(model);
 
             if (registerResult == IdentityResult.Success)
