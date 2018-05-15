@@ -20,6 +20,7 @@ namespace AprioritWebCalendar.Web.Controllers
     [Produces("application/json")]
     [Route("api/Calendar")]
     [Authorize(AuthenticationSchemes = "Bearer")]
+    [ExceptionHandler]
     public class CalendarController : Controller
     {
         private readonly IMapper _mapper;

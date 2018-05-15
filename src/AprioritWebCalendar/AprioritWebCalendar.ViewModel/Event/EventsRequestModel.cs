@@ -13,6 +13,9 @@ namespace AprioritWebCalendar.ViewModel.Event
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            StartDate = StartDate.ToUniversalTime();
+            EndDate = EndDate.ToUniversalTime();
+
             var result = new List<ValidationResult>();
 
             if (!CalendarsIds.Any())

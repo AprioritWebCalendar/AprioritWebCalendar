@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Quartz;
 using AprioritWebCalendar.Business.Interfaces;
 using AprioritWebCalendar.Business.DomainModels;
+using AprioritWebCalendar.Business.Telegram;
 
 namespace AprioritWebCalendar.Web.Jobs
 {
@@ -13,13 +14,16 @@ namespace AprioritWebCalendar.Web.Jobs
     {
         private readonly INotificationService _notificationService;
         private readonly IEmailService _emailService;
+        private readonly ITelegramService _telegramService;
 
         private readonly ILogger _logger;
 
-        public NotificationJob(INotificationService notificationService, IEmailService emailService, ILoggerFactory loggerFactory)
+        public NotificationJob(INotificationService notificationService, IEmailService emailService, ITelegramService telegramService, ILoggerFactory loggerFactory)
         {
             _notificationService = notificationService;
             _emailService = emailService;
+            _telegramService = telegramService;
+
             _logger = loggerFactory.CreateLogger("NotificationJobLogger");
         }
 
@@ -49,24 +53,58 @@ namespace AprioritWebCalendar.Web.Jobs
 
             foreach (var e in eventUsers)
             {
-                var userLocalTime = e.Event.StartDate.Value.ToShortDateString();
+                var message = CreateMessage(e);
+                await SendEmailAsync(e, message);         
 
-                if (!e.Event.IsAllDay)
+                if (e.User.IsTelegramNotificationEnabled == true)
                 {
-                    userLocalTime = e.User.TimeZone.ConvertFromUtc(e.Event.StartDate.Value.Add(e.Event.StartTime.Value)).ToString("F");
+                    await SendTelegramMessageAsync(e, message);
                 }
+            }
+        }
 
-                var message = $"Don't forget about the event <b>{e.Event.Name}.</b> It will start at <b>{userLocalTime}</b>.";
+        private async Task SendEmailAsync(EventUser eventUser, string message)
+        {
+            try
+            {
+                await _emailService.SendAsync(eventUser.User.Email, eventUser.Event.Name, message);
+                _logger.LogInformation($"Email to {eventUser.User.Email} has been sent.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to send Email ({eventUser.User.Email}), ex: {ex.Message}");
+            }
+        }
 
-                try
-                {
-                    await _emailService.SendAsync(e.User.Email, e.Event.Name, message);
-                    _logger.LogInformation($"Email to {e.User.Email} has been sent.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Unable to send Email ({e.User.Email}), ex: {ex.Message}");
-                }
+        private async Task SendTelegramMessageAsync(EventUser eventUser, string message)
+        {
+            try
+            {
+                await _telegramService.SendMessageAsync(eventUser.User.TelegramId.Value, message);
+                _logger.LogInformation($"Telegram message to {eventUser.User.TelegramId} has been sent.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to send Telegram message ({eventUser.User.TelegramId}), ex: {ex.Message}");
+            }
+        }
+
+        private string CreateMessage(EventUser eventUser)
+        {
+            return $"Don't forget about the event <b>{eventUser.Event.Name}.</b> It will start {GetUserDateTimeString(eventUser)}.";
+        }
+
+        private string GetUserDateTimeString(EventUser eventUser)
+        {
+            if (eventUser.Event.IsAllDay)
+            {
+                return $"in <b>{eventUser.Event.StartDate.Value.ToShortDateString()}</b>";
+            }
+            else
+            {
+                var dateTime = eventUser.User.TimeZone.ConvertFromUtc(eventUser.Event.StartDate.Value.Add(eventUser.Event.StartTime.Value));
+
+                return $"in <b>{dateTime.ToShortDateString()}</b> at <b>{dateTime.ToShortTimeString()}</b>";
             }
         }
     }

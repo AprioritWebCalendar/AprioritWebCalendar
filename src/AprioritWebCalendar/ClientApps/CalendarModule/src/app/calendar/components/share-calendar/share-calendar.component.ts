@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
 import { User } from '../../../authentication/models/user';
 import { UserCalendar } from '../../models/user.calendar';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IShareCalendarModel {
     Id: Number;
@@ -15,7 +16,7 @@ export interface IShareCalendarModel {
     templateUrl: './share-calendar.component.html'
 })
 export class ShareCalendarComponent 
-                        extends DialogComponent<IShareCalendarModel, boolean> 
+                        extends CustomDialogComponent<IShareCalendarModel, boolean> 
                         implements IShareCalendarModel, OnInit {  
     Id: Number;
     Name: string;

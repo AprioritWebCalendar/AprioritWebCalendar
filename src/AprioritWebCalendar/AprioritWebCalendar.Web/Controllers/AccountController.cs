@@ -18,27 +18,30 @@ namespace AprioritWebCalendar.Web.Controllers
 {
     [Produces("application/json")]
     [Route("api/Account")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class AccountController : Controller
     {
         private readonly IIdentityService _identityService;
         private readonly IUserAuthenticationService _userAuthenticationService;
+        private readonly ICaptchaService _captchaService;
         private readonly IMapper _mapper;
         private readonly JwtOptions _jwtOptions;
 
         public AccountController(
             IIdentityService identityService, 
             IUserAuthenticationService userAuthenticationService, 
+            ICaptchaService captchaService,
             IMapper mapper,
             IOptions<JwtOptions> jwtOptions)
         {
             _identityService = identityService;
             _userAuthenticationService = userAuthenticationService;
+            _captchaService = captchaService;
             _mapper = mapper;
             _jwtOptions = jwtOptions.Value;
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> Get()
         {
             var user = await _identityService.GetUserAsync(this.GetUserId());
@@ -46,10 +49,13 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPost("Login")]
-        [OnlyAnonymous]
+        [AllowAnonymous]
         [ValidateApiModelFilter]
         public async Task<IActionResult> Login([FromBody]LoginRequestModel model)
         {
+            if (User.Identity.IsAuthenticated)
+                return Forbid();
+
             try
             {
                 var user = await _userAuthenticationService.FindUserByCredentialsAsync(model);
@@ -69,10 +75,16 @@ namespace AprioritWebCalendar.Web.Controllers
         }
 
         [HttpPost("Register")]
-        [OnlyAnonymous]
+        [AllowAnonymous]
         [ValidateApiModelFilter]
         public async Task<IActionResult> Register([FromBody]RegisterRequestModel model)
         {
+            if (User.Identity.IsAuthenticated)
+                return Forbid();
+
+            if (!await _captchaService.TryVerifyCaptchaAsync(model.RecaptchaToken))
+                return this.BadRequestError("Invalid captcha.");
+
             var registerResult = await _identityService.CreateUserAsync(model);
 
             if (registerResult == IdentityResult.Success)

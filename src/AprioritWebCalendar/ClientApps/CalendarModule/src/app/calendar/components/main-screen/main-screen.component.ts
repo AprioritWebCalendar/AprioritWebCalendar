@@ -25,6 +25,7 @@ import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 import { NotificationListener } from '../../../notification/notification.listener';
 import { PushNotificationService } from '../../../services/push.notification.service';
 import { EventDetailsComponent } from '../../../event/components/event-details/event-details.component';
+import { TelegramListener } from '../../../settings/services/telegram.listener';
 
 @Component({
     selector: 'app-main-screen',
@@ -46,7 +47,8 @@ export class MainScreenComponent implements OnInit {
         private authenticationService: AuthenticationService,
         private hotkeysService: HotkeysService,
         private notificationListener: NotificationListener,
-        private pushNotifService: PushNotificationService
+        private pushNotifService: PushNotificationService,
+        private telegramListener: TelegramListener
     ) {
         this.model.actions = this.actions;
      }
@@ -281,6 +283,10 @@ export class MainScreenComponent implements OnInit {
         this.model.updateEventsByCalendar(calendar);
     }
 
+    private addCalendar(calendar: Calendar) : void {
+        this.model.calendars.push(calendar);
+    }
+
     private configureHotkeys() : void {
         this.hotkeysService.add(new Hotkey("alt+e", (e: KeyboardEvent): boolean => {
             e.preventDefault();
@@ -364,7 +370,20 @@ export class MainScreenComponent implements OnInit {
 
             this.pushNotifService.PushNotification(message, owner);
         });
-        
-        this.notificationListener.Start();
+
+        this.telegramListener.OnTelegramReseted(() => {
+            this.pushNotifService.PushNotification(`Your account has been disconnected from the profile.`, `Telegram`);
+            this.authenticationService.ResetTelegram();
+        });
+
+        this.telegramListener.OnNotificationsEnabled(() => {
+            this.pushNotifService.PushNotification(`Notifications have been enabled.`, `Telegram`);
+            this.authenticationService.SetTelegramNotificationsEnabled(true);
+        });
+
+        this.telegramListener.OnNotificationsDisabled(() => {
+            this.pushNotifService.PushNotification(`Notifications have been disabled.`, `Telegram`);
+            this.authenticationService.SetTelegramNotificationsEnabled(false);
+        });
     }
 }

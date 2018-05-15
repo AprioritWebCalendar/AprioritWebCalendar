@@ -9,10 +9,10 @@
         <div class="panel-heading">
             <div class="row">
                 <div class="col-xs-6">
-                    <a [class.active]="IsLoginOpened" (click)="SwitchForms(true)">Login</a>
+                    <a [class.active]="IsLoginOpened" (click)="SwitchForms(true, loginForm, registerForm)">Login</a>
                 </div>
                 <div class="col-xs-6">
-                    <a [class.active]="!IsLoginOpened" (click)="SwitchForms(false)">Register</a>
+                    <a [class.active]="!IsLoginOpened" (click)="SwitchForms(false, loginForm, registerForm)">Register</a>
                 </div>
             </div>
             <hr>
@@ -33,11 +33,11 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="password" class="form-control" id="Password" name="Password" required 
+                            <input type="password" class="form-control" id="loginPassword" name="loginPassword" required 
                                 placeholder="Password"
-                                [(ngModel)]="LoginModel.Password" #password="ngModel" />
+                                [(ngModel)]="LoginModel.Password" #loginpassword="ngModel" />
 
-                            <span class="text-danger" *ngIf="!password.valid && !password.untouched">
+                            <span class="text-danger" *ngIf="!loginpassword.valid && !loginpassword.untouched">
                                 The Password field is required.
                             </span>
                         </div>
@@ -118,6 +118,11 @@
                                 [(timezone)]="RegisterModel.TimeZone" 
                                 guess="true" 
                                 showOffset="true"></ng2-timezone-picker>
+                        </div>
+
+                        <div class="form-group">
+                            <jhi-re-captcha site_key="6LfYM1kUAAAAAPJpC-wZrNcl5BWcwRkNz6YMb0dI"
+                                (captchaResponse)="SetRecaptcha($event)"></jhi-re-captcha>
                         </div>
                         
                         <div class="form-group">

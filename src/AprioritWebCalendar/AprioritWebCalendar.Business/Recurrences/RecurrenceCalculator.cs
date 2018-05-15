@@ -32,6 +32,12 @@ namespace AprioritWebCalendar.Business.Recurrences
                 ev.StartDate = date;
                 ev.EndDate = date;
 
+                if (!ev.IsAllDay)
+                {
+                    if (ev.StartTime.Value > ev.EndTime.Value)
+                        ev.EndDate = ev.EndDate.Value.AddDays(1);
+                }
+
                 if (ev.StartTime != null && ev.EndTime != null)
                 {
                     ev.StartDate.Value.Add(ev.StartTime.Value);

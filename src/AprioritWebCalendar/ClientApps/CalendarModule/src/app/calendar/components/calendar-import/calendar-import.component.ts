@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { CalendarIcalService } from '../../services/calendar.ical.service';
-import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarCheck } from '../left-calendar-menu/calendar.check.model';
 import { NgForm } from '@angular/forms';
 import { CalendarImportPreviewModel } from '../../models/calendar-import.preview.model';
 import { CalendarImportModel } from '../../models/calendar-import.model';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 @Component({
     selector: 'app-calendar-import',
     templateUrl: './calendar-import.component.html'
 })
-export class CalendarImportComponent extends DialogComponent<CalendarImportModel, CalendarCheck> {
+export class CalendarImportComponent extends CustomDialogComponent<CalendarImportModel, CalendarCheck> {
 
     constructor(
         public dialogService: DialogService,
@@ -40,6 +41,8 @@ export class CalendarImportComponent extends DialogComponent<CalendarImportModel
                 this.calendarPreview = preview;
                 this.isLoading = false;
                 this.isSave = true;
+
+                setTimeout(() => this.close(), 300000);
             }, resp => {
                 var errors = resp.json();
                 this.isLoading = false;

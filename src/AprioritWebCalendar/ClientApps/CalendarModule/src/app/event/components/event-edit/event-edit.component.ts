@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { EventRequestModel } from '../../models/event.request.model';
-import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { EventService } from '../../services/event.service';
 import { Location } from '../../models/location';
 import { PeriodRequestModel } from '../../models/period.request.model';
 import { NgForm } from '@angular/forms';
 import { Event } from '../../models/event';
 import { getLocalTime, getTimeAsDate, getTimeAsString } from '../../services/datetime.functions';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventEditParams {
     model: EventRequestModel;
@@ -16,7 +17,7 @@ export interface IEventEditParams {
     selector: 'app-event-edit',
     templateUrl: './event-edit.component.html'
 })
-export class EventEditComponent extends DialogComponent<IEventEditParams, Event>
+export class EventEditComponent extends CustomDialogComponent<IEventEditParams, Event>
                                 implements OnInit, IEventEditParams {
     model: EventRequestModel = new EventRequestModel();
     errors: string[] = [];

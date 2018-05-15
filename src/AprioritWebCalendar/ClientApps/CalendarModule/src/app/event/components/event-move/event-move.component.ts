@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { EventService } from '../../services/event.service';
 import { Event } from '../../models/event';
 import { Calendar } from '../../../calendar/models/calendar';
 import { NgForm } from '@angular/forms';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventMoveParams {
     event: Event;
@@ -14,7 +15,7 @@ export interface IEventMoveParams {
     selector: 'app-event-move',
     templateUrl: './event-move.component.html'
 })
-export class EventMoveComponent extends DialogComponent<IEventMoveParams, Event>
+export class EventMoveComponent extends CustomDialogComponent<IEventMoveParams, Event>
                                 implements OnInit, IEventMoveParams {
     constructor(
         public dialogService: DialogService,

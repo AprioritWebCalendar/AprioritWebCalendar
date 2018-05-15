@@ -22,6 +22,8 @@ namespace AprioritWebCalendar.Data
         public DbSet<Period> EventPeriods { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
 
+        public DbSet<TelegramCode> TelegramCodes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -33,6 +35,8 @@ namespace AprioritWebCalendar.Data
             builder.Entity<UserCalendar>().HasKey(k => new { k.UserId, k.CalendarId });
             builder.Entity<EventCalendar>().HasKey(k => new { k.EventId, k.CalendarId });
             builder.Entity<Invitation>().HasKey(k => new { k.EventId, k.UserId, k.InvitatorId });
+            builder.Entity<TelegramCode>().HasKey(k => new { k.TelegramId, k.Code });
+
             EFCore.UseDateDiff(builder);
         }
     }

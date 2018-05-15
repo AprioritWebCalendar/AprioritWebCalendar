@@ -67,6 +67,7 @@ export class LeftCalendarMenuComponent implements OnInit {
                 if (calendar != null) {
                     calendar.Owner = this.authService.GetCurrentUser();
                     this.model.Calendars.push(calendar);
+                    this.onNewCalendar.emit(<Calendar>calendar);
 
                     console.log(calendar);
                     console.log(`UserId: ${this.UserId}`);
@@ -179,6 +180,9 @@ export class LeftCalendarMenuComponent implements OnInit {
     @Output()
     onCalendarUpdated = new EventEmitter<Calendar>();
 
+    @Output()
+    onNewCalendar = new EventEmitter<Calendar>();
+
     calendarsChanged() {
         this.onCalendarsChanged.emit(this.model.Calendars.filter(c => c.IsChecked).map(c => c as Calendar));
     }
@@ -202,6 +206,7 @@ export class LeftCalendarMenuComponent implements OnInit {
         this.calendarListener.OnCalendarShared(calendar => {
             let calCheck = <CalendarCheck>calendar;
             this.model.Calendars.push(calCheck);
+            this.onNewCalendar.emit(calendar);
 
             this.pushNotifService.PushNotification(`Has shared calendar "${calendar.Name}" with you.`, 
                 calendar.Owner.UserName.toString());
@@ -239,7 +244,5 @@ export class LeftCalendarMenuComponent implements OnInit {
             this.model.RemoveCalendar(id);
             this.onCalendarDeleted.emit(id);
         });
-
-        this.calendarListener.Start();
     }
 }

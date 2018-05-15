@@ -4,4 +4,5 @@ export class RegisterModel {
     public Password: string;
     public ConfirmPassword: string;
     public TimeZone: string;
+    public RecaptchaToken: string;
 }

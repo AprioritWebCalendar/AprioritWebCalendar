@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { EventRequestModel } from '../../models/event.request.model';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { NgForm } from '@angular/forms';
 import { Calendar } from '../../../calendar/models/calendar';
 import { Location } from '../../models/location';
@@ -9,6 +9,7 @@ import { mergeDateTime, getWithoutTime, getTimeAsString, getTimeAsDate } from '.
 import { EventService } from '../../services/event.service';
 import { Event } from '../../models/event';
 import { PeriodRequestModel } from '../../models/period.request.model';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventCreateParams {
     calendars: Calendar[];
@@ -18,7 +19,7 @@ export interface IEventCreateParams {
     selector: 'app-event-create',
     templateUrl: './event-create.component.html'
 })
-export class EventCreateComponent extends DialogComponent<IEventCreateParams, Event>
+export class EventCreateComponent extends CustomDialogComponent<IEventCreateParams, Event>
                                     implements IEventCreateParams {
     errors: string[] = [];
     model: EventRequestModel = new EventRequestModel();

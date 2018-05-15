@@ -11,6 +11,8 @@ import { Router } from "@angular/router";
 import { CalendarListener } from "../../calendar/services/calendar.listener";
 import { InvitationListener } from "../../invitation/services/invitation.listener";
 import { NotificationListener } from "../../notification/notification.listener";
+import { TelegramListener } from "../../settings/services/telegram.listener";
+import { RegisterModel } from "../components/auth-form/register.model";
 
 @Injectable()
 export class AuthenticationService {
@@ -22,7 +24,8 @@ export class AuthenticationService {
         private router: Router,
         private calendarListener: CalendarListener,
         private invitationListener: InvitationListener,
-        private notificationListener: NotificationListener
+        private notificationListener: NotificationListener,
+        private telegramListener: TelegramListener
     ) {
     }
 
@@ -55,6 +58,20 @@ export class AuthenticationService {
         this.currentUser.TimeZone = timeZone;
     }
 
+    public SetTelegramId(telegramId: number) : void {
+        this.currentUser.TelegramId = telegramId;
+        this.currentUser.IsTelegramNotificationEnabled = true;
+    }
+
+    public ResetTelegram() : void {
+        this.currentUser.TelegramId = null;
+        this.currentUser.IsTelegramNotificationEnabled = null;
+    }
+
+    public SetTelegramNotificationsEnabled(isEnabled: boolean) : void {
+        this.currentUser.IsTelegramNotificationEnabled = isEnabled;
+    }
+
     public Login(emailOrUserName : string, password : string) : Observable<boolean> {
         return this.http.post("/api/Account/Login", { EmailOrUserName : emailOrUserName, Password : password})
             .map((response: Response) => {
@@ -72,8 +89,8 @@ export class AuthenticationService {
             });
     }
 
-    public Register(email : string, userName : string, password : string, timeZone: string) : Observable<boolean> {
-        return this.http.post("/api/Account/Register", { Email: email, UserName: userName, Password : password, TimeZone: timeZone })
+    public Register(registerModel: RegisterModel) : Observable<boolean> {
+        return this.http.post("/api/Account/Register", registerModel)
             .map((response: Response) => {
                 return true;
             })
@@ -86,6 +103,7 @@ export class AuthenticationService {
         this.calendarListener.Stop();
         this.invitationListener.Stop();
         this.notificationListener.Stop();
+        this.telegramListener.Stop();
 
         this.customHttp.ResetToken();
         this.currentUser = null;
@@ -106,5 +124,11 @@ export class AuthenticationService {
         this.calendarListener.Initialize(token);
         this.invitationListener.Initialize(token);
         this.notificationListener.Initialize(token);
+        this.telegramListener.Initialize(token);
+
+        this.calendarListener.Start();
+        this.invitationListener.Start();
+        this.notificationListener.Start();
+        this.telegramListener.Start();
     }
 }

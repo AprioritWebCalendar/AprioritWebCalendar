@@ -27,6 +27,7 @@
     "angular-font-awesome": "^3.1.2",
     "angular2-hotkeys": "^2.0.4",
     "angular2-text-equality-validator": "^2.0.0",
+    "angular5-recaptcha": "0.0.2",
     "bootstrap": "3.3.7",
     "bootstrap-sidebar": "^0.2.2-retry",
     "core-js": "^2.4.1",

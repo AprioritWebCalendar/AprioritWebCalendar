@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
-import { BootstrapModalModule, DialogService } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule, DialogService, DialogComponent } from 'ng2-bootstrap-modal';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { ContextmenuModule } from 'ng2-contextmenu';
 import { TypeaheadModule, ButtonsModule, TooltipModule, TimepickerModule, BsDatepickerModule } from 'ngx-bootstrap';
@@ -16,6 +16,7 @@ import { PopoverModule } from 'ngx-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { TimezonePickerModule } from 'ng2-timezone-selector';
+import { ReCaptchaModule } from 'angular5-recaptcha';
 
 import { AgmCoreModule } from '@agm/core';
 
@@ -46,7 +47,6 @@ import { UserService } from './services/user.service';
 import { SelectUserShareComponent } from './calendar/components/select-user-share/select-user-share.component';
 import { CalendarViewSwitcherComponent } from './calendar/components/calendar-view-switcher/calendar-view-switcher.component';
 import { AddEventButtonComponent } from './calendar/components/add-event-button/add-event-button.component';
-import { NotificationsPopoverComponent } from './authentication/components/notifications-popover/notifications-popover.component';
 import { EventService } from './event/services/event.service';
 import { EventCreateComponent } from './event/components/event-create/event-create.component';
 import { EventPeriodComponent } from './event/components/event-period/event-period.component';
@@ -82,6 +82,13 @@ import { MaxTextLengthPipe } from './pipes/max.text.length.pipe';
 import { SettingsMainComponent } from './settings/components/settings-main/settings-main.component';
 import { SettingsTimezoneComponent } from './settings/components/settings-timezone/settings-timezone.component';
 import { SettingsService } from './settings/services/settings.service';
+import { SettingsTelegramComponent } from './settings/components/settings-telegram/settings-telegram.component';
+import { TelegramService } from './settings/services/telegram.service';
+import { TelegramListener } from './settings/services/telegram.listener';
+import { PeriodTypePipe } from './pipes/period.type.pipe';
+import { CustomDialogService } from './services/custom.dialog.service';
+import { CustomDialogComponent } from './services/custom.dialog.component';
+import { CountdownComponent } from './shared/countdown/countdown.component';
 
 @NgModule({
   declarations: [
@@ -100,7 +107,6 @@ import { SettingsService } from './settings/services/settings.service';
     SelectUserShareComponent,
     CalendarViewSwitcherComponent,
     AddEventButtonComponent,
-    NotificationsPopoverComponent,
     EventCreateComponent,
     EventPeriodComponent,
     EventLocationComponent,
@@ -122,12 +128,15 @@ import { SettingsService } from './settings/services/settings.service';
 
     SettingsMainComponent,
     SettingsTimezoneComponent,
+    SettingsTelegramComponent,
 
     DateFormatPipe,
     DateLocalPipe,
     DateTimeLocalPipe,
     TimeLocalPipe,
-    MaxTextLengthPipe
+    MaxTextLengthPipe,
+    PeriodTypePipe,
+    CountdownComponent
   ],
   imports: [
     BrowserModule,
@@ -149,6 +158,7 @@ import { SettingsService } from './settings/services/settings.service';
     ClickOutsideModule,
     HotkeyModule.forRoot(),
     TimezonePickerModule,
+    ReCaptchaModule,
 
     ngCalendarModule.forRoot(),
     
@@ -162,6 +172,7 @@ import { SettingsService } from './settings/services/settings.service';
     NotificationListener,
     InvitationListener,
     CalendarListener,
+    TelegramListener,
     
     {
         provide: CustomHttp,
@@ -175,12 +186,13 @@ import { SettingsService } from './settings/services/settings.service';
 
     {
         provide: AuthenticationService,
-        deps: [Http, CustomHttp, Router, CalendarListener, InvitationListener, NotificationListener],
+        deps: [Http, CustomHttp, Router, CalendarListener, InvitationListener, NotificationListener, TelegramListener],
         useFactory: (http: Http, customHttp: CustomHttp, router: Router, calListener: CalendarListener,
                 invListener: InvitationListener,
-                notifListener: NotificationListener) => {
+                notifListener: NotificationListener,
+                telegramListener: TelegramListener) => {
             
-            var authService = new AuthenticationService(http, customHttp, router, calListener, invListener, notifListener);
+            var authService = new AuthenticationService(http, customHttp, router, calListener, invListener, notifListener, telegramListener);
             authService.InitializeUser();
             return authService;
         }
@@ -195,8 +207,14 @@ import { SettingsService } from './settings/services/settings.service';
     InvitationService,
     CalendarIcalService,
     SettingsService,
+    TelegramService,
 
-    PushNotificationService
+    PushNotificationService,
+
+    {
+        provide: DialogService,
+        useClass: CustomDialogService
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [

@@ -17,6 +17,7 @@ namespace AprioritWebCalendar.Web.Controllers
     [Route("api/iCal")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     [Produces("application/json")]
+    [ExceptionHandler]
     public class ICalController : Controller
     {
         const string ICAL_MIME = "text/calendar";

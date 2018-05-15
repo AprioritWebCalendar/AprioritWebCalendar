@@ -81,7 +81,5 @@ export class InvitationsIncomingComponent implements OnInit {
             this.invitations = this.invitations.filter(i => i.Event.Id != id);
             this.pushNotifService.PushNotification(`Has deleted invitation on event "${name}".`, invitator);
         });
-        
-        this.invitationListener.Start();
     }
 }

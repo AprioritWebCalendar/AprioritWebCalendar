@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { Event } from '../../models/event';
 import { PeriodType } from '../../models/period.type';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 export interface IEventDetailsParams {
     event: Event;
@@ -11,7 +12,7 @@ export interface IEventDetailsParams {
     selector: 'app-event-details',
     templateUrl: './event-details.component.html'
 })
-export class EventDetailsComponent extends DialogComponent<IEventDetailsParams, boolean>
+export class EventDetailsComponent extends CustomDialogComponent<IEventDetailsParams, boolean>
                                     implements IEventDetailsParams {
 
     constructor(public _dialogService: DialogService) {
@@ -19,20 +20,4 @@ export class EventDetailsComponent extends DialogComponent<IEventDetailsParams, 
     }
 
     public event: Event;
-
-    public GetPeriodType() : string {
-        switch (this.event.Period.Type) {
-            case PeriodType.Custom:
-                return "Daily";
-
-            case PeriodType.Monthly:
-                return "Monthly";
-
-            case PeriodType.Weekly:
-                return "Weekly";
-
-            case PeriodType.Yearly:
-                return "Yearly";
-        }
-    }
 }

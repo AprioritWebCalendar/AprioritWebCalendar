@@ -44,7 +44,7 @@
                 <span *ngIf="event.Period != null">
                     <dt>Period:</dt>
                     <dd>
-                        <span>{{GetPeriodType()}}</span>
+                        <span>{{event.Period.Type | periodType}}</span>
                         <span *ngIf="event.Period.Cycle != null"> <i>Interval: </i>({{event.Period.Cycle}})</span>
                     </dd>
                 </span>

@@ -323,3 +323,5 @@ src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/jwtOptions.json
 src/AprioritWebCalendar/AprioritWebCalendar.Web/wwwroot/*
 src/AprioritWebCalendar/ClientApps/CalendarModule/dist/
 src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/smtpOptions.json
+src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/telegramOptions.json
+src/AprioritWebCalendar/AprioritWebCalendar.Web/configs/recaptchaKeys.json

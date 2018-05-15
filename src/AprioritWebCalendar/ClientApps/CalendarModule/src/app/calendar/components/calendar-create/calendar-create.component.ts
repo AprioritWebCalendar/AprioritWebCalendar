@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { DialogService, DialogComponent } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ng2-bootstrap-modal';
 import { CalendarService } from '../../services/calendar.service';
 import { NgForm } from '@angular/forms';
 import { CalendarCheck } from '../left-calendar-menu/calendar.check.model';
 import { Calendar } from '../../models/calendar';
 import { CalendarCreateModel } from '../../models/calendar-create.model';
+import { CustomDialogComponent } from '../../../services/custom.dialog.component';
 
 @Component({
     selector: 'app-calendar-create',
     templateUrl: './calendar-create.component.html'
 })
-export class CalendarCreateComponent extends DialogComponent<CalendarCreateModel, CalendarCheck> {
+export class CalendarCreateComponent extends CustomDialogComponent<CalendarCreateModel, CalendarCheck> {
     public model: CalendarCreateModel = new CalendarCreateModel();
     public errors: string[];
 

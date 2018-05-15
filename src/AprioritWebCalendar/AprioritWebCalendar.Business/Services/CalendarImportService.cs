@@ -77,10 +77,12 @@ namespace AprioritWebCalendar.Business.Services
                 var dEvent = new DomainModels.Event()
                 {
                     Name = iEvent.Summary,
-                    Description = iEvent.Description,
                     IsAllDay = iEvent.IsAllDay,
                     IsPrivate = false
                 };
+
+                if (!string.IsNullOrEmpty(iEvent.Description))
+                    dEvent.Description = iEvent.Description;
 
                 if (iEvent.GeographicLocation != null)
                 {

@@ -12,23 +12,18 @@ export class EventLocationComponent implements OnInit {
         if (this.location.Lattitude != null && this.location.Longitude != null)
             return;
 
+        this.location.Lattitude = 48.46199462233164;
+        this.location.Longitude = 35.048583783209324;
+        this.emitLocationChanged();
+
         let geo = navigator.geolocation;
 
         if (geo) {
             geo.getCurrentPosition(position => {
                 this.location.Longitude = position.coords.longitude;
                 this.location.Lattitude = position.coords.latitude;
-
-                console.log(position);
-
                 this.emitLocationChanged();
             });
-        } else {
-            this.location.Lattitude = 48.4491614;
-            this.location.Longitude = 35.2137371;
-
-            console.log("Location from browser isn't available.");
-            this.emitLocationChanged();
         }
     }
 

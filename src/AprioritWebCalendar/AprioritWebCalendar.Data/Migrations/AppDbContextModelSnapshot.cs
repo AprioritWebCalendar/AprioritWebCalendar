@@ -62,6 +62,8 @@ namespace AprioritWebCalendar.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<bool?>("IsTelegramNotificationEnabled");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -79,6 +81,8 @@ namespace AprioritWebCalendar.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed");
 
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<int?>("TelegramId");
 
                     b.Property<string>("TimeZone");
 
@@ -218,6 +222,19 @@ namespace AprioritWebCalendar.Data.Migrations
                     b.HasKey("EventId");
 
                     b.ToTable("EventPeriods");
+                });
+
+            modelBuilder.Entity("AprioritWebCalendar.Data.Models.TelegramCode", b =>
+                {
+                    b.Property<int>("TelegramId");
+
+                    b.Property<string>("Code");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.HasKey("TelegramId", "Code");
+
+                    b.ToTable("TelegramCodes");
                 });
 
             modelBuilder.Entity("AprioritWebCalendar.Data.Models.UserCalendar", b =>

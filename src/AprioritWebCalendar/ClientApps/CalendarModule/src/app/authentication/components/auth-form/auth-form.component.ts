@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
 import { LoginModel } from './login.model';
 import { RegisterModel } from './register.model';
@@ -37,18 +37,7 @@ export class AuthFormComponent {
         if (!form.valid)
             return;
 
-        this._authService.Login(this.LoginModel.EmailOrUserName, this.LoginModel.Password)
-            .subscribe(r => {
-                this._router.navigate(['/']);
-            }, response => {
-                var result = response.json();
-
-                if (result instanceof Array) {
-                    this.Errors = result as string[];
-                } else {
-                    this.Errors.push("Something happened. Try again!");
-                }
-            });
+        this.loginRequest(this.LoginModel.EmailOrUserName, this.LoginModel.Password);
     }
 
     public Register(form: NgForm) : void {
@@ -57,10 +46,12 @@ export class AuthFormComponent {
         if (!form.valid)
             return;
 
-        this._authService.Register(this.RegisterModel.Email, this.RegisterModel.UserName, this.RegisterModel.Password, this.RegisterModel.TimeZone)
+        this._authService.Register(this.RegisterModel)
             .subscribe(r => {
-                this._toastr.success("You have been registered successfully. Sign in to continue.");
-                this.IsLoginOpened = true;
+                // this._toastr.success("You have been registered successfully. Sign in to continue.");
+                // this.IsLoginOpened = true;
+
+                this.loginRequest(this.RegisterModel.Email, this.RegisterModel.Password);
             }, r => {
                 var result = r.json();
 
@@ -72,12 +63,37 @@ export class AuthFormComponent {
             });
     }
 
-    public SwitchForms(isLoginOpened: boolean) : void {
+    public SwitchForms(isLoginOpened: boolean, loginForm: NgForm, registerForm: NgForm) : void {
         if (this.IsLoginOpened != isLoginOpened) {
             this.IsLoginOpened = !this.IsLoginOpened;
             this.Errors = [];
             this.RegisterModel = new RegisterModel();
             this.LoginModel = new LoginModel();
+
+            if (isLoginOpened) {
+                registerForm.reset();
+            } else {
+                loginForm.reset();
+            }
         }
+    }
+
+    public SetRecaptcha(response: string) : void {
+        this.RegisterModel.RecaptchaToken = response;
+    }
+
+    private loginRequest(emailOrUserName: string, password: string) : void {
+        this._authService.Login(emailOrUserName, password)
+            .subscribe(r => {
+                this._router.navigate(['/']);
+            }, response => {
+                var result = response.json();
+
+                if (result instanceof Array) {
+                    this.Errors = result as string[];
+                } else {
+                    this.Errors.push("Something happened. Try again!");
+                }
+            });
     }
 }
